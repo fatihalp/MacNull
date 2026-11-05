@@ -1,6 +1,7 @@
 import AppKit
 import MacCleanKit
 
+@MainActor
 enum VacuumAsset {
 
     static let image: NSImage = {
