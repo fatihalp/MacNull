@@ -37,7 +37,9 @@ struct ReviewBrowserView: View {
         self.onClean = onClean
         let section = data.sections.first { $0.id == initialSectionID } ?? data.sections.first
         _sectionID = State(initialValue: section?.id ?? "")
-        let initialCat = section?.categoryIDs.first(where: { data.categories[$0].size > 0 }) ?? section?.categoryIDs.first ?? data.categories.first?.id
+        let sectionCategoryIDs: [Int] = section?.categoryIDs ?? []
+        let firstNonEmptyID: Int? = sectionCategoryIDs.first { data.categories[$0].size > 0 }
+        let initialCat: Int? = firstNonEmptyID ?? sectionCategoryIDs.first ?? data.categories.first?.id
         _categoryID = State(initialValue: initialCat)
     }
 
