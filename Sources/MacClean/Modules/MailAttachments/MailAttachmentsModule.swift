@@ -12,35 +12,24 @@ public struct MailAttachmentsModule: ScanModule {
 
     public func scan() async -> [ScanResult] {
         let targets = [
-
             ScanTarget(
                 path: MCConstants.mailDownloads,
                 recursive: true
             ),
-
             ScanTarget(
                 path: MCConstants.mailContainerDownloads,
                 recursive: true
             ),
-
             ScanTarget(
-                path: MCConstants.mailData,
-                recursive: true,
-                maxDepth: 6,
-                fileExtensions: [
-                    "jpg", "jpeg", "png", "gif", "bmp", "tiff", "heic", "webp",
-                    "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-                    "zip", "gz", "tar", "rar", "7z",
-                    "csv", "txt", "rtf",
-                ]
+                path: MCConstants.userContainers
+                    .appending(path: "com.apple.mail/Data/Library/Caches"),
+                recursive: true
             ),
-
             ScanTarget(
                 path: MCConstants.userContainers
                     .appending(path: "com.microsoft.Outlook/Data/Library/Caches"),
                 recursive: true
             ),
-
             ScanTarget(
                 path: MCConstants.userContainers
                     .appending(path: "com.readdle.smartemail/Data/Library/Caches"),

@@ -90,7 +90,7 @@ public enum UpdaterActions {
 
     public static func hasUpdate(current: String, available: String?) -> Bool {
         guard let available else { return false }
-        return UpdateChecker.isNewer(available, than: current)
+        return AppcastParser.isNewer(available, than: current)
     }
 
     public static func isAcceptableFeedURL(_ url: URL) -> Bool {

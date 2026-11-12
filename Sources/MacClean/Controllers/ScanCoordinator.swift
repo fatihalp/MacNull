@@ -6,7 +6,7 @@ import MacCleanKit
 public final class ScanCoordinator {
     public enum ScanState: Sendable {
         case idle
-        case scanning(progress: Double, currentModule: String, filesScanned: Int, sizeFound: UInt64)
+        case scanning(progress: Double, currentModule: String, phase: String, filesScanned: Int, sizeFound: UInt64)
         case completed(results: [ModuleScanResult])
         case failed(Error)
     }
@@ -30,21 +30,18 @@ public final class ScanCoordinator {
     }
 
     public func scanAll(onStateChange: (@MainActor (ScanState) -> Void)? = nil) {
-        scanModules(modules.filter { $0.includedInSmartScan }, onStateChange: onStateChange)
+        scanSmart(mode: .safe, onStateChange: onStateChange)
     }
 
-    public func scanAllIncludingHeavy() {
-        scanModules(modules)
-    }
-
-    public func scanCategory(_ category: ModuleCategory) {
-        let filtered = modules.filter { $0.category == category }
-        scanModules(filtered)
-    }
-
-    public func scanSingle(_ moduleID: String) {
-        let filtered = modules.filter { $0.id == moduleID }
-        scanModules(filtered)
+    public func scanSmart(mode: SmartScanMode, onStateChange: (@MainActor (ScanState) -> Void)? = nil) {
+        let targets: [ScanModule]
+        switch mode {
+        case .safe:
+            targets = modules.filter { $0.includedInSmartScan && $0.id != "projectJunk" }
+        case .deep:
+            targets = modules.filter { $0.includedInSmartScan }
+        }
+        scanModules(targets, onStateChange: onStateChange)
     }
 
     public func cancel() {
@@ -66,55 +63,120 @@ public final class ScanCoordinator {
         totalSizeFound = 0
         completedResults = []
 
-        scanTask = Task { @MainActor [weak self] in
+        scanTask = Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return }
 
             var results: [ModuleScanResult] = []
             let totalModules = modulesToScan.count
+            var runningBaseFiles = 0
+            var runningBaseBytes: UInt64 = 0
 
             for (index, module) in modulesToScan.enumerated() {
                 if Task.isCancelled { break }
 
-                let progress = Double(index) / Double(totalModules)
-                self.state = .scanning(
-                    progress: progress,
+                let baseProgress = Double(index) / Double(totalModules)
+                let moduleFraction = 1.0 / Double(totalModules)
+
+                await self.updateProgress(
+                    progress: baseProgress,
                     currentModule: module.name,
-                    filesScanned: self.filesScanned,
-                    sizeFound: self.totalSizeFound
+                    phase: module.name,
+                    files: runningBaseFiles,
+                    size: runningBaseBytes,
+                    onStateChange: onStateChange
                 )
 
-                onStateChange?(self.state)
-
                 let start = Date()
-                let rawResults = await module.scan()
+                let currentBaseFiles = runningBaseFiles
+                let currentBaseBytes = runningBaseBytes
+
+                let rawResults = await module.scan(onProgress: { [weak self] phase, count, bytes, fraction in
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        let currentProgress = min(0.99, baseProgress + (moduleFraction * fraction))
+                        self.updateProgress(
+                            progress: currentProgress,
+                            currentModule: module.name,
+                            phase: phase,
+                            files: currentBaseFiles + count,
+                            size: currentBaseBytes + bytes,
+                            onStateChange: onStateChange
+                        )
+                    }
+                })
+
                 if Task.isCancelled { break }
 
-                let scanResults: [ScanResult] = rawResults.map { result in
-                    ScanResult(
-                        category: result.category,
-                        items: result.items.filter { CleanFilter.isActionable($0.url) },
-                        autoSelect: result.autoSelect
-                    )
-                }
                 let duration = Date().timeIntervalSince(start)
-
                 let moduleResult = ModuleScanResult(
                     moduleID: module.id,
                     moduleName: module.name,
-                    categories: scanResults,
+                    categories: rawResults,
                     scanDuration: duration
                 )
                 results.append(moduleResult)
-                self.completedResults = results
 
-                self.filesScanned += moduleResult.totalFileCount
-                self.totalSizeFound += moduleResult.totalSize
+                runningBaseFiles += moduleResult.totalFileCount
+                runningBaseBytes += moduleResult.totalSize
+
+                let completedProgress = Double(index + 1) / Double(totalModules)
+                await self.recordModuleCompleted(
+                    result: moduleResult,
+                    progress: completedProgress,
+                    onStateChange: onStateChange
+                )
             }
 
             if !Task.isCancelled {
-                self.state = .completed(results: results)
-                onStateChange?(self.state)
+                await self.completeScan(results: results, onStateChange: onStateChange)
             }
         }
+    }
+
+    @MainActor
+    private func updateProgress(
+        progress: Double,
+        currentModule: String,
+        phase: String,
+        files: Int,
+        size: UInt64,
+        onStateChange: (@MainActor (ScanState) -> Void)?
+    ) {
+        self.state = .scanning(
+            progress: progress,
+            currentModule: currentModule,
+            phase: phase,
+            filesScanned: files,
+            sizeFound: size
+        )
+        onStateChange?(self.state)
+    }
+
+    @MainActor
+    private func recordModuleCompleted(
+        result: ModuleScanResult,
+        progress: Double,
+        onStateChange: (@MainActor (ScanState) -> Void)?
+    ) {
+        self.completedResults.append(result)
+        self.filesScanned += result.totalFileCount
+        self.totalSizeFound += result.totalSize
+        self.state = .scanning(
+            progress: progress,
+            currentModule: result.moduleName,
+            phase: result.moduleName,
+            filesScanned: self.filesScanned,
+            sizeFound: self.totalSizeFound
+        )
+        onStateChange?(self.state)
+    }
+
+    @MainActor
+    private func completeScan(
+        results: [ModuleScanResult],
+        onStateChange: (@MainActor (ScanState) -> Void)?
+    ) {
+        self.state = .completed(results: results)
+        onStateChange?(self.state)
     }
 }

@@ -66,15 +66,3 @@ public enum ModuleTheme {
         }
     }
 }
-
-public struct GradientBackgroundView: View {
-    let theme: ModuleTheme
-
-    public init(theme: ModuleTheme) {
-        self.theme = theme
-    }
-
-    public var body: some View {
-        Color.white
-    }
-}

@@ -19,17 +19,17 @@ public enum AppCacheOwnership {
     }
 
     public static func owningBundleID(for url: URL) -> String? {
-        let components = url.pathComponents
+        let components: [String] = url.pathComponents
 
-        let anchors = ["Caches", "Containers", "HTTPStorages", "WebKit", "Application Scripts"]
-        for anchor in anchors {
-            guard let i = components.firstIndex(of: anchor), i + 1 < components.count else { continue }
-            let candidate = components[i + 1]
+        let anchors: [String] = ["Caches", "Containers", "HTTPStorages", "WebKit", "Application Scripts"]
+        for anchor: String in anchors {
+            guard let i: Int = components.firstIndex(of: anchor), i + 1 < components.count else { continue }
+            let candidate: String = components[i + 1]
             if looksLikeBundleID(candidate) { return candidate }
         }
 
-        let path = url.path
-        for entry in browserMap where path.contains(entry.needle) {
+        let path: String = url.path
+        for entry: (needle: String, bundleID: String) in browserMap where path.contains(entry.needle) {
             return entry.bundleID
         }
         return nil
@@ -41,11 +41,26 @@ public enum AppCacheOwnership {
     }
 
     private static let browserMap: [(needle: String, bundleID: String)] = [
-        ("/Google/Chrome/", "com.google.Chrome"),
-        ("/Firefox/", "org.mozilla.firefox"),
-        ("/Arc/", "company.thebrowser.Browser"),
-        ("/BraveSoftware/Brave-Browser/", "com.brave.Browser"),
-        ("/Microsoft Edge/", "com.microsoft.edgemac"),
-        ("/Vivaldi/", "com.vivaldi.Vivaldi"),
+        ("Google/Chrome", "com.google.Chrome"),
+        ("com.google.Chrome", "com.google.Chrome"),
+        ("Firefox", "org.mozilla.firefox"),
+        ("org.mozilla.firefox", "org.mozilla.firefox"),
+        ("Safari", "com.apple.Safari"),
+        ("com.apple.Safari", "com.apple.Safari"),
+        ("Arc", "company.thebrowser.Browser"),
+        ("company.thebrowser.Browser", "company.thebrowser.Browser"),
+        ("BraveSoftware/Brave-Browser", "com.brave.Browser"),
+        ("com.brave.Browser", "com.brave.Browser"),
+        ("Microsoft Edge", "com.microsoft.edgemac"),
+        ("com.microsoft.edgemac", "com.microsoft.edgemac"),
+        ("Vivaldi", "com.vivaldi.Vivaldi"),
+        ("com.vivaldi.Vivaldi", "com.vivaldi.Vivaldi"),
+        ("Opera", "com.operasoftware.Opera"),
+        ("com.operasoftware.Opera", "com.operasoftware.Opera"),
+        ("Antigravity", "com.google.antigravity"),
+        ("Codex", "com.openai.codex"),
+        (".cache/codex-runtimes", "com.openai.codex"),
+        ("Claude", "com.anthropic.claudefordesktop"),
+        ("WhatsApp", "net.whatsapp.WhatsApp"),
     ]
 }

@@ -27,7 +27,6 @@ struct MacCleanMenuApp: App {
 
     @NSApplicationDelegateAdaptor(MenuAppDelegate.self) private var appDelegate
     @State private var model = MenuStatsModel.shared
-    @AppStorage(Localization.defaultsKey, store: SharedAppState.defaults) private var appLanguage = "en"
     @AppStorage(MenuBarMetric.defaultsKey, store: SharedAppState.defaults) private var menuBarMetricRaw = MenuBarMetric.diskFree.rawValue
 
     private static let labelIcon: NSImage = {
@@ -47,8 +46,6 @@ struct MacCleanMenuApp: App {
                 tips: model.tips,
                 onDismissTip: { model.dismissTip(id: $0) }
             )
-            .environment(\.locale, Localization.locale(for: appLanguage))
-            .id(appLanguage)
         } label: {
             HStack(spacing: 4) {
                 Image(nsImage: Self.labelIcon)
@@ -109,7 +106,6 @@ struct MenuContentView: View {
                     statGrid(stats)
                     networkCard(stats)
                     if !tips.isEmpty { recommendationsCard }
-                    if let p = protection { protectionCard(p) }
                     if let d = devices, d.hasAny { devicesCard(d) }
                 } else {
                     ProgressView().controlSize(.small).tint(.white)

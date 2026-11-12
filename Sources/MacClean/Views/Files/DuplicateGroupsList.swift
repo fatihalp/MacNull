@@ -8,10 +8,6 @@ struct DuplicateGroupsList: View {
 
     @Binding var expanded: Set<UUID>
 
-    private var totalDuplicateCount: Int {
-        groups.reduce(0) { $0 + $1.duplicates.count }
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             banner

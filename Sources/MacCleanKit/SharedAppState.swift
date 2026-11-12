@@ -20,11 +20,11 @@ public enum SharedAppState {
 
         public var localizedScanDepth: String {
             switch scanDepth.lowercased() {
-            case "quick", "快速", "быстро":
+            case "quick":
                 String(localized: "Quick")
-            case "balanced", "平衡", "сбалансированно":
+            case "balanced":
                 String(localized: "Balanced")
-            case "deep", "深度", "глубоко":
+            case "deep":
                 String(localized: "Deep")
             default:
                 scanDepth

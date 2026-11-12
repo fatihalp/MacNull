@@ -4,7 +4,31 @@ import MacCleanKit
 
 enum ReviewPath {
 
+    @inline(__always)
     static func precedes(_ a: String, _ b: String) -> Bool {
+        let aCount = a.utf8.count
+        let bCount = b.utf8.count
+        let minCount = min(aCount, bCount)
+
+        let contiguousResult: Bool? = a.utf8.withContiguousStorageIfAvailable { aBuf in
+            b.utf8.withContiguousStorageIfAvailable { bBuf in
+                for i in 0..<minCount {
+                    let ax = aBuf[i]
+                    let bx = bBuf[i]
+                    if ax != bx {
+                        let av = (ax == 0x2F ? 0 : ax)
+                        let bv = (bx == 0x2F ? 0 : bx)
+                        return av < bv
+                    }
+                }
+                return aCount < bCount
+            }
+        } ?? nil
+
+        if let contiguousResult {
+            return contiguousResult
+        }
+
         var ai = a.utf8.makeIterator()
         var bi = b.utf8.makeIterator()
         while true {
@@ -18,11 +42,29 @@ enum ReviewPath {
         }
     }
 
+    @inline(__always)
     static func isDescendant(_ path: String, of base: String) -> Bool {
+        let pCount = path.utf8.count
+        let bCount = base.utf8.count
+        guard pCount > bCount else { return false }
+        if base == "/" { return true }
+
+        let contiguousResult: Bool? = path.utf8.withContiguousStorageIfAvailable { pBuf in
+            base.utf8.withContiguousStorageIfAvailable { bBuf in
+                for i in 0..<bCount {
+                    if pBuf[i] != bBuf[i] { return false }
+                }
+                return pBuf[bCount] == 0x2F
+            }
+        } ?? nil
+
+        if let contiguousResult {
+            return contiguousResult
+        }
+
         let p = path.utf8
         let b = base.utf8
-        guard p.count > b.count, p.starts(with: b) else { return false }
-        if base == "/" { return true }
+        guard p.starts(with: b) else { return false }
         return p[p.index(p.startIndex, offsetBy: b.count)] == 0x2F
     }
 
@@ -69,12 +111,14 @@ enum ReviewPath {
 struct ReviewItem: Sendable {
     let url: URL
     let path: String
+    let name: String
     let size: UInt64
     let isDirectory: Bool
 
     init(_ item: FileItem) {
         url = item.url
         path = ReviewPath.normalized(item.url)
+        name = item.name
         size = item.size
         isDirectory = item.isDirectory
     }
@@ -97,6 +141,8 @@ struct ReviewNode: Identifiable, Hashable, Sendable {
     let autoSelect: Bool
 
     let isSensitive: Bool
+    let isAIConversation: Bool
+    let isOldVersion: Bool
 
     init(
         id: String,
@@ -108,7 +154,9 @@ struct ReviewNode: Identifiable, Hashable, Sendable {
         iconPath: String,
         appIsRunning: Bool,
         autoSelect: Bool = true,
-        isSensitive: Bool? = nil
+        isSensitive: Bool? = nil,
+        isAIConversation: Bool? = nil,
+        isOldVersion: Bool? = nil
     ) {
         self.id = id
         self.name = name
@@ -120,6 +168,19 @@ struct ReviewNode: Identifiable, Hashable, Sendable {
         self.appIsRunning = appIsRunning
         self.autoSelect = autoSelect
         self.isSensitive = isSensitive ?? SensitiveRemnantMatcher.isSensitive(path: basePath)
+        self.isAIConversation = isAIConversation ?? AIConversationMatcher.isConversation(path: basePath)
+        self.isOldVersion = isOldVersion ?? Self.isOldVersionPath(basePath)
+    }
+
+    private static func isOldVersionPath(_ path: String) -> Bool {
+        let lower = path.lowercased()
+        if lower.contains("/.rustup/toolchains/") && !lower.contains("/stable-") {
+            return true
+        }
+        if lower.contains("/.gradle/wrapper/dists/") {
+            return true
+        }
+        return false
     }
 }
 
@@ -135,7 +196,7 @@ struct ReviewCategory: Identifiable, Sendable {
 struct ReviewSection: Identifiable, Sendable {
     let id: String
     let name: String
-    let categoryIDs: [Int]
+    var categoryIDs: [Int]
     let size: UInt64
     let itemCount: Int
 }
@@ -187,8 +248,72 @@ final class ReviewData: Sendable {
             ))
             i = j
         }
+        if out.isEmpty {
+            out = diskChildren(of: node)
+        }
         out.sort { $0.size > $1.size }
         return out
+    }
+
+    private func diskChildren(of node: ReviewNode) -> [ReviewNode] {
+        let url = URL(filePath: node.basePath, directoryHint: .isDirectory)
+        let fm = FileManager.default
+        var isDir: ObjCBool = false
+        guard fm.fileExists(atPath: node.basePath, isDirectory: &isDir), isDir.boolValue else {
+            return []
+        }
+        guard let contents = try? fm.contentsOfDirectory(
+            at: url,
+            includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey, .totalFileAllocatedSizeKey, .isSymbolicLinkKey],
+            options: []
+        ) else { return [] }
+
+        var result: [ReviewNode] = []
+        result.reserveCapacity(contents.count)
+
+        for childURL in contents {
+            let path = ReviewPath.normalized(childURL)
+            let name = childURL.lastPathComponent
+            let values = try? childURL.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey, .totalFileAllocatedSizeKey, .isSymbolicLinkKey])
+            let isDirectory = values?.isDirectory == true && values?.isSymbolicLink != true
+            let size: UInt64
+            if isDirectory {
+                size = quickDirectoryBytes(childURL)
+            } else {
+                size = UInt64(values?.totalFileAllocatedSize ?? values?.fileSize ?? 0)
+            }
+            result.append(ReviewNode(
+                id: path + "#disk",
+                name: name,
+                basePath: path,
+                range: node.range,
+                size: size,
+                isLeaf: !isDirectory,
+                iconPath: path,
+                appIsRunning: node.appIsRunning,
+                autoSelect: node.autoSelect
+            ))
+        }
+        return result
+    }
+
+    private func quickDirectoryBytes(_ url: URL) -> UInt64 {
+        guard let enumerator = FileManager.default.enumerator(
+            at: url,
+            includingPropertiesForKeys: [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey],
+            options: []
+        ) else { return 0 }
+        var total: UInt64 = 0
+        var count = 0
+        for case let fileURL as URL in enumerator {
+            count += 1
+            if count > 50_000 { break }
+            let values = try? fileURL.resourceValues(forKeys: [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey])
+            if values?.isRegularFile == true {
+                total += UInt64(values?.totalFileAllocatedSize ?? values?.fileSize ?? 0)
+            }
+        }
+        return total
     }
 
     func selectedURLs(flags: [Bool]) -> Set<URL> {

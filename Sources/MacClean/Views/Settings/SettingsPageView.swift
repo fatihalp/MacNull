@@ -10,10 +10,7 @@ struct SettingsPageView: View {
     @AppStorage(MenuBarMetric.defaultsKey, store: SharedAppState.defaults) private var menuBarMetricRaw = MenuBarMetric.diskFree.rawValue
     @AppStorage("launchAtLogin") private var launchAtLogin = false
     @AppStorage("removeBackgroundColors") private var removeBackgroundColors = false
-    @AppStorage("automaticUpdateChecks") private var automaticUpdateChecks = true
-    @AppStorage("lastUpdateCheckDate") private var lastUpdateCheckTimestamp: Double = 0
     @AppStorage(AppearanceManager.defaultsKey) private var appearanceRaw = AppearanceMode.light.rawValue
-    @AppStorage(Localization.defaultsKey, store: SharedAppState.defaults) private var appLanguage = "en"
     @State private var launcher = MenuBarLauncher.shared
     @State private var loginLauncher = LaunchAtLoginManager.shared
 
@@ -21,7 +18,6 @@ struct SettingsPageView: View {
         Form {
             headerSection
             generalSection
-            interfaceLanguageSection
             appearanceSection
             languageSection
             excludedFoldersSection
@@ -48,81 +44,9 @@ struct SettingsPageView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                updateControl
-            }
-            if case .available(let version, let url) = controller.updateState {
-                updateAvailableRow(version: version, url: url)
-            }
-            Toggle("Automatically check for updates",
-                   isOn: $automaticUpdateChecks)
-            if lastUpdateCheckTimestamp > 0 {
-                Text("Last checked: \(lastCheckedDescription)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
         }
     }
-
-    private var lastCheckedDescription: String {
-        let date = Date(timeIntervalSinceReferenceDate: lastUpdateCheckTimestamp)
-        return date.formatted(date: .abbreviated, time: .shortened)
-    }
-
-    @ViewBuilder
-    private var updateControl: some View {
-        switch controller.updateState {
-        case .idle:
-            Button("Check for Updates") { controller.startUpdateCheck() }
-        case .checking:
-            HStack(spacing: 6) {
-                ProgressView().controlSize(.small)
-                Text("Checking…").foregroundStyle(.secondary)
-            }
-        case .upToDate:
-            HStack(spacing: 4) {
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-                Text("Up to date")
-            }
-        case .available:
-            EmptyView()
-        case .failed(let message):
-            HStack(spacing: 6) {
-                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
-                Text(message).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                Button("Retry") { controller.startUpdateCheck() }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func updateAvailableRow(version: String, url: URL) -> some View {
-        if UpdateChecker.isHomebrewInstall() {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Version \(version) is available. Update with Homebrew:")
-                    Text(Self.brewUpgradeCommand)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                }
-                Spacer()
-                Button {
-                    NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(Self.brewUpgradeCommand, forType: .string)
-                } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
-                }
-            }
-        } else {
-            HStack {
-                Text("Version \(version) is available.")
-                Spacer()
-                Button("View Release") { NSWorkspace.shared.open(url) }
-                    .buttonStyle(.borderedProminent)
-            }
-        }
-    }
-
-    static let brewUpgradeCommand = "brew upgrade --cask mac-sai"
 
     private var launchAtLoginBinding: Binding<Bool> {
         Binding(
@@ -208,24 +132,6 @@ struct SettingsPageView: View {
                     .foregroundStyle(.orange)
                     .font(.caption)
             }
-        }
-    }
-
-    private var interfaceLanguageSection: some View {
-        Section("Interface Language") {
-            Picker("Language", selection: $appLanguage) {
-                ForEach(AppLanguage.all) { language in
-                    Text(language.name).tag(language.id)
-                }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: appLanguage) { _, newValue in
-                controller.setInterfaceLanguage(newValue)
-            }
-
-            Text("Changes apply immediately to the main window and menu-bar widget.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 

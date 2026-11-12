@@ -2,53 +2,6 @@ import SwiftUI
 import AppKit
 import MacCleanKit
 
-public struct ProgressGauge: View {
-    let value: Double
-    let label: String
-    let detail: String
-    let color: Color
-
-    public init(value: Double, label: String, detail: String, color: Color = Color(nsColor: .systemBlue)) {
-        self.value = min(max(value, 0), 1)
-        self.label = label
-        self.detail = detail
-        self.color = color
-    }
-
-    public var body: some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .stroke(Color.primary.opacity(0.08), lineWidth: 6)
-
-                Circle()
-                    .trim(from: 0, to: value)
-                    .stroke(
-                        color,
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.35), value: value)
-
-                VStack(spacing: 2) {
-                    Text("\(Int(value * 100))%")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.primary)
-                    Text(detail)
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-            }
-            .frame(width: 76, height: 76)
-
-            Text(label)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.secondary)
-        }
-    }
-}
-
 public struct SizeDisplay: View {
     let bytes: UInt64
     let subtitle: String

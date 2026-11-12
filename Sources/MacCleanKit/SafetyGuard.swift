@@ -103,16 +103,4 @@ public struct SafetyGuard: Sendable {
     public func isProtectedApp(_ bundleID: String) -> Bool {
         MCConstants.protectedApps.contains(bundleID)
     }
-
-    public func isSafeForOrphanDeletion(_ url: URL) -> Bool {
-        let path = url.path(percentEncoded: false)
-        let safePrefixes = [
-            MCConstants.userCaches.path(percentEncoded: false),
-            MCConstants.userLogs.path(percentEncoded: false),
-            MCConstants.userHTTPStorages.path(percentEncoded: false),
-            MCConstants.userSavedAppState.path(percentEncoded: false),
-            MCConstants.userWebKit.path(percentEncoded: false),
-        ]
-        return safePrefixes.contains { path.hasPrefix($0) }
-    }
 }

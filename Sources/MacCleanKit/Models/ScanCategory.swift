@@ -22,6 +22,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
     case packageManagerCaches = "package_manager_caches"
     case ideCaches = "ide_caches"
     case aiToolCaches = "ai_tool_caches"
+    case appCaches = "app_caches"
 
     case mailAttachments = "mail_attachments"
 
@@ -61,10 +62,11 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .packageManagerCaches: String(localized: "Package Manager Caches")
         case .ideCaches: String(localized: "IDE & Editor Caches")
         case .aiToolCaches: String(localized: "AI Tool Caches")
+        case .appCaches: String(localized: "Application Caches")
         case .mailAttachments: String(localized: "Mail Attachments")
         case .trashBins: String(localized: "Trash Bins")
         case .malware: String(localized: "Malware")
-        case .browserPrivacy: String(localized: "Browser Privacy")
+        case .browserPrivacy: String(localized: "Browser Caches")
         case .systemPrivacy: String(localized: "System Privacy")
         case .largeFiles: String(localized: "Large Files")
         case .oldFiles: String(localized: "Old Files")
@@ -92,13 +94,14 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .unusedDiskImages: String(localized: "Disk images you mounted once and forgot.")
         case .incompleteDownloads: String(localized: "Partially downloaded files.")
         case .appLeftovers: String(localized: "Support files from apps you've deleted.")
-        case .packageManagerCaches: String(localized: "Regenerable caches from npm, Cargo, pip, Homebrew, and Gradle.")
-        case .ideCaches: String(localized: "Caches from code editors like Cursor and Antigravity.")
-        case .aiToolCaches: String(localized: "Caches from AI coding tools (Claude, Codex). History and sessions excluded.")
+        case .packageManagerCaches: String(localized: "Regenerable caches from npm, Cargo, Pub, pip, Composer, Homebrew, and Gradle.")
+        case .ideCaches: String(localized: "Caches from code editors like Cursor and Windsurf.")
+        case .aiToolCaches: String(localized: "Caches, runtimes, and sessions from AI coding tools (Gemini, Claude, Codex).")
+        case .appCaches: String(localized: "Caches and temporary files from messaging and desktop applications (WhatsApp, etc.).")
         case .mailAttachments: String(localized: "Saved copies of Mail attachments.")
         case .trashBins: String(localized: "Items currently sitting in the Trash.")
         case .malware: String(localized: "Known malicious files found on disk.")
-        case .browserPrivacy: String(localized: "Browsing history and tracking data. Cookies and sessions stay.")
+        case .browserPrivacy: String(localized: "Temporary cache files and web storage from web browsers.")
         case .systemPrivacy: String(localized: "Recent-items lists and other privacy traces.")
         case .largeFiles: String(localized: "The files taking up the most space.")
         case .oldFiles: String(localized: "Files you haven't opened in a long time.")
@@ -138,7 +141,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
 
     public var cleanupSafety: CleanupSafety {
         switch self {
-        case .userCaches, .systemCaches, .packageManagerCaches, .ideCaches, .aiToolCaches:
+        case .userCaches, .systemCaches, .packageManagerCaches, .ideCaches, .aiToolCaches, .appCaches:
             .regenerates
         case .userLogs, .systemLogs, .brokenPreferences, .brokenLoginItems,
              .brokenDownloads, .incompleteDownloads, .oldUpdates, .appLeftovers:
@@ -157,7 +160,8 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .systemCaches: String(localized: "Caches macOS manages itself. It rebuilds them automatically as needed.")
         case .packageManagerCaches: String(localized: "Download and build caches. npm, Cargo, pip, Homebrew, and Gradle re-download what they need on the next install or build.")
         case .ideCaches: String(localized: "Editor caches only. Cursor and Antigravity recreate them on next launch; your settings and extensions aren't touched.")
-        case .aiToolCaches: String(localized: "Scratch and cache folders only. Claude and Codex recreate them as needed; history, memory, and sessions are never included.")
+        case .aiToolCaches: String(localized: "AI tools accumulate heavy models, runtimes, and sessions. Safe Clean preserves conversations; Deep Clean recovers maximum space.")
+        case .appCaches: String(localized: "Temporary files and media caches from apps like WhatsApp. The app regenerates them as needed.")
         case .userLogs: String(localized: "Diagnostic text your apps wrote for troubleshooting. Apps don't read old logs back, and they start new ones as they run.")
         case .systemLogs: String(localized: "macOS diagnostic logs. Only useful when investigating a past problem; macOS keeps writing fresh ones.")
         case .brokenPreferences: String(localized: "Settings files that can't be read, or whose app is no longer installed. Nothing on this Mac uses them.")
@@ -176,7 +180,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .mailAttachments: String(localized: "Copies of attachments Mail saved on disk. Mail can download them again from the server for IMAP and Exchange accounts, not for POP.")
         case .trashBins: String(localized: "Already in the Trash. Emptying it is permanent and can't be undone.")
         case .malware: String(localized: "Matched a known malware signature. Check the path first if it belongs to software you installed on purpose.")
-        case .browserPrivacy: String(localized: "Your browsing history and tracking data. Can't be restored after cleaning; cookies and logged-in sessions stay.")
+        case .browserPrivacy: String(localized: "Temporary files and web caches from web browsers. Can be safely removed to free up disk space while preserving logins and cookies.")
         case .systemPrivacy: String(localized: "Recent-items lists and similar traces. Apps' Open Recent menus will start empty.")
         case .largeFiles: String(localized: "Your own files, picked only by size. Nothing here is junk by definition; check each one.")
         case .oldFiles: String(localized: "Your own files you haven't opened in a long time. Old doesn't mean unneeded; check each one.")
@@ -204,10 +208,11 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .packageManagerCaches: "shippingbox"
         case .ideCaches: "macwindow"
         case .aiToolCaches: "sparkles"
+        case .appCaches: "bubble.left.and.bubble.right"
         case .mailAttachments: "paperclip"
         case .trashBins: "trash"
         case .malware: "shield.lefthalf.filled.trianglebadge.exclamationmark"
-        case .browserPrivacy: "safari"
+        case .browserPrivacy: "globe"
         case .systemPrivacy: "hand.raised"
         case .largeFiles: "arrow.up.right.square"
         case .oldFiles: "clock.arrow.circlepath"
@@ -220,7 +225,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .unusedDiskImages, .largeFiles, .oldFiles, .duplicates, .projectJunk,
              .universalBinaries, .appLeftovers, .deletedUsers,
-             .packageManagerCaches, .ideCaches, .aiToolCaches:
+             .packageManagerCaches, .ideCaches, .aiToolCaches, .appCaches:
 
             false
         default:

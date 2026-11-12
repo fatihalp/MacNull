@@ -69,7 +69,7 @@ struct DuplicatesView: View {
 
                                 Text(actionMode == .consolidate
                                     ? String(localized: "Selected copies stay in place as clones. Only the wasted duplicate space is freed, nothing is deleted.")
-                                    : String(localized: "Selected copies are moved to the Trash, one original is kept per group."))
+                                    : String(localized: "Selected copies will be permanently deleted, one original is kept per group."))
                                     .font(.system(size: 12))
                                     .foregroundStyle(.primary.opacity(0.6))
                                     .frame(maxWidth: .infinity, alignment: .leading)

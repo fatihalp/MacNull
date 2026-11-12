@@ -146,17 +146,4 @@ public enum FileConsolidator {
         }
         return summary
     }
-
-    public static func estimateReclaimable(groups: [GroupConsolidation],
-                                           safetyGuard: SafetyGuard = SafetyGuard()) -> UInt64 {
-        var total: UInt64 = 0
-        for group in groups {
-            for copy in group.copies
-            where ineligibilityReason(master: group.master, copy: copy, safetyGuard: safetyGuard) == nil {
-                total += UInt64((try? copy.resourceValues(
-                    forKeys: [.totalFileAllocatedSizeKey]))?.totalFileAllocatedSize ?? 0)
-            }
-        }
-        return total
-    }
 }

@@ -6,6 +6,7 @@ import MacCleanKit
 public final class AppState {
     var selectedCategory: SidebarCategory = .smartScan
     var selectedSidebarItem: SidebarItem? = .smartScan
+    var selectedOptimizationTab: Int = 0
     let scanCoordinator = ScanCoordinator()
     let cleaningEngine = CleaningEngine()
     @ObservationIgnored lazy var smartScanController = SmartScanController(coordinator: scanCoordinator, engine: cleaningEngine)
@@ -33,6 +34,9 @@ public final class AppState {
     func requestCleanShortcut() { cleanShortcutNonce &+= 1 }
 
     func selectCategory(_ category: SidebarCategory) {
+        if category == .smartScan && selectedCategory == .smartScan {
+            smartScanController.resetScan()
+        }
         selectedCategory = category
         if category == .smartScan {
             selectedSidebarItem = .smartScan
@@ -69,10 +73,10 @@ public final class AppState {
     private func registerModules() {
         scanCoordinator.registerModules([
             SystemJunkModule(),
+            BrowserCleanupModule(),
+            ProjectJunkModule(),
             MailAttachmentsModule(),
             TrashBinsModule(),
-            MalwareModule(),
-            PrivacyModule(),
             OptimizationModule(),
             MaintenanceModule(),
             UninstallerModule(),

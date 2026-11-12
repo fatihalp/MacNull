@@ -7,7 +7,7 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
     case mailAttachments = "Mail Attachments"
     case trashBins = "Trash Bins"
     case malwareRemoval = "Malware Removal"
-    case privacy = "Privacy"
+    case privacy = "Browser Caches"
     case wifiNetworks = "Saved Wi-Fi"
     case appPermissions = "Permissions"
     case optimization = "Optimization"
@@ -66,7 +66,7 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
         switch self {
         case .smartScan: .smartScan
         case .systemJunk, .mailAttachments, .trashBins, .diskHogs, .projectJunk, .cleanHistory: .cleanup
-        case .malwareRemoval, .privacy, .wifiNetworks, .appPermissions, .browserExtensions: .protection
+        case .malwareRemoval, .privacy, .wifiNetworks, .appPermissions, .browserExtensions: .cleanup
         case .optimization, .maintenance: .performance
         case .uninstaller, .unusedApps, .extensions, .updater: .applications
         case .spaceLens, .largeOldFiles, .duplicates, .shredder: .files
@@ -88,7 +88,6 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
 public enum SidebarCategory: String, CaseIterable, Identifiable {
     case smartScan = "Smart Scan"
     case cleanup = "Cleanup"
-    case protection = "Protection"
     case performance = "Performance"
     case applications = "Applications"
     case files = "Files"
@@ -102,9 +101,7 @@ public enum SidebarCategory: String, CaseIterable, Identifiable {
         case .smartScan:
             [.smartScan]
         case .cleanup:
-            [.systemJunk, .mailAttachments, .trashBins, .diskHogs, .projectJunk, .cleanHistory]
-        case .protection:
-            [.malwareRemoval, .privacy, .wifiNetworks, .appPermissions, .browserExtensions]
+            [.systemJunk, .privacy, .mailAttachments, .trashBins, .diskHogs, .projectJunk, .cleanHistory]
         case .performance:
             [.optimization, .maintenance]
         case .applications:

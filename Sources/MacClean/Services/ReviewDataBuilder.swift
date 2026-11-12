@@ -23,6 +23,7 @@ enum ReviewDataBuilder {
         .packageManagerCaches,
         .ideCaches,
         .aiToolCaches,
+        .appCaches,
     ]
 
     private static let coreCleanupModuleIDs: Set<String> = [
@@ -41,7 +42,7 @@ enum ReviewDataBuilder {
         var categories: [ReviewCategory] = []
         var sections: [ReviewSection] = []
         var appLookup: [String: URL?] = [:]
-        let isMultiModule = modules.count > 1
+        _ = modules.count > 1
 
         for module in modules {
             var categoryIDs: [Int] = []
@@ -60,16 +61,25 @@ enum ReviewDataBuilder {
 
             var prepared: [PreparedCategory] = []
             if module.moduleID == "system_junk" && hasUserCaches {
-                var userCacheBuckets: [(bucket: ReviewGrouping.Bucket, autoSelect: Bool)] = []
+                var bucketByName: [String: (bucket: ReviewGrouping.Bucket, autoSelect: Bool)] = [:]
                 for result in nonEmptyResults where result.category == .userCaches || mergedUserCacheCategories.contains(result.category) {
                     let buckets = ReviewGrouping.buckets(
                         for: result.category,
                         items: result.items.map(ReviewItem.init)
                     )
                     for b in buckets {
-                        userCacheBuckets.append((b, result.autoSelect))
+                        if var existing = bucketByName[b.name] {
+                            existing.bucket.items.append(contentsOf: b.items)
+                            existing.bucket.size += b.size
+                            existing.bucket.roots.formUnion(b.roots)
+                            existing.autoSelect = existing.autoSelect && result.autoSelect
+                            bucketByName[b.name] = existing
+                        } else {
+                            bucketByName[b.name] = (b, result.autoSelect)
+                        }
                     }
                 }
+                var userCacheBuckets = Array(bucketByName.values)
                 userCacheBuckets.sort { $0.bucket.size > $1.bucket.size }
                 let userCacheSize = userCacheBuckets.reduce(0 as UInt64) { $0 + $1.bucket.size }
                 prepared.append(PreparedCategory(
@@ -129,6 +139,7 @@ enum ReviewDataBuilder {
                 }
                 let range = categoryStart..<items.count
                 let size = groups.reduce(0) { $0 + $1.size }
+                guard size > 0 else { continue }
                 let id = categories.count
                 categories.append(ReviewCategory(
                     id: id, category: entry.category, autoSelect: entry.autoSelect,
@@ -139,38 +150,17 @@ enum ReviewDataBuilder {
                 sectionCount += range.count
             }
 
-            if module.moduleID == "system_junk" && (includeEmptySystemJunkCategories || isMultiModule) && !categoryIDs.isEmpty {
-                for stdCategory in standardSystemJunkCategories where !seenCategories.contains(stdCategory) {
-                    let id = categories.count
-                    let emptyRange = items.count..<items.count
-                    categories.append(ReviewCategory(
-                        id: id, category: stdCategory, autoSelect: stdCategory.autoSelect,
-                        range: emptyRange, size: 0, groups: []
-                    ))
-                    categoryIDs.append(id)
-                }
-            }
-
-            if categoryIDs.isEmpty && isMultiModule && coreCleanupModuleIDs.contains(module.moduleID) {
-                let fallbackCategory: ScanCategory = switch module.moduleID {
-                case "mail_attachments": .mailAttachments
-                case "trash_bins": .trashBins
-                default: .userCaches
-                }
-                let id = categories.count
-                let emptyRange = items.count..<items.count
-                categories.append(ReviewCategory(
-                    id: id, category: fallbackCategory, autoSelect: fallbackCategory.autoSelect,
-                    range: emptyRange, size: 0, groups: []
-                ))
-                categoryIDs.append(id)
-            }
-
-            guard !categoryIDs.isEmpty else { continue }
+            guard !categoryIDs.isEmpty, sectionSize > 0 else { continue }
+            categoryIDs.sort { categories[$0].size > categories[$1].size }
             sections.append(ReviewSection(
                 id: module.moduleID, name: module.moduleName,
                 categoryIDs: categoryIDs, size: sectionSize, itemCount: sectionCount
             ))
+        }
+
+        sections.sort { $0.size > $1.size }
+        for i in sections.indices {
+            sections[i].categoryIDs.sort { categories[$0].size > categories[$1].size }
         }
 
         return ReviewData(items: items, categories: categories, sections: sections)
@@ -188,20 +178,50 @@ enum ReviewDataBuilder {
         var iconPath = bucket.base
         var owner = AppCacheOwnership.owningBundleID(for: URL(filePath: bucket.base))
 
-        if ReviewGrouping.looksLikeBundleID(bucket.name) {
-            let appURL: URL?
-            if let cached = appLookup[bucket.name] {
-                appURL = cached
-            } else {
-                appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bucket.name)
-                appLookup[bucket.name] = appURL
+        if owner == nil && ReviewGrouping.looksLikeBundleID(bucket.name) {
+            owner = bucket.name
+        }
+
+        let knownAppBundleIDs: [String: [String]] = [
+            "WhatsApp": ["net.whatsapp.WhatsApp"],
+            "Claude": ["com.anthropic.claudefordesktop", "com.anthropic.claudedesktop"],
+            "Codex": ["com.openai.codex"],
+            "Antigravity": ["com.google.antigravity"],
+            "Antigravity (Gemini)": ["com.google.antigravity"],
+            "Chrome": ["com.google.Chrome"],
+            "Google": ["com.google.Chrome"],
+            "Google Chrome": ["com.google.Chrome"],
+            "Firefox": ["org.mozilla.firefox"],
+            "Safari": ["com.apple.Safari"],
+            "Brave": ["com.brave.Browser"],
+            "Edge": ["com.microsoft.edgemac"],
+            "Arc": ["company.thebrowser.Browser"],
+            "Vivaldi": ["com.vivaldi.Vivaldi"],
+            "Opera": ["com.operasoftware.Opera"],
+        ]
+
+        if owner == nil, let bundleIDs = knownAppBundleIDs[bucket.name] {
+            owner = bundleIDs.first
+        }
+
+        let lowerBase = bucket.base.lowercased()
+        if owner == nil {
+            if lowerBase.contains("google/chrome") || lowerBase.contains("google chrome") {
+                owner = "com.google.Chrome"
+            } else if lowerBase.contains("firefox") {
+                owner = "org.mozilla.firefox"
+            } else if lowerBase.contains("safari") {
+                owner = "com.apple.Safari"
+            } else if lowerBase.contains("bravesoftware") || lowerBase.contains("brave") {
+                owner = "com.brave.Browser"
+            } else if lowerBase.contains("microsoft edge") || lowerBase.contains("edgemac") {
+                owner = "com.microsoft.edgemac"
+            } else if lowerBase.contains("arc") {
+                owner = "company.thebrowser.Browser"
             }
-            if let appURL {
-                name = appURL.lastPathComponent
-                iconPath = appURL.path(percentEncoded: false)
-                owner = bucket.name
-            }
-        } else if let ownerID = owner {
+        }
+
+        if let ownerID = owner {
             let appURL: URL?
             if let cached = appLookup[ownerID] {
                 appURL = cached
@@ -209,9 +229,34 @@ enum ReviewDataBuilder {
                 appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ownerID)
                 appLookup[ownerID] = appURL
             }
-            if let appURL, bucket.name.lowercased().contains("brave") {
-                name = appURL.lastPathComponent
+
+            if let appURL {
                 iconPath = appURL.path(percentEncoded: false)
+            }
+
+            let appName = appURL?.deletingPathExtension().lastPathComponent ?? ReviewGrouping.friendlyAppName(for: ownerID)
+
+            let lowerName = bucket.name.lowercased()
+            if ownerID == "com.apple.Safari" {
+                if lowerName == "com.apple.safari" || lowerName == "webkitcache" || lowerName == "cache" || lowerName == "caches" {
+                    name = "Safari"
+                } else if !bucket.name.isEmpty {
+                    name = "Safari (\(bucket.name))"
+                } else {
+                    name = "Safari"
+                }
+            } else if lowerName == "default" {
+                name = "\(appName) (Default Profile)"
+            } else if lowerName.hasPrefix("profile ") {
+                name = "\(appName) (\(bucket.name))"
+            } else if lowerName.contains(".default") || lowerName.hasSuffix("-release") {
+                name = "\(appName) (\(bucket.name))"
+            } else if ReviewGrouping.looksLikeBundleID(bucket.name) || lowerName == "chrome" || lowerName == "google" || lowerName == "firefox" || lowerName == "safari" || lowerName == "brave" || lowerName == "edge" || lowerName == "arc" {
+                name = appName
+            } else if !bucket.name.isEmpty && bucket.name != appName {
+                name = "\(appName) (\(bucket.name))"
+            } else {
+                name = appName
             }
         }
 
@@ -250,7 +295,7 @@ enum ReviewGrouping {
 
     static func mode(for category: ScanCategory) -> Mode {
         switch category {
-        case .packageManagerCaches, .ideCaches, .aiToolCaches: .byTool
+        case .packageManagerCaches, .ideCaches, .aiToolCaches, .appCaches: .byTool
         case .systemLogs, .userLogs: .byLogEntry
         default: .byChild
         }
@@ -258,7 +303,7 @@ enum ReviewGrouping {
 
     static let rootsByCategory: [ScanCategory: [String]] = {
         var map: [ScanCategory: [String]] = [:]
-        for junk in SystemJunkModule.allCategories {
+        for junk: JunkCategory in SystemJunkModule.allCategories {
             map[junk.scanCategory, default: []] += junk.targets.map { ReviewPath.normalized($0.path) }
         }
         map[.mailAttachments] = [
@@ -269,7 +314,33 @@ enum ReviewGrouping {
             MCConstants.userContainers.appending(path: "com.readdle.smartemail/Data/Library/Caches"),
         ].map(ReviewPath.normalized)
         map[.trashBins] = [ReviewPath.normalized(MCConstants.userTrash)]
-        return map.mapValues { roots in
+        map[.browserPrivacy] = [
+            MCConstants.chromeCache,
+            MCConstants.firefoxCache,
+            MCConstants.userCaches.appending(path: "company.thebrowser.Browser"),
+            MCConstants.userCaches.appending(path: "BraveSoftware/Brave-Browser"),
+            MCConstants.userCaches.appending(path: "Microsoft Edge"),
+            MCConstants.userCaches.appending(path: "com.operasoftware.Opera"),
+            MCConstants.userCaches.appending(path: "Vivaldi"),
+            MCConstants.userCaches,
+        ].map(ReviewPath.normalized)
+        map[.packageManagerCaches, default: []] += [
+            ReviewPath.normalized(MCConstants.rustupToolchains),
+            ReviewPath.normalized(MCConstants.rustupUpdateHashes),
+        ]
+        for (cat, roots) in map {
+            var expanded: Set<String> = []
+            for r: String in roots {
+                expanded.insert(r)
+                if r.hasPrefix("/private/var/") {
+                    expanded.insert(String(r.dropFirst(8)))
+                } else if r.hasPrefix("/var/") {
+                    expanded.insert("/private" + r)
+                }
+            }
+            map[cat] = Array(expanded)
+        }
+        return map.mapValues { (roots: [String]) -> [String] in
             Array(Set(roots)).sorted { $0.utf8.count > $1.utf8.count }
         }
     }()
@@ -321,7 +392,20 @@ enum ReviewGrouping {
                 current!.append(item)
             } else {
                 if let done = current { result.append(done) }
-                var fresh = Bucket(name: ReviewPath.lastComponent(item.path), base: item.path)
+                let name: String
+                if category == .projectJunk {
+                    if !item.name.isEmpty && item.name != ReviewPath.lastComponent(item.path) {
+                        name = item.name
+                    } else {
+                        let parentDir = (item.path as NSString).deletingLastPathComponent
+                        let projectName = (parentDir as NSString).lastPathComponent
+                        let junkName = ReviewPath.lastComponent(item.path)
+                        name = projectName.isEmpty ? junkName : "\(junkName) (\(projectName))"
+                    }
+                } else {
+                    name = ReviewPath.lastComponent(item.path)
+                }
+                var fresh = Bucket(name: name, base: item.path)
                 fresh.append(item)
                 current = fresh
             }
@@ -331,19 +415,34 @@ enum ReviewGrouping {
     }
 
     static func logStem(for filename: String) -> String {
-        var s = filename
-        if let range = s.range(of: ".log", options: .caseInsensitive) {
-            s = String(s[..<range.lowerBound])
-        } else {
-            for ext in [".gz", ".txt", ".crash", ".diag", ".ips", ".out"] where s.lowercased().hasSuffix(ext) {
-                s = String(s.dropLast(ext.count))
-                break
-            }
+        var s: String = filename
+        for ext: String in [".bz2", ".gz", ".aapbz"] where s.lowercased().hasSuffix(ext) {
+            s = String(s.dropLast(ext.count))
+            break
+        }
+        for ext: String in [".log", ".txt", ".crash", ".diag", ".ips", ".out"] where s.lowercased().hasSuffix(ext) {
+            s = String(s.dropLast(ext.count))
+            break
         }
         return s.isEmpty ? filename : s
     }
 
     static func toolName(for root: String) -> String {
+        let lower = root.lowercased()
+        if lower.contains("whatsapp") { return "WhatsApp" }
+        if lower.contains("antigravity") || lower.contains(".gemini") { return "Antigravity (Gemini)" }
+        if lower.contains("claude") { return "Claude" }
+        if lower.contains("codex") { return "Codex" }
+        if lower.contains("puppeteer") { return "Puppeteer" }
+        if lower.contains("rustup") || lower.contains(".cargo") || lower.contains("cargo") { return "Rust" }
+        if lower.contains("windsurf") { return "Windsurf" }
+        if lower.contains("cursor") { return "Cursor" }
+        if lower.contains("code") && (lower.contains("vscode") || lower.contains("/code/")) { return "VS Code" }
+        if lower.contains("phpactor") { return "Phpactor" }
+        if lower.contains("copilot") { return "Copilot" }
+        if lower.contains("opencode") { return "Opencode" }
+        if lower.contains("corespotlight") || lower.contains("pipelinestorage") { return "Spotlight Document Index" }
+
         let home = ReviewPath.normalized(MCConstants.home)
         let relative = ReviewPath.isDescendant(root, of: home)
             ? String(root.dropFirst(home.count + 1))
@@ -361,6 +460,32 @@ enum ReviewGrouping {
     static func looksLikeBundleID(_ string: String) -> Bool {
         guard string.split(separator: ".").count >= 3 else { return false }
         return string.allSatisfy { $0.isLetter || $0.isNumber || $0 == "." || $0 == "-" || $0 == "_" }
+    }
+
+    static func friendlyAppName(for bundleID: String) -> String {
+        switch bundleID {
+        case "com.google.Chrome": return "Google Chrome"
+        case "org.mozilla.firefox": return "Mozilla Firefox"
+        case "com.apple.Safari": return "Safari"
+        case "com.brave.Browser": return "Brave Browser"
+        case "com.microsoft.edgemac": return "Microsoft Edge"
+        case "company.thebrowser.Browser": return "Arc"
+        case "com.vivaldi.Vivaldi": return "Vivaldi"
+        case "com.operasoftware.Opera": return "Opera"
+        case "com.spotify.client": return "Spotify"
+        case "com.tinyspeck.slackmacgap": return "Slack"
+        case "com.microsoft.VSCode": return "Visual Studio Code"
+        case "com.apple.dt.Xcode": return "Xcode"
+        case "net.whatsapp.WhatsApp": return "WhatsApp"
+        case "com.anthropic.claudefordesktop", "com.anthropic.claudedesktop": return "Claude"
+        case "com.openai.codex": return "Codex"
+        case "com.google.antigravity": return "Antigravity"
+        default:
+            if let last = bundleID.split(separator: ".").last, !last.isEmpty {
+                return String(last)
+            }
+            return bundleID
+        }
     }
 }
 

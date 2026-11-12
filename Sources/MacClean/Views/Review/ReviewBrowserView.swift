@@ -8,6 +8,7 @@ struct ReviewBrowserView: View {
     var doneTitle: String = "Done"
     var doneDisabled: Bool = false
     let onDone: () -> Void
+    var onReset: (() -> Void)? = nil
     var onClean: (() -> Void)? = nil
 
     @State private var sectionID: String
@@ -27,6 +28,7 @@ struct ReviewBrowserView: View {
         doneTitle: String = "Done",
         doneDisabled: Bool = false,
         onDone: @escaping () -> Void,
+        onReset: (() -> Void)? = nil,
         onClean: (() -> Void)? = nil
     ) {
         self.data = data
@@ -34,12 +36,17 @@ struct ReviewBrowserView: View {
         self.doneTitle = doneTitle
         self.doneDisabled = doneDisabled
         self.onDone = onDone
+        self.onReset = onReset
         self.onClean = onClean
-        let section = data.sections.first { $0.id == initialSectionID } ?? data.sections.first
+        let validSections = data.sections.filter { section in
+            section.size > 0 && section.categoryIDs.contains { data.categories[$0].size > 0 }
+        }
+        let section = validSections.first { $0.id == initialSectionID } ?? validSections.first ?? data.sections.first
         _sectionID = State(initialValue: section?.id ?? "")
         let sectionCategoryIDs: [Int] = section?.categoryIDs ?? []
         let firstNonEmptyID: Int? = sectionCategoryIDs.first { data.categories[$0].size > 0 }
-        let initialCat: Int? = firstNonEmptyID ?? sectionCategoryIDs.first ?? data.categories.first?.id
+        let fallbackID: Int? = data.categories.first(where: { $0.size > 0 })?.id ?? data.categories.first?.id
+        let initialCat: Int? = firstNonEmptyID ?? sectionCategoryIDs.first ?? fallbackID
         _categoryID = State(initialValue: initialCat)
     }
 
@@ -108,16 +115,27 @@ struct ReviewBrowserView: View {
             Divider()
 
             ScrollView {
-                if data.sections.count > 1 {
+                let nonEmptySections = data.sections.filter { section in
+                    section.size > 0 && section.categoryIDs.contains { data.categories[$0].size > 0 }
+                }
+                if nonEmptySections.count > 1 {
                     LazyVStack(alignment: .leading, spacing: 14) {
-                        ForEach(data.sections) { section in
+                        ForEach(nonEmptySections) { section in
                             sectionGroup(section)
                         }
                     }
                     .padding(.vertical, 8)
+                } else if let singleSection = nonEmptySections.first {
+                    LazyVStack(spacing: 2) {
+                        ForEach(singleSection.categoryIDs.filter { data.categories[$0].size > 0 }, id: \.self) { id in
+                            categoryRow(data.categories[id])
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 8)
                 } else {
                     LazyVStack(spacing: 2) {
-                        ForEach(data.categories) { category in
+                        ForEach(data.categories.filter { $0.size > 0 }.sorted { $0.size > $1.size }) { category in
                             categoryRow(category)
                         }
                     }
@@ -128,41 +146,45 @@ struct ReviewBrowserView: View {
         }
     }
 
+    @ViewBuilder
     private func sectionGroup(_ section: ReviewSection) -> some View {
         let sectionSize = selection.selectedSize(ofSection: section)
-        return VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
-                Image(systemName: ReviewSectionInfo.icon(for: section.id))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color(nsColor: .systemBlue))
-
-                Text(section.name)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-
-                Spacer()
-
-                if sectionSize > 0 {
-                    Text(FileSizeFormatter.format(sectionSize))
-                        .font(.system(size: 11, weight: .semibold))
+        let nonEmptyCatIDs = section.categoryIDs.filter { data.categories[$0].size > 0 }
+        if !nonEmptyCatIDs.isEmpty {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Image(systemName: ReviewSectionInfo.icon(for: section.id))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color(nsColor: .systemBlue))
-                }
 
-                ReviewCheckbox(state: selection.state(ofSection: section)) {
-                    selection.toggleSection(section)
-                }
-            }
-            .padding(.horizontal, 14)
-            .padding(.top, 4)
-            .padding(.bottom, 2)
+                    Text(section.name)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
 
-            VStack(spacing: 2) {
-                ForEach(section.categoryIDs, id: \.self) { id in
-                    categoryRow(data.categories[id])
+                    Spacer()
+
+                    if sectionSize > 0 {
+                        Text(FileSizeFormatter.format(sectionSize))
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(Color(nsColor: .systemBlue))
+                    }
+
+                    ReviewCheckbox(state: selection.state(ofSection: section)) {
+                        selection.toggleSection(section)
+                    }
                 }
+                .padding(.horizontal, 14)
+                .padding(.top, 4)
+                .padding(.bottom, 2)
+
+                VStack(spacing: 2) {
+                    ForEach(nonEmptyCatIDs, id: \.self) { id in
+                        categoryRow(data.categories[id])
+                    }
+                }
+                .padding(.horizontal, 8)
             }
-            .padding(.horizontal, 8)
         }
     }
 
@@ -321,6 +343,14 @@ struct ReviewBrowserView: View {
                         .buttonStyle(.bordered)
                         .controlSize(.small)
 
+                        if category.category == .projectJunk {
+                            Button("Select > 1 GB") {
+                                selection.selectOver1GB(inCategory: category.id)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+
                         Button("Deselect") {
                             selection.apply(.none, toCategory: category.id)
                         }
@@ -328,7 +358,7 @@ struct ReviewBrowserView: View {
                         .controlSize(.small)
 
                         Toggle(isOn: $onlyLargeFiles) {
-                            Text("> 100 MB")
+                            Text(category.category == .projectJunk && drillPath.isEmpty ? "> 1 GB" : (drillPath.isEmpty ? "> 100 MB" : "> 50 MB"))
                                 .font(.system(size: 11, weight: .medium))
                         }
                         .toggleStyle(.button)
@@ -374,9 +404,13 @@ struct ReviewBrowserView: View {
     @ViewBuilder
     private func nodeList(_ category: ReviewCategory) -> some View {
         let baseNodes = drillPath.last.flatMap { childCache[$0.id] } ?? category.groups
+        let isDrilled = !drillPath.isEmpty
+        let largeThreshold: UInt64 = isDrilled
+            ? (50 * 1024 * 1024)
+            : (category.category == .projectJunk ? 1_000_000_000 : 100 * 1024 * 1024)
         let filteredNodes = baseNodes.filter { node in
             let matchesSearch = searchText.isEmpty || node.name.localizedCaseInsensitiveContains(searchText)
-            let matchesSize = !onlyLargeFiles || node.size >= 100 * 1024 * 1024
+            let matchesSize = !onlyLargeFiles || node.size >= largeThreshold
             return matchesSearch && matchesSize
         }
 
@@ -396,6 +430,18 @@ struct ReviewBrowserView: View {
             VStack {
                 Spacer()
                 ProgressView().controlSize(.small)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if baseNodes.isEmpty {
+            VStack(spacing: 8) {
+                Spacer()
+                Image(systemName: "folder")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.secondary)
+                Text("This folder is empty")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -443,16 +489,44 @@ struct ReviewBrowserView: View {
             ReviewFileIcon(path: node.iconPath)
                 .frame(width: 24, height: 24)
             VStack(alignment: .leading, spacing: 2) {
-                Text(node.name)
-                    .font(.system(size: 13))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                if node.appIsRunning || node.isSensitive {
+                if category.category == .projectJunk {
+                    let info = projectJunkInfo(for: node)
+                    HStack(alignment: .center, spacing: 6) {
+                        Text(info.junkName)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+
+                        if !info.projectName.isEmpty {
+                            Text(info.projectName)
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(Color(nsColor: .systemBlue))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1.5)
+                                .background(Color(nsColor: .systemBlue).opacity(0.12), in: Capsule())
+                                .lineLimit(1)
+                        }
+                    }
+                } else {
+                    Text(node.name)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+
+                    if !node.basePath.isEmpty && node.basePath != node.name {
+                        Text((node.basePath as NSString).abbreviatingWithTildeInPath)
+                            .font(.system(size: 10.5))
+                            .foregroundStyle(.tertiary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                    }
+                }
+                if node.appIsRunning || node.isSensitive || node.isAIConversation || node.isOldVersion {
                     HStack(spacing: 8) {
                         if node.appIsRunning {
                             Label(
-                                "App is open",
+                                String(localized: "App is open"),
                                 systemImage: "lock.fill"
                             )
                             .font(.system(size: 10.5, weight: .medium))
@@ -465,6 +539,22 @@ struct ReviewBrowserView: View {
                             )
                             .font(.system(size: 10.5, weight: .medium))
                             .foregroundStyle(.red)
+                        }
+                        if node.isAIConversation {
+                            Label(
+                                String(localized: "AI History"),
+                                systemImage: "bubble.left.and.bubble.right.fill"
+                            )
+                            .font(.system(size: 10.5, weight: .medium))
+                            .foregroundStyle(.purple)
+                        }
+                        if node.isOldVersion {
+                            Label(
+                                String(localized: "Old Version"),
+                                systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90"
+                            )
+                            .font(.system(size: 10.5, weight: .medium))
+                            .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -508,22 +598,38 @@ struct ReviewBrowserView: View {
         }
     }
 
+    private func projectJunkInfo(for node: ReviewNode) -> (junkName: String, projectName: String) {
+        if let openParen = node.name.range(of: " (", options: .backwards),
+           node.name.hasSuffix(")") {
+            let junk = String(node.name[..<openParen.lowerBound])
+            let project = String(node.name[openParen.upperBound..<node.name.index(before: node.name.endIndex)])
+            if !project.isEmpty {
+                return (junkName: junk, projectName: project)
+            }
+        }
+        let junkName = (node.basePath as NSString).lastPathComponent
+        let parentDir = (node.basePath as NSString).deletingLastPathComponent
+        let projectName = (parentDir as NSString).lastPathComponent
+        return (junkName: junkName.isEmpty ? node.name : junkName,
+                projectName: projectName.isEmpty ? "" : projectName)
+    }
+
     private func drill(into node: ReviewNode) {
         guard !node.isLeaf else { return }
+        searchText = ""
+        onlyLargeFiles = false
         drillPath.append(node)
         guard childCache[node.id] == nil else { return }
-        if node.range.count <= 20_000 {
-            childCache[node.id] = data.children(of: node)
-            return
-        }
         loadingNodeID = node.id
         let data = self.data
         Task {
             let children = await Task.detached(priority: .userInitiated) {
                 data.children(of: node)
             }.value
-            childCache[node.id] = children
-            if loadingNodeID == node.id { loadingNodeID = nil }
+            await MainActor.run {
+                childCache[node.id] = children
+                if loadingNodeID == node.id { loadingNodeID = nil }
+            }
         }
     }
 
@@ -558,8 +664,23 @@ struct ReviewBrowserView: View {
             }
 
             HStack(spacing: 8) {
+                if let onReset {
+                    Button {
+                        onReset()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "house.fill")
+                                .font(.system(size: 11))
+                            Text(String(localized: "Dashboard"))
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.regular)
+                    .help(String(localized: "Return to Home Dashboard"))
+                }
+
                 if let onClean {
-                    Button("Back", action: onDone)
+                    Button(String(localized: "Back"), action: onDone)
                         .buttonStyle(.bordered)
                         .controlSize(.regular)
 
@@ -582,139 +703,5 @@ struct ReviewBrowserView: View {
         }
         .frame(height: 50)
         .background(Color.white)
-    }
-}
-
-enum ReviewSectionInfo {
-    static func description(for moduleID: String) -> String? {
-        switch moduleID {
-        case "system_junk":
-            String(localized: "Redundant files that clog up device storage and impede optimal performance.")
-        case "mail_attachments":
-            String(localized: "Local copies of attachments saved by your mail apps.")
-        case "trash_bins":
-            String(localized: "Items still taking up space in your Trash bins.")
-        case "malware":
-            String(localized: "Suspicious files found on your disk.")
-        case "privacy":
-            String(localized: "Browsing and activity traces.")
-        default:
-            nil
-        }
-    }
-
-    static func icon(for moduleID: String) -> String {
-        switch moduleID {
-        case "system_junk": "trash.circle.fill"
-        case "mail_attachments": "paperclip.circle.fill"
-        case "trash_bins": "trash.fill"
-        case "malware": "shield.lefthalf.filled"
-        case "privacy": "hand.raised.fill"
-        default: "folder.fill"
-        }
-    }
-}
-
-enum ReviewCategoryInfo {
-    static func description(for category: ScanCategory) -> String {
-        switch category {
-        case .userCaches, .packageManagerCaches, .ideCaches, .aiToolCaches:
-            String(localized: "Originally intended to improve startup times, the cache files of your applications ultimately accumulate and result in improper functioning or an overall performance drop.")
-        case .systemLogs:
-            String(localized: "The activity of your system applications and services is being captured into numerous logs, which may be helpful for debugging purposes only and can be removed without a second thought.")
-        case .userLogs:
-            String(localized: "The activity of your applications is constantly being captured into numerous log files, which start using quite a lot of space after some time but are rather useless, especially if they are old.")
-        default:
-            category.safetyRationale
-        }
-    }
-}
-
-struct ReviewCheckbox: View {
-    let state: ReviewCheckState
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .fill(state == .off ? Color.white : Color(nsColor: .systemBlue))
-                RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .strokeBorder(state == .off ? Color.secondary.opacity(0.45) : Color(nsColor: .systemBlue), lineWidth: 1)
-                switch state {
-                case .on:
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 9.5, weight: .bold))
-                        .foregroundStyle(.white)
-                case .mixed:
-                    Image(systemName: "minus")
-                        .font(.system(size: 9.5, weight: .bold))
-                        .foregroundStyle(.white)
-                case .off:
-                    EmptyView()
-                }
-            }
-            .frame(width: 15, height: 15)
-            .padding(2)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Select")
-        .accessibilityValue(state == .on ? "1" : state == .mixed ? "0.5" : "0")
-    }
-}
-
-struct ReviewCategoryIcon: View {
-    let category: ScanCategory
-    var isEmpty: Bool = false
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 6, style: .continuous)
-            .fill(isEmpty ? Color.secondary.opacity(0.1) : Color(nsColor: .systemBlue).opacity(0.12))
-            .overlay(
-                Image(systemName: mainSymbol)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(isEmpty ? Color.secondary : Color(nsColor: .systemBlue))
-            )
-            .frame(width: 26, height: 26)
-    }
-
-    private var mainSymbol: String {
-        switch category {
-        case .userCaches, .systemCaches: "clock.fill"
-        case .xcodeJunk: "hammer.fill"
-        case .universalBinaries: "circle.lefthalf.filled"
-        case .userLogs, .systemLogs: "doc.text.fill"
-        case .languageFiles: "bubble.left.fill"
-        case .documentVersions: "checkmark.circle.fill"
-        case .brokenLoginItems: "person.slash.fill"
-        case .iosDeviceBackups: "arrow.clockwise.circle.fill"
-        case .deletedUsers: "person.crop.rectangle.fill"
-        case .brokenPreferences: "gearshape.fill"
-        default: category.systemImage
-        }
-    }
-}
-
-struct ReviewFileIcon: View {
-    let path: String
-
-    var body: some View {
-        Image(nsImage: ReviewIconCache.icon(for: path))
-            .resizable()
-            .interpolation(.high)
-            .aspectRatio(contentMode: .fit)
-    }
-}
-
-@MainActor
-enum ReviewIconCache {
-    private static let cache = NSCache<NSString, NSImage>()
-
-    static func icon(for path: String) -> NSImage {
-        if let cached = cache.object(forKey: path as NSString) { return cached }
-        let image = NSWorkspace.shared.icon(forFile: path)
-        cache.setObject(image, forKey: path as NSString)
-        return image
     }
 }

@@ -16,11 +16,6 @@ public struct UninstallerModule: ScanModule {
 }
 
 public actor AppDiscovery {
-    private let resourceKeys: [URLResourceKey] = [
-        .fileSizeKey, .totalFileAllocatedSizeKey, .isApplicationKey,
-        .contentModificationDateKey,
-    ]
-
     public init() {}
 
     public func discoverApps() -> [AppInfo] {

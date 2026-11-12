@@ -10,39 +10,40 @@ public enum CleanActions {
         engine: CleaningEngine,
         onProgress: (@Sendable (CleaningEngine.Progress) -> Void)? = nil
     ) async -> CleaningEngine.CleanResult {
-        var trashItems: [FileItem] = []
-        var permanentItems: [FileItem] = []
+        var deleteItems: [FileItem] = []
         var thinItems: [FileItem] = []
         for result in results {
             for item in result.items where selectedItems.contains(item.url) {
                 switch result.category {
                 case .universalBinaries:
                     thinItems.append(item)
-                case .trashBins:
-                    permanentItems.append(item)
                 default:
-                    trashItems.append(item)
+                    deleteItems.append(item)
                 }
             }
         }
 
-        let dedupedTrashItems = Self.prunedToParents(trashItems)
-        let dedupedPermanentItems = Self.prunedToParents(permanentItems)
+        let dedupedItems = Self.prunedToParents(deleteItems)
+        let totalItemsCount = max(dedupedItems.count, 1)
 
-        let trashResult = await engine.clean(items: dedupedTrashItems, mode: .trash,
-                                             onProgress: onProgress)
-        CleanHistoryRecorder.record(trashedItems: trashResult.trashedItems)
+        onProgress?(CleaningEngine.Progress(
+            totalItems: totalItemsCount,
+            processedItems: 0,
+            removedSoFar: 0,
+            freedBytesSoFar: 0
+        ))
+
+        let deleteResult = await engine.clean(
+            items: dedupedItems,
+            mode: .permanent,
+            onProgress: onProgress
+        )
         if Task.isCancelled {
-            return trashResult
+            return deleteResult
         }
 
-        let permanentResult = await engine.clean(items: dedupedPermanentItems, mode: .permanent,
-                                                 onProgress: onProgress)
-        let combinedResult = trashResult.merging(permanentResult)
-        if Task.isCancelled { return combinedResult }
-
         let thinResult = await thinSelectedBinaries(thinItems)
-        return combinedResult.merging(thinResult)
+        return deleteResult.merging(thinResult)
     }
 
     private static func thinSelectedBinaries(
@@ -100,9 +101,8 @@ public enum CleanActions {
     ) async -> CleaningEngine.CleanResult {
         let filtered = items.filter { selectedItems.contains($0.url) }
         let deduped = Self.prunedToParents(filtered)
-        let result = await engine.clean(items: deduped, mode: .trash,
+        let result = await engine.clean(items: deduped, mode: .permanent,
                                   onProgress: onProgress)
-        CleanHistoryRecorder.record(trashedItems: result.trashedItems)
         return result
     }
 
@@ -116,19 +116,19 @@ public enum CleanActions {
         var kept: [FileItem] = []
         kept.reserveCapacity(sorted.count)
         for item in sorted {
-            let path: String = item.url.standardizedFileURL.path(percentEncoded: false)
+            let rawPath = item.url.path(percentEncoded: false)
+            let path = (rawPath as NSString).standardizingPath
             guard !keptPaths.contains(path) else { continue }
-            var parent: URL = item.url.standardizedFileURL.deletingLastPathComponent()
-            var hasAncestor: Bool = false
-            while true {
-                let parentPath: String = parent.path(percentEncoded: false)
+            var parentPath = (path as NSString).deletingLastPathComponent
+            var hasAncestor = false
+            while parentPath != "/" && !parentPath.isEmpty {
                 if keptPaths.contains(parentPath) {
                     hasAncestor = true
                     break
                 }
-                let next: URL = parent.deletingLastPathComponent()
-                if next == parent { break }
-                parent = next
+                let next = (parentPath as NSString).deletingLastPathComponent
+                if next == parentPath { break }
+                parentPath = next
             }
             if !hasAncestor {
                 kept.append(item)

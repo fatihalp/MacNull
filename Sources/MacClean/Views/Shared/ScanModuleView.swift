@@ -7,8 +7,8 @@ struct ScanModuleView: View {
 
     private var theme: ModuleTheme {
         switch feature {
-        case .mailAttachments, .trashBins: .cleanup
-        case .malware, .privacy: .protection
+        case .mailAttachments, .trashBins, .privacy: .cleanup
+        case .malware: .protection
         case .largeOldFiles: .files
         }
     }
@@ -18,7 +18,7 @@ struct ScanModuleView: View {
         case .mailAttachments: String(localized: "Find cached email attachments from Mail, Outlook, and Spark")
         case .trashBins: String(localized: "Empty all trash locations including external drives")
         case .malware: String(localized: "Scan for viruses, adware, and other threats")
-        case .privacy: String(localized: "Clean browser data, history, cookies, and system traces")
+        case .privacy: String(localized: "Clean browser caches, temporary web files, and site storage")
         case .largeOldFiles: String(localized: "Find files larger than 50 MB that haven't been accessed recently")
         }
     }
@@ -28,7 +28,7 @@ struct ScanModuleView: View {
         case .mailAttachments: String(localized: "No attachments found")
         case .trashBins: String(localized: "Trash is empty")
         case .malware: String(localized: "No threats detected")
-        case .privacy: String(localized: "No privacy traces found")
+        case .privacy: String(localized: "No browser caches found")
         case .largeOldFiles: String(localized: "No large or old files found")
         }
     }

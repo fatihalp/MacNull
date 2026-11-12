@@ -8,7 +8,7 @@ extension SidebarItem {
         case .mailAttachments: "paperclip"
         case .trashBins: "trash.slash.fill"
         case .malwareRemoval: "shield.fill"
-        case .privacy: "hand.raised.fill"
+        case .privacy: "globe"
         case .wifiNetworks: "wifi"
         case .appPermissions: "lock.shield.fill"
         case .optimization: "gauge.with.dots.needle.67percent"
@@ -78,7 +78,7 @@ extension SidebarItem {
         switch self {
         case .smartScan: .smartScan
         case .systemJunk, .mailAttachments, .trashBins, .projectJunk, .diskHogs, .cleanHistory: .cleanup
-        case .malwareRemoval, .privacy, .browserExtensions, .wifiNetworks, .appPermissions: .protection
+        case .malwareRemoval, .privacy, .browserExtensions, .wifiNetworks, .appPermissions: .cleanup
         case .optimization, .maintenance: .performance
         case .uninstaller, .unusedApps, .extensions, .updater: .applications
         case .spaceLens, .largeOldFiles, .duplicates, .shredder: .files
@@ -105,7 +105,7 @@ extension SidebarItem {
         case .malwareRemoval:
             "Scan memory, launch agents, and applications for security threats."
         case .privacy:
-            "Clean browser histories, cookies, autofill, and tracking traces."
+            "Clean web browser caches and temporary web storage to free up disk space."
         case .wifiNetworks:
             "Audit saved Wi-Fi networks and remove unsecured hotspots."
         case .appPermissions:
@@ -147,7 +147,7 @@ extension SidebarItem {
         case .projectJunk: "Clean Builds"
         case .cleanHistory: "View History"
         case .malwareRemoval: "Scan Malware"
-        case .privacy: "Review Privacy"
+        case .privacy: "Review Caches"
         case .wifiNetworks: "Inspect Networks"
         case .appPermissions: "Review Permissions"
         case .browserExtensions: "Manage Extensions"
@@ -171,7 +171,6 @@ extension SidebarCategory {
         switch self {
         case .smartScan: "sparkles"
         case .cleanup: "trash.fill"
-        case .protection: "shield.fill"
         case .performance: "gauge.with.dots.needle.67percent"
         case .applications: "square.stack.3d.up.fill"
         case .files: "doc.fill"
@@ -185,8 +184,6 @@ extension SidebarCategory {
             Color(nsColor: .systemIndigo)
         case .cleanup:
             Color(nsColor: .systemBlue)
-        case .protection:
-            Color(nsColor: .systemGreen)
         case .performance:
             Color(nsColor: .systemOrange)
         case .applications:
@@ -201,11 +198,9 @@ extension SidebarCategory {
     public var subtitle: String {
         switch self {
         case .smartScan:
-            "Clean, protect, and optimize your Mac in one click."
+            "Clean and optimize your Mac in one click."
         case .cleanup:
             "Reclaim storage by removing system junk, caches, mail attachments, and trash."
-        case .protection:
-            "Safeguard your Mac against malware, unauthorized permissions, and privacy risks."
         case .performance:
             "Optimize background processes, startup items, and run vital maintenance routines."
         case .applications:

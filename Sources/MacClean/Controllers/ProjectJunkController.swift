@@ -104,9 +104,10 @@ final class ProjectJunkController {
             scanProgress = 0.95
             let statuses = await scanner.gitStatuses(for: foundItems)
             guard !Task.isCancelled, generation == scanGeneration else { return }
-            items = foundItems
+            let sortedItems = foundItems.sorted { $0.bytes > $1.bytes }
+            items = sortedItems
             gitStatuses = statuses
-            results = scanner.asScanResults(foundItems)
+            results = scanner.asScanResults(sortedItems)
             selectedItems = []
             scanProgress = 1
             isScanning = false
