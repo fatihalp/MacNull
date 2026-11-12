@@ -22,9 +22,8 @@ public struct ProjectJunkModule: ScanModule {
         guard !roots.isEmpty else { return [] }
         let scanner = self.scanner
         let results = await Task.detached(priority: .userInitiated) {
-            let items = scanner.scan(roots: roots, onProgress: { progress in
-                let pct = Int(progress * 100)
-                onProgress?("\(pct)%", 0, 0, progress)
+            let items = scanner.scan(roots: roots, onProgress: { progress, count, bytes in
+                onProgress?(name, count, bytes, progress)
             })
             return scanner.asScanResults(items)
         }.value

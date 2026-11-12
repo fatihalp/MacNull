@@ -2,6 +2,46 @@ import Foundation
 import Darwin
 import MacCleanKit
 
+final class ProgressAccumulator: @unchecked Sendable {
+    private let lock = NSLock()
+    private var count = 0
+    private var bytes: UInt64 = 0
+    private var lastReportUptime: UInt64 = 0
+    private let onProgress: (@Sendable (Int, UInt64) -> Void)?
+
+    init(onProgress: (@Sendable (Int, UInt64) -> Void)?) {
+        self.onProgress = onProgress
+    }
+
+    func add(count: Int, bytes: UInt64) {
+        guard let onProgress else { return }
+        lock.lock()
+        self.count += count
+        self.bytes += bytes
+        let now = DispatchTime.now().uptimeNanoseconds
+        let elapsed = now - lastReportUptime
+        let shouldReport = elapsed > 50_000_000
+        if shouldReport {
+            lastReportUptime = now
+            let currentCount = self.count
+            let currentBytes = self.bytes
+            lock.unlock()
+            onProgress(currentCount, currentBytes)
+        } else {
+            lock.unlock()
+        }
+    }
+
+    func flush() {
+        guard let onProgress else { return }
+        lock.lock()
+        let currentCount = self.count
+        let currentBytes = self.bytes
+        lock.unlock()
+        onProgress(currentCount, currentBytes)
+    }
+}
+
 public actor TargetedScanner {
     private let resourceKeys: [URLResourceKey] = [
         .fileSizeKey, .fileAllocatedSizeKey,
@@ -25,27 +65,28 @@ public actor TargetedScanner {
         onProgress: (@Sendable (_ itemsFound: Int, _ bytesFound: UInt64) -> Void)? = nil
     ) async -> ScanOutcome {
         let keys = resourceKeys
+        let accumulator = ProgressAccumulator(onProgress: onProgress)
         return await withTaskGroup(of: (items: [FileItem], deniedPath: URL?).self) { group in
             for target in targets {
                 group.addTask {
-                    Self.scanTarget(target, keys: keys)
+                    Self.scanTarget(target, keys: keys, onBatch: { count, bytes in
+                        accumulator.add(count: count, bytes: bytes)
+                    })
                 }
             }
 
             var allItems: [FileItem] = []
             var seenURLs = Set<URL>()
             var deniedPaths: [URL] = []
-            var totalBytes: UInt64 = 0
             for await result in group {
                 for item in result.items where seenURLs.insert(item.url).inserted {
                     allItems.append(item)
-                    totalBytes += item.size
                 }
                 if let denied = result.deniedPath {
                     deniedPaths.append(denied)
                 }
-                onProgress?(allItems.count, totalBytes)
             }
+            accumulator.flush()
             return ScanOutcome(items: allItems, permissionDeniedPaths: deniedPaths)
         }
     }
@@ -56,7 +97,11 @@ public actor TargetedScanner {
         return errno == EPERM || errno == EACCES
     }
 
-    private static func scanTarget(_ target: ScanTarget, keys: [URLResourceKey]) -> (items: [FileItem], deniedPath: URL?) {
+    private static func scanTarget(
+        _ target: ScanTarget,
+        keys: [URLResourceKey],
+        onBatch: (@Sendable (Int, UInt64) -> Void)? = nil
+    ) -> (items: [FileItem], deniedPath: URL?) {
         let fm = FileManager.default
 
         guard fm.fileExists(atPath: target.path.path(percentEncoded: false)) else {
@@ -124,6 +169,7 @@ public actor TargetedScanner {
                 if matchesTarget(url: fileURL, target: target),
                    let item = makeFileItem(from: fileURL, keys: keys) {
                     results.append(item)
+                    onBatch?(1, item.size)
                 }
             }
         } else {
@@ -138,6 +184,7 @@ public actor TargetedScanner {
                 if matchesTarget(url: fileURL, target: target),
                    let item = makeFileItem(from: fileURL, keys: keys, computeDirSizeIfNeeded: true) {
                     results.append(item)
+                    onBatch?(1, item.size)
                 }
             }
         }

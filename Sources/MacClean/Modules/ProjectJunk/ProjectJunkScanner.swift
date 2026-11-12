@@ -53,7 +53,7 @@ public struct ProjectJunkScanner: Sendable {
     public func scan(
         root: URL,
         maxDepth: Int = 6,
-        onProgress: (@Sendable (Double) -> Void)? = nil
+        onProgress: (@Sendable (Double, Int, UInt64) -> Void)? = nil
     ) -> [ProjectJunkItem] {
         scan(roots: [root], maxDepth: maxDepth, onProgress: onProgress)
     }
@@ -61,7 +61,7 @@ public struct ProjectJunkScanner: Sendable {
     public func scan(
         roots: [URL],
         maxDepth: Int = 6,
-        onProgress: (@Sendable (Double) -> Void)? = nil
+        onProgress: (@Sendable (Double, Int, UInt64) -> Void)? = nil
     ) -> [ProjectJunkItem] {
         let allowedRoots = roots.filter { Self.isAllowedRoot($0) }
         guard !allowedRoots.isEmpty else { return [] }
@@ -72,19 +72,23 @@ public struct ProjectJunkScanner: Sendable {
             allNodes.append(contentsOf: collectNodes(root: root, maxDepth: maxDepth))
         }
         let matches = ProjectJunkFinder.find(nodes: allNodes)
-        onProgress?(Self.walkShare)
+        onProgress?(Self.walkShare, 0, 0)
 
         var items: [ProjectJunkItem] = []
+        var runningBytes: UInt64 = 0
         for (index, item) in matches.enumerated() {
             if Task.isCancelled { return [] }
+            let bytes = Self.directoryBytes(URL(filePath: item.path, directoryHint: .isDirectory))
+            runningBytes += bytes
             items.append(ProjectJunkItem(
                 path: item.path,
                 projectPath: item.projectPath,
                 kind: item.kind,
-                bytes: Self.directoryBytes(URL(filePath: item.path, directoryHint: .isDirectory)),
+                bytes: bytes,
                 projectModified: item.projectModified
             ))
-            onProgress?(Self.walkShare + (1 - Self.walkShare) * Double(index + 1) / Double(matches.count))
+            let fraction = Self.walkShare + (1 - Self.walkShare) * Double(index + 1) / Double(matches.count)
+            onProgress?(fraction, items.count, runningBytes)
         }
         return items
     }

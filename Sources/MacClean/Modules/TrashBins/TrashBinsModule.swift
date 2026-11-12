@@ -11,7 +11,22 @@ public struct TrashBinsModule: ScanModule {
     public init() {}
 
     public func scan() async -> [ScanResult] {
-        await scanReportingPermissions().results
+        await scan(onProgress: nil)
+    }
+
+    public func scan(
+        onProgress: (@Sendable (_ phase: String, _ count: Int, _ bytes: UInt64, _ fraction: Double) -> Void)?
+    ) async -> [ScanResult] {
+        let outcome = await scanner.scanReportingPermissions(targets: Self.targets()) { count, bytes in
+            onProgress?(name, count, bytes, 0.5)
+        }
+        guard !outcome.items.isEmpty else { return [] }
+        let results = [ScanResult(category: .trashBins, items: outcome.items)]
+            .filteringUncleanable()
+        let totalCount = results.reduce(0) { $0 + $1.fileCount }
+        let totalBytes = results.reduce(0) { $0 + $1.totalSize }
+        onProgress?(name, totalCount, totalBytes, 1.0)
+        return results
     }
 
     public func scanReportingPermissions() async -> (results: [ScanResult], permissionDenied: Bool) {
