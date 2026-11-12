@@ -35,7 +35,7 @@ final class SmartScanController {
         let initialModuleName = String(localized: "System Junk")
         currentModuleName = initialModuleName
         scanState = .scanning(
-            phase: initialModuleName, progress: 0.01, filesFound: 0, sizeFound: 0
+            phase: initialModuleName, progress: 0.0, filesFound: 0, sizeFound: 0
         )
         coordinator.scanSmart(mode: scanMode) { [weak self] state in
             self?.receive(state)

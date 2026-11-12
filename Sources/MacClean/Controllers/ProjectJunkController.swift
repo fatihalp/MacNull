@@ -86,7 +86,7 @@ final class ProjectJunkController {
         let scanner = scanner
         scanTask = Task {
             let worker = Task.detached(priority: .userInitiated) {
-                scanner.scan(roots: roots) { fraction in
+                scanner.scan(roots: roots) { fraction, _, _ in
                     Task { @MainActor in
                         guard generation == self.scanGeneration else { return }
                         self.scanProgress = max(self.scanProgress, fraction * 0.9)
