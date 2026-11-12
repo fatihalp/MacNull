@@ -7,8 +7,6 @@ struct ContentView: View {
     @State private var visited: Set<SidebarItem> = []
     @State private var history: [SidebarItem] = []
     @State private var historyIndex: Int = -1
-    @State private var updateCoordinator = UpdateCoordinator()
-    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var state = appState
@@ -24,15 +22,16 @@ struct ContentView: View {
                 }
             )
             .toolbar(removing: .sidebarToggle)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
         } detail: {
             if state.selectedCategory == .smartScan {
                 SmartScanView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
+                    .background(Color(nsColor: .windowBackgroundColor))
             } else if state.selectedCategory == .settings {
                 SettingsPageView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
+                    .background(Color(nsColor: .windowBackgroundColor))
             } else if let activeItem = appState.selectedSidebarItem {
                 VStack(spacing: 0) {
                     HStack(spacing: 8) {
@@ -111,7 +110,7 @@ struct ContentView: View {
             } else {
                 CategoryHubView(category: state.selectedCategory)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.white)
+                    .background(Color(nsColor: .windowBackgroundColor))
             }
         }
         .navigationTitle(
@@ -154,47 +153,6 @@ struct ContentView: View {
             }
             history.append(newValue)
             historyIndex = history.count - 1
-        }
-        .task {
-            try? await Task.sleep(for: .seconds(3))
-            await updateCoordinator.runCheckIfDue()
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                Task { await updateCoordinator.runCheckIfDue() }
-            }
-        }
-        .alert(
-            "Update available",
-            isPresented: Binding(
-                get: { updateCoordinator.pendingUpdate != nil },
-                set: { if !$0 { updateCoordinator.dismiss() } }
-            ),
-            presenting: updateCoordinator.pendingUpdate
-        ) { pending in
-            switch pending.action {
-            case .brewCommand:
-                Button("Copy Upgrade Command") {
-                    updateCoordinator.performPrimaryAction()
-                }
-            case .openRelease:
-                Button("Download") {
-                    updateCoordinator.performPrimaryAction()
-                }
-            }
-            Button("Skip This Version") {
-                updateCoordinator.skip(pending.version)
-            }
-            Button("Later", role: .cancel) {
-                updateCoordinator.dismiss()
-            }
-        } message: { pending in
-            switch pending.action {
-            case .brewCommand(let cmd):
-                Text("Mac Sai \(pending.version) is available. Upgrade with Homebrew:\n\(cmd)")
-            case .openRelease:
-                Text("Mac Sai \(pending.version) is available.")
-            }
         }
     }
 

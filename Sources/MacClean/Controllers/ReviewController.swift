@@ -13,7 +13,7 @@ final class ReviewController {
         case .mailAttachments: "mail_attachments"
         case .trashBins: "trash_bins"
         case .malware: "malware"
-        case .browserPrivacy: "privacy"
+        case .browserPrivacy: "browser_cleanup"
         default: "module"
         }
         let data = await ReviewService.build(modules: [ModuleScanResult(

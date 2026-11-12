@@ -33,11 +33,30 @@ public extension Array where Element == ScanResult {
     func filteringUncleanable(
         excludedFolders: [String] = FolderExclusionPreferences.paths
     ) -> [ScanResult] {
-        map { result in
+        var parentWritableCache: [String: Bool] = [:]
+        return map { result in
             ScanResult(
                 category: result.category,
-                items: result.items.filter {
-                    CleanFilter.isActionable($0.url, excludedFolders: excludedFolders)
+                items: result.items.filter { item in
+                    let url = item.url
+                    if !excludedFolders.isEmpty && PathExclusion.isExcluded(url, by: excludedFolders) {
+                        return false
+                    }
+                    let path = url.path(percentEncoded: false)
+                    let parent = (path as NSString).deletingLastPathComponent
+                    let isParentWritable: Bool
+                    if let cached = parentWritableCache[parent] {
+                        isParentWritable = cached
+                    } else {
+                        let writable = access(parent, W_OK) == 0
+                        parentWritableCache[parent] = writable
+                        isParentWritable = writable
+                    }
+                    guard isParentWritable else { return false }
+                    if item.isDirectory {
+                        return access(path, W_OK) == 0
+                    }
+                    return true
                 },
                 autoSelect: result.autoSelect
             )

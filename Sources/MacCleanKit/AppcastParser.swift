@@ -21,8 +21,22 @@ public final class AppcastParser: NSObject, XMLParserDelegate, @unchecked Sendab
 
     public override init() { super.init() }
 
-    public func parseLatestVersion(from data: Data) -> String? {
-        parseLatestItem(from: data).version
+    public static func isNewer(_ candidate: String, than current: String) -> Bool {
+        let lhs = candidate.split(separator: ".").map { Int($0) ?? 0 }
+        let rhs = current.split(separator: ".").map { Int($0) ?? 0 }
+        for i in 0..<max(lhs.count, rhs.count) {
+            let l = i < lhs.count ? lhs[i] : 0
+            let r = i < rhs.count ? rhs[i] : 0
+            if l != r { return l > r }
+        }
+        return false
+    }
+
+    public static func preferredAppcastVersion(
+        shortVersion: String?,
+        buildVersion: String?
+    ) -> String? {
+        shortVersion ?? buildVersion
     }
 
     public func parseLatestItem(from data: Data) -> (version: String?, downloadURL: URL?) {
@@ -35,7 +49,7 @@ public final class AppcastParser: NSObject, XMLParserDelegate, @unchecked Sendab
         let parser = XMLParser(data: data)
         parser.delegate = self
         parser.parse()
-        let version = UpdateChecker.preferredAppcastVersion(
+        let version = Self.preferredAppcastVersion(
             shortVersion: bestShortVersion,
             buildVersion: bestBuildVersion
         )
@@ -119,7 +133,7 @@ public final class AppcastParser: NSObject, XMLParserDelegate, @unchecked Sendab
 
     private func shouldReplace(_ bestVersion: String?, with candidate: String) -> Bool {
         guard let bestVersion else { return true }
-        return UpdateChecker.isNewer(candidate, than: bestVersion)
+        return Self.isNewer(candidate, than: bestVersion)
     }
 
     private func resetCurrentItem() {

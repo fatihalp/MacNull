@@ -12,6 +12,9 @@ public struct SystemHardwareSpecs: Sendable {
     public let memoryUsed: UInt64
     public let diskTotal: UInt64
     public let diskFree: UInt64
+    public let diskPurgeable: UInt64
+    public let diskName: String
+    public let diskFormat: String
     public let batteryLevel: Int?
     public let isCharging: Bool
     public let uptime: TimeInterval
@@ -22,6 +25,18 @@ public struct SystemHardwareSpecs: Sendable {
 
     public var diskUsedFraction: Double {
         diskTotal > 0 && diskTotal >= diskFree ? Double(diskTotal - diskFree) / Double(diskTotal) : 0
+    }
+
+    public var isLowDiskSpace: Bool {
+        diskTotal > 0 && (Double(diskFree) / Double(diskTotal)) < 0.10
+    }
+
+    public var diskUsedFormatted: String {
+        FileSizeFormatter.format(diskTotal > diskFree ? (diskTotal - diskFree) : 0)
+    }
+
+    public var diskPurgeableFormatted: String {
+        FileSizeFormatter.format(diskPurgeable)
     }
 
     public var memoryUsedFormatted: String {
@@ -49,7 +64,7 @@ public enum SystemSpecsProvider {
         let cores = ProcessInfo.processInfo.activeProcessorCount
         let totalMem = ProcessInfo.processInfo.physicalMemory
         let usedMem = readUsedMemory()
-        let disk = readDiskSpace()
+        let disk = readDiskDetails()
         let battery = readBattery()
         let uptime = ProcessInfo.processInfo.systemUptime
 
@@ -62,6 +77,9 @@ public enum SystemSpecsProvider {
             memoryUsed: usedMem,
             diskTotal: disk.total,
             diskFree: disk.free,
+            diskPurgeable: disk.purgeable,
+            diskName: disk.name,
+            diskFormat: disk.format,
             batteryLevel: battery.level,
             isCharging: battery.isCharging,
             uptime: uptime
@@ -130,14 +148,30 @@ public enum SystemSpecsProvider {
         return pages * UInt64(pageSize)
     }
 
-    private static func readDiskSpace() -> (total: UInt64, free: UInt64) {
+    private static func readDiskDetails() -> (total: UInt64, free: UInt64, purgeable: UInt64, name: String, format: String) {
+        let url = URL(fileURLWithPath: "/")
+        let values = try? url.resourceValues(forKeys: [
+            .volumeTotalCapacityKey,
+            .volumeAvailableCapacityKey,
+            .volumeAvailableCapacityForImportantUsageKey,
+            .volumeNameKey,
+            .volumeLocalizedFormatDescriptionKey
+        ])
+
         var fs = statfs()
-        guard statfs("/", &fs) == 0 else {
-            return (0, 0)
-        }
-        let total = UInt64(fs.f_blocks) * UInt64(fs.f_bsize)
-        let free = UInt64(fs.f_bavail) * UInt64(fs.f_bsize)
-        return (total, free)
+        let statfsSuccess = statfs("/", &fs) == 0
+        let statfsTotal = statfsSuccess ? UInt64(fs.f_blocks) * UInt64(fs.f_bsize) : 0
+        let statfsFree = statfsSuccess ? UInt64(fs.f_bavail) * UInt64(fs.f_bsize) : 0
+
+        let total = (values?.volumeTotalCapacity).map(UInt64.init) ?? statfsTotal
+        let free = (values?.volumeAvailableCapacity).map(UInt64.init) ?? statfsFree
+        let important = (values?.volumeAvailableCapacityForImportantUsage).map(UInt64.init) ?? free
+        let purgeable = important > free ? (important - free) : 0
+
+        let name = values?.volumeName ?? "Macintosh HD"
+        let format = values?.volumeLocalizedFormatDescription ?? "APFS"
+
+        return (total, free, purgeable, name, format)
     }
 
     private static func readBattery() -> (level: Int?, isCharging: Bool) {

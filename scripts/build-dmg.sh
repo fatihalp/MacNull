@@ -59,6 +59,7 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
     <key>CFBundleLocalizations</key>
     <array>
         <string>en</string>
+        <string>tr</string>
         <string>ru</string>
         <string>de</string>
         <string>zh-Hans</string>
@@ -133,6 +134,7 @@ cat > "${MENU_APP}/Contents/Info.plist" << MENU_PLIST
     <key>CFBundleLocalizations</key>
     <array>
         <string>en</string>
+        <string>tr</string>
         <string>ru</string>
         <string>de</string>
         <string>zh-Hans</string>

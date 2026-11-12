@@ -2,57 +2,65 @@ import Foundation
 
 public struct UserCacheCategory: JunkCategory {
     public init() {}
-    public let scanCategory = ScanCategory.userCaches
+    public let scanCategory: ScanCategory = ScanCategory.userCaches
     public var targets: [ScanTarget] {
-        [
+        var list: [ScanTarget] = [
             ScanTarget(
                 path: MCConstants.userCaches,
-                recursive: true,
+                recursive: false,
                 excludePatterns: ["com.spotify.client", "org.gradle"],
-
-                excludedPaths: [MCConstants.homebrewCache, MCConstants.pipCache]
+                excludedPaths: MCConstants.userCachesExcludedPaths
+            ),
+            ScanTarget(
+                path: MCConstants.coreSpotlightPipelineStorage,
+                recursive: false
+            ),
+            ScanTarget(
+                path: MCConstants.assistantLLMCache,
+                recursive: false
             ),
         ]
+        if let darwinCache: URL = MCConstants.darwinUserCacheDir {
+            list.append(ScanTarget(path: darwinCache, recursive: false))
+        }
+        if let darwinTemp: URL = MCConstants.darwinUserTempDir {
+            list.append(ScanTarget(path: darwinTemp, recursive: false))
+        }
+        return list
     }
 }
 
 public struct SystemCacheCategory: JunkCategory {
     public init() {}
-    public let scanCategory = ScanCategory.systemCaches
+    public let scanCategory: ScanCategory = ScanCategory.systemCaches
     public var targets: [ScanTarget] {
-        [ScanTarget(path: MCConstants.systemCaches, recursive: true)]
+        [
+            ScanTarget(path: MCConstants.systemCaches, recursive: false),
+            ScanTarget(path: MCConstants.osSystemCaches, recursive: false),
+        ]
     }
 }
 
 public struct UserLogCategory: JunkCategory {
     public init() {}
-    public let scanCategory = ScanCategory.userLogs
+    public let scanCategory: ScanCategory = ScanCategory.userLogs
     public var targets: [ScanTarget] {
         [
-            ScanTarget(
-                path: MCConstants.userLogs,
-                recursive: true,
-                fileExtensions: ["log", "txt", "crash", "diag", "ips"]
-            ),
+            ScanTarget(path: MCConstants.userLogs, recursive: true),
+            ScanTarget(path: MCConstants.userDiagnosticReports, recursive: true),
         ]
     }
 }
 
 public struct SystemLogCategory: JunkCategory {
     public init() {}
-    public let scanCategory = ScanCategory.systemLogs
+    public let scanCategory: ScanCategory = ScanCategory.systemLogs
     public var targets: [ScanTarget] {
         [
-            ScanTarget(
-                path: MCConstants.systemLogs,
-                recursive: true,
-                fileExtensions: ["log", "txt", "crash", "diag"]
-            ),
-            ScanTarget(
-                path: MCConstants.varLog,
-                recursive: true,
-                fileExtensions: ["log", "gz"]
-            ),
+            ScanTarget(path: MCConstants.systemLogs, recursive: true),
+            ScanTarget(path: MCConstants.varLog, recursive: true),
+            ScanTarget(path: MCConstants.varLogSymlink, recursive: true),
+            ScanTarget(path: MCConstants.systemDiagnosticReports, recursive: true),
         ]
     }
 }
@@ -93,7 +101,8 @@ public struct BrokenDownloadsCategory: JunkCategory {
         [
             ScanTarget(
                 path: MCConstants.downloads,
-                recursive: false,
+                recursive: true,
+                maxDepth: 3,
                 fileExtensions: ["download", "crdownload", "part", "partial"]
             ),
         ]
@@ -137,8 +146,9 @@ public struct UnusedDiskImagesCategory: JunkCategory {
         [
             ScanTarget(
                 path: MCConstants.downloads,
-                recursive: false,
-                fileExtensions: ["dmg", "iso", "sparseimage"],
+                recursive: true,
+                maxDepth: 3,
+                fileExtensions: ["dmg", "iso", "sparseimage", "pkg"],
                 minAge: 7 * 24 * 3600
             ),
         ]
@@ -153,8 +163,10 @@ public struct XcodeJunkCategory: JunkCategory {
             ScanTarget(path: MCConstants.xcodeDerivedData, recursive: false),
             ScanTarget(path: MCConstants.xcodeArchives, recursive: false),
             ScanTarget(path: MCConstants.xcodeDeviceSupport, recursive: false),
-            ScanTarget(path: MCConstants.coreSimulator, recursive: false),
+            ScanTarget(path: MCConstants.coreSimulator.appending(path: "Caches"), recursive: false),
             ScanTarget(path: MCConstants.xcodePreviews, recursive: false),
+            ScanTarget(path: MCConstants.userLibrary.appending(path: "Developer/Xcode/iOS Device Logs"), recursive: false),
+            ScanTarget(path: MCConstants.userLibrary.appending(path: "Developer/Xcode/UserData/IB Support"), recursive: false),
         ]
     }
 }

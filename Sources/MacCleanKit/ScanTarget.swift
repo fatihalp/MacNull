@@ -49,37 +49,4 @@ public struct ScanTarget: Sendable, Equatable {
     public static func isHiddenEntry(_ url: URL) -> Bool {
         url.lastPathComponent.hasPrefix(".")
     }
-
-    public func matchesByNameRules(_ url: URL) -> Bool {
-        let name = url.lastPathComponent
-
-        for pattern in excludePatterns {
-            if name.localizedCaseInsensitiveContains(pattern) {
-                return false
-            }
-        }
-
-        if let extensions = fileExtensions, !extensions.isEmpty {
-            let ext = url.pathExtension.lowercased()
-            if !extensions.contains(ext) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    public func passesSizeFilter(_ size: UInt64) -> Bool {
-        guard let minSize else { return true }
-        return size >= minSize
-    }
-
-    public func passesAgeFilters(modificationDate: Date?, now: Date = Date()) -> Bool {
-        guard minAge != nil || maxAge != nil else { return true }
-        guard let modDate = modificationDate else { return false }
-        let age = now.timeIntervalSince(modDate)
-        if let minAge, age < minAge { return false }
-        if let maxAge, age > maxAge { return false }
-        return true
-    }
 }

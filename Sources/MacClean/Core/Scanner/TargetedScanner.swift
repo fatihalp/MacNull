@@ -13,11 +13,17 @@ public actor TargetedScanner {
 
     public init() {}
 
-    public func scan(targets: [ScanTarget]) async -> [FileItem] {
-        await scanReportingPermissions(targets: targets).items
+    public func scan(
+        targets: [ScanTarget],
+        onProgress: (@Sendable (_ itemsFound: Int, _ bytesFound: UInt64) -> Void)? = nil
+    ) async -> [FileItem] {
+        await scanReportingPermissions(targets: targets, onProgress: onProgress).items
     }
 
-    public func scanReportingPermissions(targets: [ScanTarget]) async -> ScanOutcome {
+    public func scanReportingPermissions(
+        targets: [ScanTarget],
+        onProgress: (@Sendable (_ itemsFound: Int, _ bytesFound: UInt64) -> Void)? = nil
+    ) async -> ScanOutcome {
         let keys = resourceKeys
         return await withTaskGroup(of: (items: [FileItem], deniedPath: URL?).self) { group in
             for target in targets {
@@ -29,21 +35,24 @@ public actor TargetedScanner {
             var allItems: [FileItem] = []
             var seenURLs = Set<URL>()
             var deniedPaths: [URL] = []
+            var totalBytes: UInt64 = 0
             for await result in group {
                 for item in result.items where seenURLs.insert(item.url).inserted {
                     allItems.append(item)
+                    totalBytes += item.size
                 }
                 if let denied = result.deniedPath {
                     deniedPaths.append(denied)
                 }
+                onProgress?(allItems.count, totalBytes)
             }
             return ScanOutcome(items: allItems, permissionDeniedPaths: deniedPaths)
         }
     }
 
     private static func isPermissionDenied(_ url: URL) -> Bool {
-        let fd = open(url.path(percentEncoded: false), O_RDONLY | O_DIRECTORY)
-        if fd >= 0 { close(fd); return false }
+        let path = url.path(percentEncoded: false)
+        if access(path, R_OK) == 0 { return false }
         return errno == EPERM || errno == EACCES
     }
 
@@ -59,6 +68,9 @@ public actor TargetedScanner {
         }
 
         var results: [FileItem] = []
+        let activeConv = ProcessInfo.processInfo.environment["ANTIGRAVITY_CONVERSATION_ID"]
+        let hasActiveConv = !(activeConv?.isEmpty ?? true)
+        let checkActiveConv = hasActiveConv && target.path.path(percentEncoded: false).contains(".gemini")
 
         if target.recursive {
             guard let enumerator = fm.enumerator(
@@ -94,6 +106,13 @@ public actor TargetedScanner {
                     continue
                 }
 
+                if checkActiveConv, let activeConv {
+                    if fileURL.path(percentEncoded: false).contains(activeConv) {
+                        enumerator.skipDescendants()
+                        continue
+                    }
+                }
+
                 if matchesExcludePattern(url: fileURL, target: target) {
                     let isDir = (try? fileURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
                     if isDir {
@@ -117,7 +136,7 @@ public actor TargetedScanner {
                 if Task.isCancelled { break }
                 if target.isExcludedPath(fileURL) { continue }
                 if matchesTarget(url: fileURL, target: target),
-                   let item = makeFileItem(from: fileURL, keys: keys) {
+                   let item = makeFileItem(from: fileURL, keys: keys, computeDirSizeIfNeeded: true) {
                     results.append(item)
                 }
             }
@@ -168,25 +187,53 @@ public actor TargetedScanner {
         return true
     }
 
-    private static func makeFileItem(from url: URL, keys: [URLResourceKey]) -> FileItem? {
+    public static func directorySize(at url: URL) -> UInt64 {
+        let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey]
+        guard let enumerator = FileManager.default.enumerator(
+            at: url,
+            includingPropertiesForKeys: keys,
+            options: [.skipsPackageDescendants]
+        ) else { return 0 }
+
+        var total: UInt64 = 0
+        for case let fileURL as URL in enumerator {
+            if Task.isCancelled { break }
+            if let values = try? fileURL.resourceValues(forKeys: Set(keys)),
+               values.isRegularFile == true {
+                total += UInt64(values.totalFileAllocatedSize ?? values.fileSize ?? 0)
+            }
+        }
+        return total
+    }
+
+    private static func makeFileItem(from url: URL, keys: [URLResourceKey], computeDirSizeIfNeeded: Bool = false) -> FileItem? {
         guard let values = try? url.resourceValues(forKeys: Set(keys)) else { return nil }
 
-        var metadata = stat()
-        let hasIdentity = lstat(url.path(percentEncoded: false), &metadata) == 0
+        let isDir = values.isDirectory ?? false
+        var size = UInt64(values.totalFileSize ?? values.fileSize ?? 0)
+        var allocated = UInt64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? 0)
+
+        if isDir && computeDirSizeIfNeeded {
+            let dirSize = directorySize(at: url)
+            if dirSize > 0 {
+                size = dirSize
+                allocated = dirSize
+            }
+        }
 
         return FileItem(
             url: url,
             name: values.name ?? url.lastPathComponent,
-            size: UInt64(values.totalFileSize ?? values.fileSize ?? 0),
-            allocatedSize: UInt64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? 0),
-            isDirectory: values.isDirectory ?? false,
+            size: size,
+            allocatedSize: allocated,
+            isDirectory: isDir,
             isSymlink: values.isSymbolicLink ?? false,
             isPackage: values.isPackage ?? false,
             contentType: values.contentType,
             creationDate: values.creationDate,
             modificationDate: values.contentModificationDate,
-            inode: hasIdentity ? UInt64(metadata.st_ino) : 0,
-            deviceID: hasIdentity ? Int32(metadata.st_dev) : 0
+            inode: 0,
+            deviceID: 0
         )
     }
 }

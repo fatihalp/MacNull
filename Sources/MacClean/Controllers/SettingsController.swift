@@ -5,40 +5,15 @@ import MacCleanKit
 
 @MainActor @Observable
 final class SettingsController {
-    private(set) var updateState: UpdateUIState = .idle
     private(set) var keptLanguages: Set<String> = []
     private(set) var selectable: [(name: String, lprojs: [String])] = []
     var languageSearch: String = ""
     private(set) var excludedFolders: [String] = FolderExclusionPreferences.paths
     private(set) var exclusionError: String?
 
-    enum UpdateUIState: Equatable {
-        case idle
-        case checking
-        case upToDate
-        case available(version: String, url: URL)
-        case failed(message: String)
-    }
-
     var filteredLanguages: [(name: String, lprojs: [String])] {
         guard !languageSearch.isEmpty else { return selectable }
         return selectable.filter { $0.name.localizedCaseInsensitiveContains(languageSearch) }
-    }
-
-    func startUpdateCheck() {
-        guard updateState != .checking else { return }
-        updateState = .checking
-        Task {
-            let result = await UpdateChecker.check()
-            switch result {
-            case .upToDate:
-                updateState = .upToDate
-            case .updateAvailable(let version, let url):
-                updateState = .available(version: version, url: url)
-            case .failed(let message):
-                updateState = .failed(message: message)
-            }
-        }
     }
 
     func addExcludedFolder() {
@@ -103,10 +78,6 @@ final class SettingsController {
         FolderExclusionPreferences.remove(path)
         excludedFolders = FolderExclusionPreferences.paths
         exclusionError = nil
-    }
-    func setInterfaceLanguage(_ identifier: String) {
-        Localization.currentID = identifier
-        selectable = LanguagePreferences.selectableLanguages()
     }
 
 }

@@ -5,6 +5,7 @@ import MacCleanKit
 @MainActor @Observable
 final class ReviewSelection {
     let data: ReviewData
+    public let scanMode: SmartScanMode
     @ObservationIgnored private var flags: [Bool]
     @ObservationIgnored private var categorySize: [UInt64]
     @ObservationIgnored private var categoryCount: [Int]
@@ -14,8 +15,9 @@ final class ReviewSelection {
 
     let lockedSummary: (appCount: Int, bytes: UInt64)?
 
-    init(data: ReviewData) {
+    init(data: ReviewData, mode: SmartScanMode = .safe) {
         self.data = data
+        self.scanMode = mode
         flags = Array(repeating: false, count: data.items.count)
         categorySize = Array(repeating: 0, count: data.categories.count)
         categoryCount = Array(repeating: 0, count: data.categories.count)
@@ -35,14 +37,55 @@ final class ReviewSelection {
         }
 
         for category in data.categories {
-            for group in category.groups where Self.isSmartPick(group, in: category) {
+            for group in category.groups where Self.isSmartPick(group, in: category, mode: mode) {
                 write(group.range, to: true, category: category.id)
             }
         }
     }
 
-    static func isSmartPick(_ node: ReviewNode, in category: ReviewCategory) -> Bool {
-        category.autoSelect && node.autoSelect && !node.appIsRunning && !node.isSensitive
+    static func isSmartPick(_ node: ReviewNode, in category: ReviewCategory, mode: SmartScanMode = .safe) -> Bool {
+        if node.appIsRunning || node.isSensitive { return false }
+        if category.category == .projectJunk {
+            return node.size >= 1_000_000_000
+        }
+        switch mode {
+        case .safe:
+            if node.isAIConversation || node.isOldVersion { return false }
+            return category.autoSelect && node.autoSelect
+        case .deep:
+            if category.autoSelect && node.autoSelect { return true }
+            let deepEligible: Set<ScanCategory> = [
+                .packageManagerCaches,
+                .aiToolCaches,
+                .ideCaches,
+                .appCaches,
+                .xcodeJunk,
+                .trashBins,
+                .appLeftovers,
+                .incompleteDownloads,
+                .brokenDownloads,
+            ]
+            return deepEligible.contains(category.category)
+        }
+    }
+
+    func hasSelectedAIConversations() -> Bool {
+        _ = revision
+        for i: Int in 0..<data.items.count where flags[i] {
+            if AIConversationMatcher.isConversation(path: data.items[i].path) {
+                return true
+            }
+        }
+        return false
+    }
+
+    func selectOver1GB(inCategory id: Int) {
+        let category = data.categories[id]
+        for group in category.groups {
+            let shouldSelect = group.size >= 1_000_000_000 && !group.appIsRunning && !group.isSensitive
+            write(group.range, to: shouldSelect, category: id)
+        }
+        revision &+= 1
     }
 
     func state(of range: Range<Int>) -> ReviewCheckState {
@@ -71,9 +114,9 @@ final class ReviewSelection {
         let category = data.categories[id]
         guard !category.range.isEmpty else { return .none }
         let isSmart = category.groups.allSatisfy { group in
-            state(of: group.range) == (Self.isSmartPick(group, in: category) ? .on : .off)
+            state(of: group.range) == (Self.isSmartPick(group, in: category, mode: scanMode) ? .on : .off)
         }
-        let hasExcludedSmartGroup = category.groups.contains { !Self.isSmartPick($0, in: category) }
+        let hasExcludedSmartGroup = category.groups.contains { !Self.isSmartPick($0, in: category, mode: scanMode) }
 
         if isSmart && hasExcludedSmartGroup { return .smart }
         if categoryCount[id] == category.range.count { return .all }
@@ -127,7 +170,7 @@ final class ReviewSelection {
         case .none: write(category.range, to: false, category: id)
         case .smart:
             for group in category.groups {
-                write(group.range, to: Self.isSmartPick(group, in: category), category: id)
+                write(group.range, to: Self.isSmartPick(group, in: category, mode: scanMode), category: id)
             }
         case .custom: return
         }

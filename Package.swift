@@ -1,5 +1,6 @@
 // swift-tools-version: 6.0
 
+
 import PackageDescription
 
 let package = Package(
@@ -10,6 +11,7 @@ let package = Package(
     ],
     products: [
         .executable(name: "MacClean", targets: ["MacClean"]),
+        .executable(name: "macclean", targets: ["MacClean"]),
         .executable(name: "MacCleanMenu", targets: ["MacCleanMenu"]),
         .library(name: "MacCleanKit", targets: ["MacCleanKit"]),
     ],

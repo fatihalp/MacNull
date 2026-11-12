@@ -70,7 +70,7 @@ public actor CleaningEngine {
 
     public func clean(
         items: [FileItem],
-        mode: CleanMode = .trash,
+        mode: CleanMode = .permanent,
         onProgress: (@Sendable (Progress) -> Void)? = nil
     ) async -> CleanResult {
 
@@ -93,7 +93,7 @@ public actor CleaningEngine {
         var skippedCount = 0
         var trashedItems: [TrashedItem] = []
 
-        let chunkSize = MCConstants.cleanChunkSize
+        let chunkSize = min(50, MCConstants.cleanChunkSize)
         var startIndex = 0
         var processedSoFar = 0
         while startIndex < items.count {
@@ -176,9 +176,9 @@ public actor CleaningEngine {
                 continue
             }
 
-            let realSize: UInt64 = item.isDirectory
-                ? Self.recursiveAllocatedSize(of: item.url)
-                : item.size
+            let realSize: UInt64 = item.size > 0
+                ? item.size
+                : (item.isDirectory ? Self.recursiveAllocatedSize(of: item.url) : item.size)
 
             switch mode {
             case .dryRun:

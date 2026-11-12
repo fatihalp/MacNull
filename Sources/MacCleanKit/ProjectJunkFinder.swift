@@ -37,6 +37,10 @@ public enum ProjectJunkKind: String, Equatable, Sendable, CaseIterable {
     case pythonVenv
     case pythonCache
     case pytestCache
+    case flutterBuild
+    case nodeBuild
+    case webBuild
+    case cmakeBuild
     case gradleBuild
     case gradleCache
     case mavenBuild
@@ -57,6 +61,10 @@ public enum ProjectJunkKind: String, Equatable, Sendable, CaseIterable {
         case .pythonVenv: "Python (venv)"
         case .pythonCache: "Python (__pycache__)"
         case .pytestCache: "Pytest (.pytest_cache)"
+        case .flutterBuild: "Flutter (build)"
+        case .nodeBuild: "Node (build)"
+        case .webBuild: "Web Assets (public/build)"
+        case .cmakeBuild: "CMake (build)"
         case .gradleBuild: "Gradle (build)"
         case .gradleCache: "Gradle (.gradle)"
         case .mavenBuild: "Maven (target)"
@@ -93,8 +101,6 @@ public struct ProjectJunkItem: Equatable, Sendable, Identifiable {
 
 public enum ProjectJunkFinder {
 
-    public static let defaultSelection: Set<String> = []
-
     private static let nodeMarkers: Set<String> = ["package.json"]
     private static let rustMarkers: Set<String> = ["Cargo.toml"]
     private static let swiftMarkers: Set<String> = ["Package.swift"]
@@ -108,6 +114,7 @@ public enum ProjectJunkFinder {
     private static let podsMarkers: Set<String> = ["Podfile"]
     private static let dartMarkers: Set<String> = ["pubspec.yaml"]
     private static let vendorMarkers: Set<String> = ["composer.json", "go.mod"]
+    private static let cmakeMarkers: Set<String> = ["CMakeLists.txt", "Makefile"]
 
     public static func find(nodes: [ProjectTreeNode]) -> [ProjectJunkItem] {
         let byPath = Dictionary(nodes.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
@@ -166,23 +173,46 @@ public enum ProjectJunkFinder {
 
             return isGitIgnored(node, byPath: byPath) ? .dist : nil
         case "target":
-            if !siblings.isDisjoint(with: rustMarkers) { return .rustTarget }
+            if !siblings.isDisjoint(with: rustMarkers) || isInsideRustProject(node, byPath: byPath) {
+                return .rustTarget
+            }
             if !siblings.isDisjoint(with: mavenMarkers) { return .mavenBuild }
             return nil
         case ".build" where !siblings.isDisjoint(with: swiftMarkers):
             return .swiftBuild
-        case "build" where !siblings.isDisjoint(with: gradleMarkers):
-            return .gradleBuild
+        case "build":
+            if !siblings.isDisjoint(with: gradleMarkers) { return .gradleBuild }
+            if !siblings.isDisjoint(with: dartMarkers) { return .flutterBuild }
+            if !siblings.isDisjoint(with: nodeMarkers) { return .nodeBuild }
+            if !siblings.isDisjoint(with: cmakeMarkers) { return .cmakeBuild }
+            if parent.name == "public" {
+                let grandparentPath = (parentPath as NSString).deletingLastPathComponent
+                if let grandparent = byPath[grandparentPath] {
+                    let gpSiblings = Set(grandparent.childNames)
+                    if !gpSiblings.isDisjoint(with: nodeMarkers) || !gpSiblings.isDisjoint(with: vendorMarkers) {
+                        return .webBuild
+                    }
+                }
+            }
+            return nil
         case ".gradle" where !siblings.isDisjoint(with: gradleMarkers):
             return .gradleCache
         case ".venv", "venv":
 
             guard node.childNames.contains("pyvenv.cfg") else { return nil }
             return siblings.isDisjoint(with: pythonMarkers) ? nil : .pythonVenv
-        case "__pycache__" where !siblings.isDisjoint(with: pythonMarkers):
-            return .pythonCache
-        case ".pytest_cache" where !siblings.isDisjoint(with: pythonMarkers):
-            return .pytestCache
+        case "__pycache__":
+            if !siblings.isDisjoint(with: pythonMarkers)
+                || siblings.contains(where: { $0.hasSuffix(".py") })
+                || isInsidePythonProject(node, byPath: byPath) {
+                return .pythonCache
+            }
+            return nil
+        case ".pytest_cache":
+            if !siblings.isDisjoint(with: pythonMarkers) || isInsidePythonProject(node, byPath: byPath) {
+                return .pytestCache
+            }
+            return nil
         case "Pods" where !siblings.isDisjoint(with: podsMarkers):
 
             return isGitIgnored(node, byPath: byPath) ? .cocoaPods : nil
@@ -193,6 +223,32 @@ public enum ProjectJunkFinder {
         default:
             return nil
         }
+    }
+
+    static func isInsideRustProject(_ node: ProjectTreeNode, byPath: [String: ProjectTreeNode]) -> Bool {
+        var dirPath = (node.path as NSString).deletingLastPathComponent
+        while let dir = byPath[dirPath] {
+            let siblings = Set(dir.childNames)
+            if !siblings.isDisjoint(with: rustMarkers) { return true }
+            if dir.childNames.contains(".git") { break }
+            let parent = (dirPath as NSString).deletingLastPathComponent
+            if parent == dirPath { break }
+            dirPath = parent
+        }
+        return false
+    }
+
+    static func isInsidePythonProject(_ node: ProjectTreeNode, byPath: [String: ProjectTreeNode]) -> Bool {
+        var dirPath = (node.path as NSString).deletingLastPathComponent
+        while let dir = byPath[dirPath] {
+            let siblings = Set(dir.childNames)
+            if !siblings.isDisjoint(with: pythonMarkers) { return true }
+            if dir.childNames.contains(".git") { break }
+            let parent = (dirPath as NSString).deletingLastPathComponent
+            if parent == dirPath { break }
+            dirPath = parent
+        }
+        return false
     }
 
     static func isGitIgnored(_ node: ProjectTreeNode, byPath: [String: ProjectTreeNode]) -> Bool {

@@ -124,9 +124,12 @@ public struct ProjectJunkScanner: Sendable {
     public func asScanResults(_ items: [ProjectJunkItem]) -> [ScanResult] {
         guard !items.isEmpty else { return [] }
         let files = items.map { item in
-            FileItem(
+            let projectName = (item.projectPath as NSString).lastPathComponent
+            let junkName = (item.path as NSString).lastPathComponent
+            let displayName = projectName.isEmpty ? junkName : "\(junkName) (\(projectName))"
+            return FileItem(
                 url: URL(filePath: item.path, directoryHint: .isDirectory),
-                name: (item.path as NSString).lastPathComponent,
+                name: displayName,
                 size: item.bytes,
                 allocatedSize: item.bytes,
                 isDirectory: true,

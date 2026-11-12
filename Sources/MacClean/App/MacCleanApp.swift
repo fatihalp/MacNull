@@ -2,29 +2,23 @@ import SwiftUI
 import AppKit
 import MacCleanKit
 
-@main
 struct MacCleanApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var appState = AppState()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @AppStorage("showMenuBarWidget") private var showMenuBarWidget = true
     @AppStorage("menuBarFirstLaunchDone") private var menuBarFirstLaunchDone = false
-    @AppStorage(Localization.defaultsKey, store: SharedAppState.defaults) private var appLanguage = "en"
     @State private var showOnboarding = false
 
     var body: some Scene {
         Window(MCConstants.appName, id: "main") {
             ContentView()
                 .environment(appState)
-                .environment(\.locale, Localization.locale(for: appLanguage))
                 .preferredColorScheme(.light)
-                .id(appLanguage)
                 .frame(minWidth: 880, minHeight: 580)
                 .sheet(isPresented: $showOnboarding) {
                     OnboardingView(isPresented: $showOnboarding)
-                        .environment(\.locale, Localization.locale(for: appLanguage))
                         .preferredColorScheme(.light)
-                        .id(appLanguage)
                 }
                 .onAppear {
                     AppearanceManager.apply(.light)

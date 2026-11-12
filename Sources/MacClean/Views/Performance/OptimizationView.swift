@@ -2,8 +2,8 @@ import SwiftUI
 import MacCleanKit
 
 struct OptimizationView: View {
+    @Environment(AppState.self) private var appState: AppState
     @State private var controller = OptimizationController()
-    @State private var selectedTab = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,12 +28,16 @@ struct OptimizationView: View {
             .padding(.horizontal, 24)
             .padding(.vertical, 16)
 
-            Picker("Section", selection: $selectedTab) {
+            Picker("Section", selection: Binding(
+                get: { appState.selectedOptimizationTab },
+                set: { appState.selectedOptimizationTab = $0 }
+            )) {
                 Text("Resource Hogs").tag(0)
                 Text("Login Items").tag(1)
                 Text("Launch Agents").tag(2)
                 Text("Launch Daemons").tag(3)
                 Text("File Associations").tag(4)
+                Text("System AI & Storage").tag(5)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -41,10 +45,12 @@ struct OptimizationView: View {
             .padding(.bottom, 10)
 
             Group {
-                if selectedTab == 0 {
+                if appState.selectedOptimizationTab == 0 {
                     ResourceHogsView()
-                } else if selectedTab == 4 {
+                } else if appState.selectedOptimizationTab == 4 {
                     FileHandlerView()
+                } else if appState.selectedOptimizationTab == 5 {
+                    SystemAssetAdvisorView()
                 } else if controller.isLoading {
                     VStack(spacing: 12) {
                         Spacer()
@@ -58,7 +64,7 @@ struct OptimizationView: View {
                     }
                 } else {
                     Group {
-                        switch selectedTab {
+                        switch appState.selectedOptimizationTab {
                         case 1:  itemList(items: controller.loginItems)
                         case 2:  itemList(items: controller.launchAgents)
                         case 3:  itemList(items: controller.launchDaemons)

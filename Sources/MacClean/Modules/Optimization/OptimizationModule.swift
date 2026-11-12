@@ -216,19 +216,6 @@ public final class AutoStartManager: @unchecked Sendable {
         return items
     }
 
-    private func resolveAppName(bundleId: String, path: String?) -> String? {
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleId) {
-            return FileManager.default.displayName(atPath: url.path)
-        }
-        if let p = path {
-            let expanded = (p as NSString).expandingTildeInPath
-            if FileManager.default.fileExists(atPath: expanded) {
-                return FileManager.default.displayName(atPath: expanded)
-            }
-        }
-        return nil
-    }
-
     private func resolveAppNameFromPath(_ path: String) -> String? {
         let expanded = (path as NSString).expandingTildeInPath
         guard FileManager.default.fileExists(atPath: expanded) else { return nil }

@@ -28,8 +28,8 @@ public struct SidebarView: View {
             .background(Color(nsColor: .windowBackgroundColor))
         }
         .frame(
-            minWidth: Localization.currentCode == "de" ? 220 : 180,
-            idealWidth: Localization.currentCode == "de" ? 230 : 195
+            minWidth: 205,
+            idealWidth: 220
         )
     }
 
@@ -48,12 +48,17 @@ public struct SidebarView: View {
                 }
                 .frame(width: 20, height: 20)
 
-                Text("Settings")
+                Text(String(localized: "Settings"))
                     .font(.system(size: 13, weight: selection == .settings ? .medium : .regular))
-                Spacer()
+                    .lineLimit(1)
+                    .layoutPriority(1)
+
+                Spacer(minLength: 4)
+
                 Text("v\(MCConstants.appVersion)")
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(.system(size: 10.5))
                     .foregroundStyle(.tertiary)
+                    .lineLimit(1)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
@@ -71,7 +76,7 @@ public struct SidebarView: View {
 
     private func sidebarCategoryRow(_ category: SidebarCategory) -> some View {
         Label {
-            Text(category.title)
+            Text(String(localized: category.title))
                 .font(.system(size: 13, weight: selection == category ? .medium : .regular))
         } icon: {
             ZStack {

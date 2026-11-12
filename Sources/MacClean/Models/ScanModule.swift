@@ -8,6 +8,7 @@ public protocol ScanModule: Sendable {
     var includedInSmartScan: Bool { get }
     func scan() async -> [ScanResult]
     func scanOutcome() async -> ModuleScanOutcome
+    func scan(onProgress: (@Sendable (_ phase: String, _ count: Int, _ bytes: UInt64, _ fraction: Double) -> Void)?) async -> [ScanResult]
 }
 
 public extension ScanModule {
@@ -16,14 +17,18 @@ public extension ScanModule {
     func scanOutcome() async -> ModuleScanOutcome {
         ModuleScanOutcome(results: await scan())
     }
+
+    func scan(onProgress: (@Sendable (_ phase: String, _ count: Int, _ bytes: UInt64, _ fraction: Double) -> Void)?) async -> [ScanResult] {
+        await scan()
+    }
 }
 
 public enum ModuleCategory: String, CaseIterable, Sendable {
-    case cleanup = "清理"
-    case protection = "防护"
-    case performance = "性能"
-    case applications = "应用"
-    case files = "文件"
+    case cleanup = "Cleanup"
+    case protection = "Protection"
+    case performance = "Performance"
+    case applications = "Applications"
+    case files = "Files"
 }
 
 public struct ModuleScanOutcome: Sendable {

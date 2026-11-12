@@ -4,6 +4,7 @@ import MacCleanKit
 
 @MainActor @Observable
 final class SmartScanController {
+    var scanMode: SmartScanMode = .safe
     private(set) var scanState: SmartScanState = .idle
     private(set) var completedModules: [CompletedModule] = []
     private(set) var currentModuleName = ""
@@ -24,12 +25,19 @@ final class SmartScanController {
     }
 
     func startScan() {
+        startScan(mode: scanMode)
+    }
+
+    func startScan(mode: SmartScanMode) {
+        self.scanMode = mode
         if case .cleaning = scanState { return }
         resetScan()
+        let initialModuleName = String(localized: "System Junk")
+        currentModuleName = initialModuleName
         scanState = .scanning(
-            phase: String(localized: "Analyzing system..."), progress: 0, filesFound: 0, sizeFound: 0
+            phase: initialModuleName, progress: 0.01, filesFound: 0, sizeFound: 0
         )
-        coordinator.scanAll { [weak self] state in
+        coordinator.scanSmart(mode: scanMode) { [weak self] state in
             self?.receive(state)
         }
     }
@@ -44,9 +52,9 @@ final class SmartScanController {
             )
         }
         switch state {
-        case .scanning(let progress, let module, let files, let size):
+        case .scanning(let progress, let module, let phase, let files, let size):
             currentModuleName = module
-            scanState = .scanning(phase: module, progress: progress, filesFound: files, sizeFound: size)
+            scanState = .scanning(phase: phase, progress: progress, filesFound: files, sizeFound: size)
         case .completed(let results):
             prepareReview(results)
         case .idle, .failed:
@@ -66,11 +74,12 @@ final class SmartScanController {
             filesFound: fileCount, sizeFound: totalSize
         )
         let generation = generation
+        let currentMode = scanMode
         reviewTask = Task {
             let data = await ReviewService.build(modules: results, includeEmptySystemJunkCategories: true)
             guard !Task.isCancelled, generation == self.generation else { return }
             moduleResults = results
-            review = ReviewSelection(data: data)
+            review = ReviewSelection(data: data, mode: currentMode)
             showingReview = true
             reviewSectionID = nil
             scanState = .results(

@@ -40,69 +40,6 @@ public actor FileTreeScanner {
         }
     }
 
-    public func scanWithSizeAggregation(root: URL) async -> FileNode {
-        let keys = resourceKeys
-        let rootNode = FileNode(url: root, name: root.lastPathComponent)
-
-        guard let enumerator = FileManager.default.enumerator(
-            at: root,
-            includingPropertiesForKeys: Array(keys),
-            options: [.skipsPackageDescendants]
-        ) else {
-            return rootNode
-        }
-
-        func key(_ url: URL) -> String {
-            var p = url.path(percentEncoded: false)
-            if p.hasSuffix("/") && p.count > 1 { p = String(p.dropLast()) }
-
-            for firmlink in ["/private/var", "/private/tmp", "/private/etc"] {
-                if p == firmlink || p.hasPrefix(firmlink + "/") {
-                    return String(p.dropFirst("/private".count))
-                }
-            }
-            return p
-        }
-
-        var nodeMap: [String: FileNode] = [key(root): rootNode]
-        var iterationCount = 0
-
-        while let obj = enumerator.nextObject() {
-            if Task.isCancelled { break }
-
-            iterationCount += 1
-            if iterationCount % 200 == 0 {
-                await Task.yield()
-            }
-
-            guard let fileURL = obj as? URL else { continue }
-            guard let values = try? fileURL.resourceValues(forKeys: keys) else { continue }
-            let size = UInt64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? values.fileSize ?? 0)
-            let isDir = values.isDirectory ?? false
-            let ext = values.name?.components(separatedBy: ".").last?.lowercased() ?? fileURL.pathExtension.lowercased()
-
-            let node = FileNode(
-                url: fileURL,
-                name: values.name ?? fileURL.lastPathComponent,
-                size: isDir ? 0 : size,
-                isDirectory: isDir,
-                fileExtension: ext
-            )
-
-            let parentPath = key(fileURL.deletingLastPathComponent())
-            if let parent = nodeMap[parentPath] {
-                parent.addChild(node)
-            }
-
-            if isDir {
-                nodeMap[key(fileURL)] = node
-            }
-        }
-
-        rootNode.computeTotalSize()
-        return rootNode
-    }
-
     public func topLevelSizes(
         root: URL,
         onProgress: (@Sendable (Int) -> Void)? = nil

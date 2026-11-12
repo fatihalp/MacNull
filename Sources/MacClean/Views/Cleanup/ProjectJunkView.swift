@@ -107,6 +107,14 @@ struct ProjectJunkView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.small)
 
+                Button("Select > 1 GB") {
+                    let largeURLs = controller.items.filter { $0.bytes >= 1_000_000_000 }
+                        .map { URL(filePath: $0.path, directoryHint: .isDirectory) }
+                    controller.selectedItems = Set(largeURLs)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+
                 Button("Deselect All") {
                     controller.selectedItems.removeAll()
                 }
