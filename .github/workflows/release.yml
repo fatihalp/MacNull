@@ -9,9 +9,13 @@ on:
 jobs:
   release:
     name: Build & Release DMG
-    runs-on: macos-15
+    runs-on: macos-15-intel
+    timeout-minutes: 60
     permissions:
       contents: write
+    env:
+      HAS_SIGNING: ${{ secrets.DEVID_CERT_P12_BASE64 != '' && secrets.ASC_KEY_P8_BASE64 != '' }}
+      HAS_TAP: ${{ secrets.TAP_PUSH_TOKEN != '' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -77,6 +81,7 @@ jobs:
         run: swift build -c release
 
       - name: Import Developer ID certificate
+        if: env.HAS_SIGNING == 'true'
         env:
           DEVID_CERT_P12_BASE64: ${{ secrets.DEVID_CERT_P12_BASE64 }}
           DEVID_CERT_PASSWORD: ${{ secrets.DEVID_CERT_PASSWORD }}
@@ -101,6 +106,7 @@ jobs:
           security find-identity -v -p codesigning
 
       - name: Store notarytool credentials
+        if: env.HAS_SIGNING == 'true'
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -116,6 +122,7 @@ jobs:
           rm -f "$KEY_PATH"
 
       - name: Build, sign & notarize DMG
+        if: env.HAS_SIGNING == 'true'
         env:
           APPLE_DEVELOPER_ID: ${{ secrets.APPLE_DEVELOPER_ID }}
           NOTARY_PROFILE: MacSai
@@ -125,8 +132,16 @@ jobs:
           ls -la .build/MacSai-${VERSION}.dmg
           xcrun stapler validate .build/MacSai-${VERSION}.dmg
 
+      - name: Build ad-hoc signed DMG
+        if: env.HAS_SIGNING != 'true'
+        run: |
+          echo "::warning::Developer ID secrets are not set; building an ad-hoc signed, non-notarized DMG."
+          export VERSION="${{ steps.version.outputs.version }}"
+          bash scripts/build-dmg.sh
+          ls -la .build/MacSai-${VERSION}.dmg
+
       - name: Clean up signing keychain
-        if: always()
+        if: always() && env.HAS_SIGNING == 'true'
         run: security delete-keychain "$RUNNER_TEMP/app-signing.keychain-db" || true
 
       - name: Delete existing release (same version)
@@ -197,7 +212,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Homebrew cask in tap repo
-        if: steps.version.outputs.prerelease != 'true'
+        if: steps.version.outputs.prerelease != 'true' && env.HAS_TAP == 'true'
         run: |
           REPO_OWNER="${{ github.repository_owner }}"
           TAP="${REPO_OWNER}/homebrew-macsai"
