@@ -62,7 +62,7 @@ enum BrowserExtensionsStrings {
         case .builtIn(let browser):
             return fill(builtInText, browser)
         case .refused:
-            return "Mac Sai couldn't confirm this extension's folder is safe to remove, so nothing was deleted."
+            return "MacNull couldn't confirm this extension's folder is safe to remove, so nothing was deleted."
         case .failed(let error):
             return "Couldn't move it to the Trash: " + error
         }

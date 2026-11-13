@@ -68,7 +68,7 @@ struct UnusedAppsView: View {
                         Spacer()
                         Text("Spotlight has no usage history for your apps")
                             .font(.system(size: 13, weight: .medium))
-                        Text("Mac Sai can't tell which apps are unused. Check that Spotlight indexing is turned on.")
+                        Text("MacNull can't tell which apps are unused. Check that Spotlight indexing is turned on.")
                             .font(.system(size: 12))
                             .foregroundStyle(.secondary)
                         Spacer()

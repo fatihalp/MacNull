@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-APP_NAME="Mac Sai"
+APP_NAME="MacNull"
 APP_BUNDLE=".build/dmg/${APP_NAME}.app"
 DEST="/Applications/${APP_NAME}.app"
 

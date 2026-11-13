@@ -23,7 +23,7 @@ public enum DiskHogsText {
         "Docker Desktop disk image"
     }
     public static var dockerDiskImageNote: String {
-        "Docker's virtual disk. It holds all your images, containers, and volumes, so Mac Sai never deletes it. Pruning Docker items frees space inside it, and Docker Desktop then gives that space back to macOS. To cap its size, lower the disk limit in Docker Desktop's Resources settings."
+        "Docker's virtual disk. It holds all your images, containers, and volumes, so MacNull never deletes it. Pruning Docker items frees space inside it, and Docker Desktop then gives that space back to macOS. To cap its size, lower the disk limit in Docker Desktop's Resources settings."
     }
     public static var nothingFound: String {
         "No Docker or Xcode simulators found on this Mac."

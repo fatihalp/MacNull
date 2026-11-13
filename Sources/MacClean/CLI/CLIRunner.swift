@@ -81,7 +81,7 @@ public enum CLIRunner {
 
     private static func printHelp() {
         print("""
-\u{001B}[1mMacClean (MacSai) - High-Performance macOS Storage Cleaner\u{001B}[0m
+\u{001B}[1mMacNull - High-Performance macOS Storage Cleaner\u{001B}[0m
 
 \u{001B}[1mUSAGE:\u{001B}[0m
     macclean <command> [options]
