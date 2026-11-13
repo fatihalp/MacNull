@@ -1,7 +1,0 @@
-{
-  "size": [2400, 700],
-  "role": "wordmark",
-  "layers": [
-    { "name": "word", "fill": "ink", "shape": { "glyph": { "text": "macnull", "font": "fraunces", "weight": 600, "size": 500, "at": [100, 500] } } }
-  ]
-}

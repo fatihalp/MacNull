@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="brand/brands/macnull/exports/logos/appmark/appmark.png" width="128" alt="MacNull app icon" />
+<img src="assets/app_icon.png" width="128" alt="MacNull app icon" />
 
 <h1>MacNull</h1>
 
@@ -86,11 +86,10 @@ Running without arguments opens the app; any argument runs the CLI.
 
 ## Brand
 
-The identity lives in [`brand/brands/macnull`](brand/brands/macnull). The final `l` of the wordmark is drawn hollow: still there, but emptied, the way a cleaned file still sits in the Trash. The icon is that `ll` pair on its own.
+The final `l` of the wordmark is drawn hollow: still there, but emptied, the way a cleaned file still sits in the Trash. The icon is that `ll` pair on its own.
 
-- App icon: [`exports/macos/AppIcon.icns`](brand/brands/macnull/exports/macos/AppIcon.icns)
-- Logos: [`exports/logos`](brand/brands/macnull/exports/logos)
-- Guidelines: [`exports/guidelines/index.html`](brand/brands/macnull/exports/guidelines/index.html)
+- Masters in [`brand/`](brand): `symbol.svg`, `symbol-small.svg` (32 px and below), `wordmark.svg`, `lockup.svg`
+- App icon: [`Resources/AppIcon.icns`](Resources/AppIcon.icns), built from [`assets/app_icon.png`](assets/app_icon.png)
 - Colours: blue `#3b82f6`, ink `#0f172a`, paper `#f8fafc`. Type: Space Grotesk (OFL).
 
 ## License
