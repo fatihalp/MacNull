@@ -54,19 +54,6 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>en</string>
-    <key>CFBundleLocalizations</key>
-    <array>
-        <string>en</string>
-        <string>tr</string>
-        <string>ru</string>
-        <string>de</string>
-        <string>zh-Hans</string>
-        <string>zh-Hant</string>
-        <string>fr</string>
-        <string>it</string>
-    </array>
     <key>CFBundleExecutable</key>
     <string>MacClean</string>
     <key>CFBundleIdentifier</key>
@@ -113,9 +100,6 @@ PLIST
 if [ -f "Resources/AppIcon.icns" ]; then
     cp "Resources/AppIcon.icns" "${APP_BUNDLE}/Contents/Resources/"
 fi
-if [ -d "Sources/MacCleanKit/Resources" ]; then
-    cp -R Sources/MacCleanKit/Resources/*.lproj "${APP_BUNDLE}/Contents/Resources/"
-fi
 
 echo "[2.5/7] Bundling MacCleanMenu widget..."
 MENU_APP="${APP_BUNDLE}/Contents/Library/LoginItems/MacCleanMenu.app"
@@ -129,19 +113,6 @@ cat > "${MENU_APP}/Contents/Info.plist" << MENU_PLIST
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>en</string>
-    <key>CFBundleLocalizations</key>
-    <array>
-        <string>en</string>
-        <string>tr</string>
-        <string>ru</string>
-        <string>de</string>
-        <string>zh-Hans</string>
-        <string>zh-Hant</string>
-        <string>fr</string>
-        <string>it</string>
-    </array>
     <key>CFBundleExecutable</key>
     <string>MacCleanMenu</string>
     <key>CFBundleIdentifier</key>
@@ -174,9 +145,6 @@ MENU_PLIST
 
 if [ -f "Resources/AppIcon.icns" ]; then
     cp "Resources/AppIcon.icns" "${MENU_APP}/Contents/Resources/"
-fi
-if [ -d "Sources/MacCleanKit/Resources" ]; then
-    cp -R Sources/MacCleanKit/Resources/*.lproj "${MENU_APP}/Contents/Resources/"
 fi
 
 echo "[3/7] Creating entitlements..."

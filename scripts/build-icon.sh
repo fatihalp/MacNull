@@ -1,12 +1,4 @@
 #!/bin/bash
-# Rebuild Resources/AppIcon.icns from the 1024x1024 master icon.
-#
-# Usage: ./scripts/build-icon.sh
-#
-# The master (assets/app_icon.png) follows Apple's macOS icon grid: the
-# artwork is an 824x824 rounded rect centered on a transparent 1024 canvas.
-# Everything outside the rounded shape must stay transparent, or the Dock
-# shows a square behind the icon (issue #248). AppIconTests checks this.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."

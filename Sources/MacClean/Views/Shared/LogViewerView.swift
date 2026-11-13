@@ -47,8 +47,8 @@ struct LogViewerView: View {
                         .font(.system(size: 32))
                         .foregroundStyle(.secondary)
                     Text(errorsOnly
-                         ? String(localized: "No errors logged.")
-                         : String(localized: "Log is empty. Nothing has been cleaned yet."))
+                         ? "No errors logged."
+                         : "Log is empty. Nothing has been cleaned yet.")
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

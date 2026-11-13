@@ -20,7 +20,7 @@ public actor ThinBinaryOperation {
         public var errorDescription: String? {
             switch self {
             case .notFat:
-                String(localized: "input binary is not a fat (universal) Mach-O")
+                "input binary is not a fat (universal) Mach-O"
             case .raceDetected(let message):
                 "binary changed under us while thinning: \(message)"
             case .lipoFailed(let stderr):

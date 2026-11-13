@@ -36,7 +36,7 @@ final class ResourceHogsController {
         guard let row = pendingQuit else { return }
         pendingQuit = nil
         guard row.canQuit else {
-            statusMessage = String(localized: "That process is protected and cannot be quit.")
+            statusMessage = "That process is protected and cannot be quit."
             showStatus = true
             return
         }
@@ -44,7 +44,7 @@ final class ResourceHogsController {
         guard let live = NSRunningApplication(processIdentifier: row.snapshot.pid),
               live.bundleIdentifier == row.snapshot.bundleIdentifier,
               ResourceHogsPolicy.canQuit(bundleIdentifier: live.bundleIdentifier) else {
-            statusMessage = String(localized: "That process is no longer running.")
+            statusMessage = "That process is no longer running."
             showStatus = true
             return
         }

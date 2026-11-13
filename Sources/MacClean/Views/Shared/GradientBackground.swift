@@ -23,16 +23,8 @@ public enum ModuleTheme {
         LinearGradient(colors: colors, startPoint: .top, endPoint: .bottom)
     }
 
-    public var buttonGradient: LinearGradient {
-        LinearGradient(colors: buttonColors, startPoint: .top, endPoint: .bottom)
-    }
-
     public var colors: [Color] {
         [Color.white, Color.white]
-    }
-
-    public var buttonColors: [Color] {
-        [accentColor, accentColor]
     }
 
     public var accentColor: Color {

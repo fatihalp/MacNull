@@ -11,6 +11,14 @@ public actor TipsEngine {
         public let estimatedSavings: UInt64
         public let symbol: String
 
+        public var callToAction: String {
+            switch id {
+            case "trash_large": "Empty Trash"
+            case "caches_large": "Free Up Space"
+            default: "Open \(MCConstants.appName)"
+            }
+        }
+
         public init(id: String, title: String, body: String, estimatedSavings: UInt64, symbol: String) {
             self.id = id
             self.title = title

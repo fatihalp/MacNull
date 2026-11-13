@@ -5,24 +5,16 @@ import MacCleanKit
 
 @MainActor @Observable
 final class SettingsController {
-    private(set) var keptLanguages: Set<String> = []
-    private(set) var selectable: [(name: String, lprojs: [String])] = []
-    var languageSearch: String = ""
     private(set) var excludedFolders: [String] = FolderExclusionPreferences.paths
     private(set) var exclusionError: String?
-
-    var filteredLanguages: [(name: String, lprojs: [String])] {
-        guard !languageSearch.isEmpty else { return selectable }
-        return selectable.filter { $0.name.localizedCaseInsensitiveContains(languageSearch) }
-    }
 
     func addExcludedFolder() {
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
-        panel.prompt = String(localized: "Exclude")
-        panel.message = String(localized: "Choose a folder to exclude from cleanup.")
+        panel.prompt = "Exclude"
+        panel.message = "Choose a folder to exclude from cleanup."
         guard panel.runModal() == .OK, let url = panel.url else { return }
         let path = url.path(percentEncoded: false)
         if FolderExclusionPreferences.add(path) {
@@ -41,37 +33,24 @@ final class SettingsController {
             existing: FolderExclusionPreferences.paths
         ) {
         case .allow:
-            return String(localized: "Couldn't add that folder.")
+            return "Couldn't add that folder."
         case .reject(.notAbsolute):
-            return String(localized: "Choose an absolute path.")
+            return "Choose an absolute path."
         case .reject(.entireHome):
-            return String(localized: "You can't exclude your entire home folder.")
+            return "You can't exclude your entire home folder."
         case .reject(.entireVolumesRoot):
-            return String(localized: "You can't exclude all of /Volumes.")
+            return "You can't exclude all of /Volumes."
         case .reject(.outsideAllowedRoots):
-            return String(localized: "Only folders under your home directory or /Volumes can be excluded.")
+            return "Only folders under your home directory or /Volumes can be excluded."
         case .reject(.atCapacity):
             return "You can exclude at most \(FolderExclusionPreferences.defaultMaxCount) folders."
         case .reject(.alreadyCovered):
-            return String(localized: "That path is already covered by an existing exclusion.")
+            return "That path is already covered by an existing exclusion."
         }
     }
-    func loadPreferences() async {
-        keptLanguages = LanguagePreferences.userKept
-        selectable = LanguagePreferences.selectableLanguages()
-        excludedFolders = FolderExclusionPreferences.paths
-        let found = await Task.detached(priority: .userInitiated) {
-            LanguageScanner().discoverLproj(in: LanguageScanner.defaultRoots)
-        }.value
-        guard !Task.isCancelled else { return }
-        LanguagePreferences.discoveredLproj = found
-        selectable = LanguagePreferences.selectableLanguages()
-    }
 
-    func setLanguage(_ lprojs: [String], kept: Bool) {
-        if kept { keptLanguages.formUnion(lprojs) }
-        else { keptLanguages.subtract(lprojs) }
-        LanguagePreferences.userKept = keptLanguages
+    func loadPreferences() {
+        excludedFolders = FolderExclusionPreferences.paths
     }
 
     func removeExcludedFolder(_ path: String) {

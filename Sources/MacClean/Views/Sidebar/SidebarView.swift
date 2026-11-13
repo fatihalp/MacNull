@@ -48,7 +48,7 @@ public struct SidebarView: View {
                 }
                 .frame(width: 20, height: 20)
 
-                Text(String(localized: "Settings"))
+                Text("Settings")
                     .font(.system(size: 13, weight: selection == .settings ? .medium : .regular))
                     .lineLimit(1)
                     .layoutPriority(1)
@@ -76,7 +76,7 @@ public struct SidebarView: View {
 
     private func sidebarCategoryRow(_ category: SidebarCategory) -> some View {
         Label {
-            Text(String(localized: category.title))
+            Text(category.title)
                 .font(.system(size: 13, weight: selection == category ? .medium : .regular))
         } icon: {
             ZStack {

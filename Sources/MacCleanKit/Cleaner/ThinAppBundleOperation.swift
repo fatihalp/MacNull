@@ -19,7 +19,7 @@ public actor ThinAppBundleOperation {
         public var errorDescription: String? {
             switch self {
             case .noFatBinariesFound:
-                String(localized: "no fat (universal) Mach-O binaries found in bundle")
+                "no fat (universal) Mach-O binaries found in bundle"
             case .bundleInUse(let pids):
                 "bundle is in use by process(es) \(pids.joined(separator: ", ")) — quit the app and try again"
             case .bundleVerifyFailed(let s):
@@ -79,7 +79,7 @@ public actor ThinAppBundleOperation {
             }
             try? fm.removeItem(at: backupDir)
             throw OpError.bundleVerifyFailed(
-                stderr: String(localized: "bundle no longer passes codesign --verify after thinning")
+                stderr: "bundle no longer passes codesign --verify after thinning"
             )
         }
 

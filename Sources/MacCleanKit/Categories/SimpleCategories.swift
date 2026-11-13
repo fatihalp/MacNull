@@ -72,21 +72,6 @@ public struct SystemLogCategory: JunkCategory {
     }
 }
 
-public struct LanguageFilesCategory: JunkCategory {
-    public init() {}
-    public let scanCategory = ScanCategory.languageFiles
-    public var targets: [ScanTarget] {
-        [
-            ScanTarget(
-                path: URL(filePath: "/Applications"),
-                recursive: true,
-                fileExtensions: ["lproj"],
-                excludePatterns: Array(LanguagePreferences.effectivePreserved())
-            ),
-        ]
-    }
-}
-
 public struct DocumentVersionsCategory: JunkCategory {
     public init() {}
     public let scanCategory = ScanCategory.documentVersions

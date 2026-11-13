@@ -91,7 +91,7 @@ struct BrowserExtensionsView: View {
             Text(BrowserExtensionsStrings.confirmMessage(for: ext))
         }
         .alert(
-            String(localized: "Browser Extensions"),
+            "Browser Extensions",
             isPresented: Binding(
                 get: { controller.message != nil },
                 set: { if !$0 { controller.message = nil } }
@@ -152,9 +152,9 @@ struct BrowserExtensionsView: View {
 
     private func actionLabel(for ext: BrowserExtensionRecord) -> String {
         switch ext.origin {
-        case .safariApp: String(localized: "Open in Settings")
+        case .safariApp: "Open in Settings"
         case .policy, .component: BrowserExtensionsStrings.details
-        case .user: String(localized: "Remove")
+        case .user: "Remove"
         }
     }
 }

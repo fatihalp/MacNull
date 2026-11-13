@@ -108,7 +108,7 @@ struct WiFiNetworksView: View {
         .task { await controller.reload() }
         .respondsToModuleShortcuts(onScan: { Task { await controller.reload() } }, canScan: !controller.isLoading && !controller.isForgetting)
         .alert(
-            String(localized: "Forget selected networks?"),
+            "Forget selected networks?",
             isPresented: Binding(
                 get: { pendingForget != nil },
                 set: { if !$0 { pendingForget = nil } }

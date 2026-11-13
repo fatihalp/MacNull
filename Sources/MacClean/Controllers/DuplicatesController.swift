@@ -30,7 +30,7 @@ final class DuplicatesController {
         guard cleaning == nil else { return }
         reset()
         isScanning = true
-        scanPhase = String(localized: "Hashing candidate files in parallel...")
+        scanPhase = "Hashing candidate files in parallel..."
 
         scanTimerTask = Task {
             while !Task.isCancelled {
@@ -133,12 +133,12 @@ final class DuplicatesController {
 
     func skipLabel(_ reason: SkipReason) -> String {
         switch reason {
-        case .contentChanged: String(localized: "content changed")
-        case .notSameVolume: String(localized: "different volume")
-        case .cloningUnsupported: String(localized: "not an APFS volume")
-        case .notRegularFile: String(localized: "not a regular file")
-        case .notWritable: String(localized: "not writable")
-        case .protectedPath: String(localized: "protected path")
+        case .contentChanged: "content changed"
+        case .notSameVolume: "different volume"
+        case .cloningUnsupported: "not an APFS volume"
+        case .notRegularFile: "not a regular file"
+        case .notWritable: "not writable"
+        case .protectedPath: "protected path"
         }
     }
 

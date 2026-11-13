@@ -4,32 +4,11 @@ import MacCleanKit
 
 enum ReviewDataBuilder {
 
-    static let standardSystemJunkCategories: [ScanCategory] = [
-        .userCaches,
-        .xcodeJunk,
-        .universalBinaries,
-        .userLogs,
-        .systemLogs,
-        .languageFiles,
-        .documentVersions,
-        .brokenLoginItems,
-        .systemCaches,
-        .iosDeviceBackups,
-        .deletedUsers,
-        .brokenPreferences,
-    ]
-
     private static let mergedUserCacheCategories: Set<ScanCategory> = [
         .packageManagerCaches,
         .ideCaches,
         .aiToolCaches,
         .appCaches,
-    ]
-
-    private static let coreCleanupModuleIDs: Set<String> = [
-        "system_junk",
-        "mail_attachments",
-        "trash_bins",
     ]
 
     static func build(

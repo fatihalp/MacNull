@@ -51,7 +51,7 @@ struct SmartScanView: View {
 
     private func scanningView(phase: String, progress: Double, filesFound: Int, sizeFound: UInt64) -> some View {
         let activeModules = SmartScanModules.modules(for: controller.scanMode)
-        let isPreparing = progress >= 1.0 || phase == String(localized: "Preparing results...")
+        let isPreparing = progress >= 1.0 || phase == "Preparing results..."
 
         return ScrollView {
             VStack(spacing: 18) {
@@ -68,7 +68,7 @@ struct SmartScanView: View {
                     .background((controller.scanMode == .deep ? Color(nsColor: .systemOrange) : Color(nsColor: .systemIndigo)).opacity(0.12))
                     .clipShape(Capsule())
 
-                    Text(isPreparing ? String(localized: "Preparing Review…") : String(localized: "Scanning your Mac…"))
+                    Text(isPreparing ? "Preparing Review…" : "Scanning your Mac…")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
 
@@ -82,7 +82,7 @@ struct SmartScanView: View {
                     } else {
                         HStack(spacing: 6) {
                             let cleanPhase = phase.replacingOccurrences(of: "...", with: "").replacingOccurrences(of: "…", with: "")
-                            Text(cleanPhase.isEmpty ? String(localized: "Checking system files…") : "\(String(localized: "Scanning")) \(cleanPhase)…")
+                            Text(cleanPhase.isEmpty ? "Checking system files…" : "\("Scanning") \(cleanPhase)…")
                                 .font(.system(size: 12.5))
                                 .foregroundStyle(.secondary)
                         }
@@ -114,21 +114,21 @@ struct SmartScanView: View {
 
                 HStack(spacing: 12) {
                     statCard(
-                        title: String(localized: "Progress"),
+                        title: "Progress",
                         value: isPreparing ? "100%" : "\(Int(progress * 100))%",
                         icon: "gauge.with.dots.needle.50percent",
                         color: Color(nsColor: .systemBlue)
                     )
 
                     statCard(
-                        title: String(localized: "Files Found"),
+                        title: "Files Found",
                         value: filesFound.formatted(),
                         icon: "doc.on.doc.fill",
                         color: Color(nsColor: .systemPurple)
                     )
 
                     statCard(
-                        title: String(localized: "Size Found"),
+                        title: "Size Found",
                         value: FileSizeFormatter.format(sizeFound),
                         icon: "arrow.down.circle.fill",
                         color: Color(nsColor: .systemGreen)
@@ -137,7 +137,7 @@ struct SmartScanView: View {
 
                 VStack(spacing: 0) {
                     HStack {
-                        Label(String(localized: "Scan Areas"), systemImage: "checklist")
+                        Label("Scan Areas", systemImage: "checklist")
                             .font(.system(size: 12, weight: .semibold))
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -176,7 +176,7 @@ struct SmartScanView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 12))
-                            Text(String(localized: "Stop Scan"))
+                            Text("Stop Scan")
                                 .font(.system(size: 13, weight: .medium))
                         }
                         .frame(minWidth: 130, minHeight: 32)
@@ -188,7 +188,7 @@ struct SmartScanView: View {
                 } else {
                     HStack(spacing: 8) {
                         ProgressView().controlSize(.small)
-                        Text(String(localized: "Loading review…"))
+                        Text("Loading review…")
                             .font(.system(size: 12.5, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -286,11 +286,11 @@ struct SmartScanView: View {
                         .foregroundStyle(.primary)
                 }
             } else if completedInfo != nil {
-                Text(String(localized: "Clean"))
+                Text("Clean")
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(Color(nsColor: .systemGreen))
             } else if isActive {
-                Text(String(localized: "Scanning…"))
+                Text("Scanning…")
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(Color(nsColor: .systemBlue))
             }
@@ -306,21 +306,6 @@ struct SmartScanView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
         .background(isActive ? Color.accentColor.opacity(0.08) : Color.clear)
-    }
-
-    private func statBadge(label: String, value: String) -> some View {
-        VStack(spacing: 2) {
-            Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.primary)
-                .contentTransition(.numericText())
-                .animation(.easeInOut(duration: 0.2), value: value)
-            Text(label)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.primary.opacity(0.5))
-                .textCase(.uppercase)
-        }
-        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder
@@ -349,15 +334,15 @@ struct SmartScanView: View {
         } message: {
             Text("Selected items will be permanently deleted.")
         }
-        .alert(String(localized: "Delete AI Conversations?"), isPresented: $showAIWarningAlert) {
-            Button(String(localized: "Cancel"), role: .cancel) { }
-            Button(String(localized: "Delete Conversations"), role: .destructive) {
+        .alert("Delete AI Conversations?", isPresented: $showAIWarningAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete Conversations", role: .destructive) {
                 hasWarnedAIConversationsCleanup = true
                 controller.showingReview = false
                 controller.runCleanup()
             }
         } message: {
-            Text(String(localized: "Deep Clean includes conversation histories, sessions, and project data from Gemini, Codex, and Claude. This data cannot be recovered once deleted."))
+            Text("Deep Clean includes conversation histories, sessions, and project data from Gemini, Codex, and Claude. This data cannot be recovered once deleted.")
         }
     }
 
@@ -373,13 +358,13 @@ struct SmartScanView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 11, weight: .semibold))
-                        Text(String(localized: "Dashboard"))
+                        Text("Dashboard")
                             .font(.system(size: 13, weight: .medium))
                     }
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(Color(nsColor: .systemBlue))
-                .help(String(localized: "Return to Home Dashboard"))
+                .help("Return to Home Dashboard")
 
                 Spacer()
 
@@ -389,18 +374,18 @@ struct SmartScanView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 11, weight: .semibold))
-                        Text(String(localized: "Rescan"))
+                        Text("Rescan")
                             .font(.system(size: 12, weight: .medium))
                     }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
-                .help(String(localized: "Run scan again"))
+                .help("Run scan again")
             }
             .padding(.horizontal, 24)
             .padding(.top, 14)
 
-            SizeDisplay(size: totalSize, label: String(localized: "of junk found"))
+            SizeDisplay(size: totalSize, label: "of junk found")
                 .foregroundStyle(.primary)
                 .padding(.top, 4)
 
@@ -409,8 +394,8 @@ struct SmartScanView: View {
                     .foregroundStyle(controller.scanMode == .deep ? Color(nsColor: .systemOrange) : Color(nsColor: .systemIndigo))
                 Text(
                     controller.scanMode == .deep
-                    ? String(localized: "Deep Clean Active — Project build outputs & developer caches auto-selected for maximum space recovery.")
-                    : String(localized: "Safe Clean Active — Only safe system caches selected. Code & project builds preserved.")
+                    ? "Deep Clean Active — Project build outputs & developer caches auto-selected for maximum space recovery."
+                    : "Safe Clean Active — Only safe system caches selected. Code & project builds preserved."
                 )
                 .font(.system(size: 11.5, weight: .medium))
                 .foregroundStyle(.secondary)
@@ -422,28 +407,28 @@ struct SmartScanView: View {
 
             HStack(spacing: 24) {
                 if case .results(let cleanup, _, _, _, _) = controller.scanState {
-                    resultPill(icon: "trash.circle.fill", label: String(localized: "Cleanup"), value: FileSizeFormatter.format(cleanup))
+                    resultPill(icon: "trash.circle.fill", label: "Cleanup", value: FileSizeFormatter.format(cleanup))
                 }
                 if case .results(_, _, let perf, _, _) = controller.scanState {
-                    resultPill(icon: "gauge.with.dots.needle.67percent", label: String(localized: "Speed"), value: "\(perf) items")
+                    resultPill(icon: "gauge.with.dots.needle.67percent", label: "Speed", value: "\(perf) items")
                 }
             }
 
             if let review = controller.review {
                 HStack(spacing: 8) {
-                    Button(String(localized: "Select All")) {
+                    Button("Select All") {
                         review.applyToAll(.all)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
 
-                    Button(String(localized: "Smart")) {
+                    Button("Smart") {
                         review.applyToAll(.smart)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
 
-                    Button(String(localized: "Deselect All")) {
+                    Button("Deselect All") {
                         review.applyToAll(.none)
                     }
                     .buttonStyle(.bordered)
@@ -474,13 +459,13 @@ struct SmartScanView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "house.fill")
                             .font(.system(size: 11.5))
-                        Text(String(localized: "Dashboard"))
+                        Text("Dashboard")
                             .font(.system(size: 12.5, weight: .medium))
                     }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-                .help(String(localized: "Return to Home Dashboard"))
+                .help("Return to Home Dashboard")
 
                 Button {
                     controller.startScan()
@@ -488,17 +473,17 @@ struct SmartScanView: View {
                     HStack(spacing: 5) {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 11.5, weight: .semibold))
-                        Text(String(localized: "Rescan"))
+                        Text("Rescan")
                             .font(.system(size: 12.5, weight: .medium))
                     }
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-                .help(String(localized: "Run scan again"))
+                .help("Run scan again")
 
                 Spacer()
 
-                Text("\(selectedCount.formatted()) \(selectedCount == 1 ? String(localized: "item selected") : String(localized: "items selected")) · \(FileSizeFormatter.format(selectedSize))")
+                Text("\(selectedCount.formatted()) \(selectedCount == 1 ? "item selected" : "items selected") · \(FileSizeFormatter.format(selectedSize))")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
 
@@ -508,7 +493,7 @@ struct SmartScanView: View {
                     controller.reviewSectionID = nil
                     controller.showingReview = true
                 } label: {
-                    Label(String(localized: "Review Details"), systemImage: "list.bullet.rectangle")
+                    Label("Review Details", systemImage: "list.bullet.rectangle")
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
@@ -616,7 +601,7 @@ struct SmartScanView: View {
     private func cleaningView(progress: Double) -> some View {
         VStack(spacing: 20) {
             Spacer()
-            ScanProgressRing(progress: progress, phase: String(localized: "Cleaning your Mac..."), theme: .smartScan)
+            ScanProgressRing(progress: progress, phase: "Cleaning your Mac...", theme: .smartScan)
 
             Button("Cancel") { controller.cancelCleaning() }
                 .buttonStyle(.bordered)
@@ -639,7 +624,7 @@ struct SmartScanView: View {
             Text("Cleanup Complete")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(.primary)
-            SizeDisplay(size: freedSize, label: String(localized: "freed"))
+            SizeDisplay(size: freedSize, label: "freed")
                 .foregroundStyle(.primary)
 
             if !breakdown.isEmpty {

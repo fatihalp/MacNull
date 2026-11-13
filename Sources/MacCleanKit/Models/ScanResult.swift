@@ -20,7 +20,7 @@ public struct ScanResult: Sendable {
     }
 
     public var formattedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
+        FileSizeFormatter.format(totalSize)
     }
 }
 
@@ -46,6 +46,6 @@ public struct ModuleScanResult: Sendable {
     }
 
     public var formattedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
+        FileSizeFormatter.format(totalSize)
     }
 }

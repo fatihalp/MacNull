@@ -48,7 +48,7 @@ struct UpdaterView: View {
                 List {
                     ForEach(controller.updates) { update in
                         HStack {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: update.app.path.path(percentEncoded: false)))
+                            Image(nsImage: AppIconProvider.icon(forPath: update.app.path.path(percentEncoded: false)))
                                 .resizable()
                                 .frame(width: 26, height: 26)
 

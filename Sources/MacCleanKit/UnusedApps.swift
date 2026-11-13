@@ -22,11 +22,11 @@ public enum UnusedAppHorizon: String, CaseIterable, Sendable, Identifiable {
     public var label: String {
         switch self {
         case .threeMonths:
-            String(localized: "3 months")
+            "3 months"
         case .sixMonths:
-            String(localized: "6 months")
+            "6 months"
         case .twelveMonths:
-            String(localized: "12 months")
+            "12 months"
         }
     }
 }

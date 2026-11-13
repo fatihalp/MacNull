@@ -30,7 +30,7 @@ final class UninstallerController {
         case unused = "Unused"
         case thirdParty = "Third-party"
 
-        var label: String { String(localized: rawValue) }
+        var label: String { rawValue }
     }
 
     @ObservationIgnored private var associatedFilesTask: Task<Void, Never>?

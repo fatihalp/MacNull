@@ -49,10 +49,6 @@ public enum CleanHistoryRecorder {
         }
     }
 
-    public static func save(_ sessions: [CleanHistorySession]) {
-        lock.withLock { unlockedSave(sessions) }
-    }
-
     public static func clear() {
         lock.withLock { try? FileManager.default.removeItem(at: fileURL) }
     }

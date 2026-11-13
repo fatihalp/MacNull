@@ -142,10 +142,6 @@ public final class FileNode: @unchecked Sendable {
         self.totalSize = size
     }
 
-    public func addChild(_ child: FileNode) {
-        children.append(child)
-    }
-
     @discardableResult
     public func computeTotalSize() -> UInt64 {
         if children.isEmpty {
@@ -157,6 +153,6 @@ public final class FileNode: @unchecked Sendable {
     }
 
     public var formattedTotalSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
+        FileSizeFormatter.format(totalSize)
     }
 }

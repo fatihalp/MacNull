@@ -36,7 +36,7 @@ final class WiFiNetworksController {
         case .failure(let error):
             networks = []
             selected = []
-            errorMessage = error.localizedMessage
+            errorMessage = error.userMessage
         }
         isLoading = false
     }
@@ -53,7 +53,7 @@ final class WiFiNetworksController {
         case .failure(let error):
             await reload()
             if error != .adminCancelled {
-                errorMessage = error.localizedMessage
+                errorMessage = error.userMessage
             }
         }
     }

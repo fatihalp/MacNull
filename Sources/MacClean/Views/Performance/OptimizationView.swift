@@ -122,17 +122,16 @@ private struct ItemRow: View {
     let onToggle: (Bool) -> Void
     let onOpenConfig: () -> Void
 
+    private var icon: NSImage? {
+        item.bundleIdentifier.flatMap(AppIconProvider.icon(forBundleID:))
+            ?? item.programPath.flatMap(AppIconProvider.icon(forExistingPath:))
+    }
+
     var body: some View {
         HStack(spacing: 8) {
 
-            if let bid = item.bundleIdentifier,
-               let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bid) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
-                    .resizable()
-                    .frame(width: 28, height: 28)
-            } else if let path = item.programPath,
-                      FileManager.default.fileExists(atPath: path) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: path))
+            if let icon {
+                Image(nsImage: icon)
                     .resizable()
                     .frame(width: 28, height: 28)
             } else {
@@ -149,7 +148,7 @@ private struct ItemRow: View {
 
                 HStack(spacing: 6) {
 
-                    Text(item.sourceType.localizedName)
+                    Text(item.sourceType.displayName)
                         .font(.system(size: 9, weight: .medium))
                         .padding(.horizontal, 5)
                         .padding(.vertical, 1)

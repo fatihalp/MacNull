@@ -4,7 +4,7 @@ import MacCleanKit
 
 public struct UninstallerModule: ScanModule {
     public let id = "uninstaller"
-    public var name: String { String(localized: "Uninstaller") }
+    public var name: String { "Uninstaller" }
     public let category = ModuleCategory.applications
 
     public init() {}

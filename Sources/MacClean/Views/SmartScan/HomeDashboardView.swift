@@ -7,15 +7,14 @@ struct HomeDashboardView: View {
     var onStartScan: ((SmartScanMode) -> Void)? = nil
 
     @State private var selectedMode: SmartScanMode = .safe
-    @State private var specs: SystemHardwareSpecs = SystemSpecsProvider.current()
-    @State private var systemAssetReport: SystemAssetReport? = nil
+    @State private var controller = HomeDashboardController()
 
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
                 systemHeaderCard
 
-                if let report = systemAssetReport, report.totalAssetSize > 500_000_000 {
+                if let report = controller.reportWorthAdvising {
                     systemAssetAdviceBanner(report: report)
                 }
 
@@ -31,11 +30,7 @@ struct HomeDashboardView: View {
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .task {
-            systemAssetReport = await SystemAssetAdvisor.generateReport()
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(5))
-                specs = SystemSpecsProvider.current()
-            }
+            await controller.monitor()
         }
     }
 
@@ -52,22 +47,22 @@ struct HomeDashboardView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(specs.modelName)
+                    Text(controller.specs.modelName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
 
-                    Text("\(specs.chipName) · \(specs.cpuCores) Cores · \(specs.osVersion)")
+                    Text("\(controller.specs.chipName) · \(controller.specs.cpuCores) Cores · \(controller.specs.osVersion)")
                         .font(.system(size: 11.5))
                         .foregroundStyle(.secondary)
                 }
 
                 Spacer()
 
-                if let level = specs.batteryLevel {
+                if let level = controller.specs.batteryLevel {
                     HStack(spacing: 5) {
-                        Image(systemName: specs.isCharging ? "battery.100percent.bolt" : "battery.100percent")
+                        Image(systemName: controller.specs.isCharging ? "battery.100percent.bolt" : "battery.100percent")
                             .font(.system(size: 12))
-                            .foregroundStyle(specs.isCharging ? Color(nsColor: .systemGreen) : Color.secondary)
+                            .foregroundStyle(controller.specs.isCharging ? Color(nsColor: .systemGreen) : Color.secondary)
                         Text("\(level)%")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(.secondary)
@@ -88,10 +83,10 @@ struct HomeDashboardView: View {
                             .font(.system(size: 15))
                             .foregroundStyle(Color(nsColor: .systemIndigo))
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(specs.diskName)
+                            Text(controller.specs.diskName)
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundStyle(.primary)
-                            Text("\(specs.diskFormat) · \(String(localized: "Internal Storage"))")
+                            Text("\(controller.specs.diskFormat) · \("Internal Storage")")
                                 .font(.system(size: 11))
                                 .foregroundStyle(.secondary)
                         }
@@ -99,11 +94,11 @@ struct HomeDashboardView: View {
 
                     Spacer()
 
-                    if specs.isLowDiskSpace {
+                    if controller.specs.isLowDiskSpace {
                         HStack(spacing: 4) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: 10))
-                            Text(String(localized: "Low Disk Space"))
+                            Text("Low Disk Space")
                                 .font(.system(size: 11, weight: .semibold))
                         }
                         .padding(.horizontal, 8)
@@ -113,14 +108,14 @@ struct HomeDashboardView: View {
                         .clipShape(Capsule())
                     }
 
-                    Text("\(specs.diskFreeFormatted) \(String(localized: "available"))")
+                    Text("\(controller.specs.diskFreeFormatted) \("available")")
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
                 }
 
                 GeometryReader { geo in
                     let totalWidth = geo.size.width
-                    let usedWidth = max(0, min(totalWidth, totalWidth * specs.diskUsedFraction))
+                    let usedWidth = max(0, min(totalWidth, totalWidth * controller.specs.diskUsedFraction))
 
                     ZStack(alignment: .leading) {
                         Capsule()
@@ -136,35 +131,35 @@ struct HomeDashboardView: View {
                                 )
                             )
                             .frame(width: usedWidth, height: 9)
-                            .animation(.smooth(duration: 0.3), value: specs.diskUsedFraction)
+                            .animation(.smooth(duration: 0.3), value: controller.specs.diskUsedFraction)
                     }
                 }
                 .frame(height: 9)
 
                 HStack(spacing: 16) {
                     diskMetricBadge(
-                        label: String(localized: "Used"),
-                        value: "\(specs.diskUsedFormatted) (\(Int(specs.diskUsedFraction * 100))%)",
+                        label: "Used",
+                        value: "\(controller.specs.diskUsedFormatted) (\(Int(controller.specs.diskUsedFraction * 100))%)",
                         dotColor: Color(nsColor: .systemIndigo)
                     )
 
                     diskMetricBadge(
-                        label: String(localized: "Available"),
-                        value: specs.diskFreeFormatted,
+                        label: "Available",
+                        value: controller.specs.diskFreeFormatted,
                         dotColor: Color(nsColor: .systemGreen)
                     )
 
-                    if specs.diskPurgeable > 0 {
+                    if controller.specs.diskPurgeable > 0 {
                         diskMetricBadge(
-                            label: String(localized: "Purgeable"),
-                            value: specs.diskPurgeableFormatted,
+                            label: "Purgeable",
+                            value: controller.specs.diskPurgeableFormatted,
                             dotColor: Color.orange
                         )
                     }
 
                     Spacer()
 
-                    Text("\(String(localized: "Capacity")): \(specs.diskTotalFormatted)")
+                    Text("\("Capacity"): \(controller.specs.diskTotalFormatted)")
                         .font(.system(size: 11.5, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
@@ -193,11 +188,11 @@ struct HomeDashboardView: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(String(localized: "System Space Opportunity")): \(report.totalFormattedSize)")
+                Text("\("System Space Opportunity"): \(report.totalFormattedSize)")
                     .font(.system(size: 12.5, weight: .semibold))
                     .foregroundStyle(.primary)
 
-                Text(String(localized: "Offline AI models and Siri caches can be reclaimed safely."))
+                Text("Offline AI models and Siri caches can be reclaimed safely.")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -205,7 +200,7 @@ struct HomeDashboardView: View {
 
             Spacer()
 
-            Button(String(localized: "Review")) {
+            Button("Review") {
                 appState.selectedOptimizationTab = 5
                 appState.selectItem(.optimization)
             }
@@ -265,11 +260,11 @@ struct HomeDashboardView: View {
                 }
 
                 VStack(spacing: 4) {
-                    Text(String(localized: "Smart Scan"))
+                    Text("Smart Scan")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
 
-                    Text(String(localized: "Clean junk, reclaim storage, and boost performance."))
+                    Text("Clean junk, reclaim storage, and boost performance.")
                         .font(.system(size: 13))
                         .foregroundStyle(.secondary)
                 }
@@ -277,16 +272,16 @@ struct HomeDashboardView: View {
 
             VStack(spacing: 6) {
                 Picker("", selection: $selectedMode) {
-                    Text(String(localized: "Safe Clean")).tag(SmartScanMode.safe)
-                    Text(String(localized: "Deep Clean")).tag(SmartScanMode.deep)
+                    Text("Safe Clean").tag(SmartScanMode.safe)
+                    Text("Deep Clean").tag(SmartScanMode.deep)
                 }
                 .pickerStyle(.segmented)
                 .frame(width: 240)
 
                 Text(
                     selectedMode == .safe
-                        ? String(localized: "Safe for daily cleanup. Keeps project builds intact.")
-                        : String(localized: "Thorough cleanup. Reclaims developer build caches.")
+                        ? "Safe for daily cleanup. Keeps project builds intact."
+                        : "Thorough cleanup. Reclaims developer build caches."
                 )
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
@@ -298,7 +293,7 @@ struct HomeDashboardView: View {
                 HStack(spacing: 8) {
                     Image(systemName: "play.fill")
                         .font(.system(size: 13, weight: .semibold))
-                    Text(selectedMode == .safe ? String(localized: "Start Scan") : String(localized: "Start Deep Clean"))
+                    Text(selectedMode == .safe ? "Start Scan" : "Start Deep Clean")
                         .font(.system(size: 14, weight: .semibold))
                 }
                 .frame(minWidth: 180, minHeight: 38)
@@ -330,24 +325,24 @@ struct HomeDashboardView: View {
         HStack(spacing: 12) {
             pillarCard(
                 category: .cleanup,
-                title: String(localized: "Cleanup"),
-                subtitle: String(localized: "Caches & Junk"),
+                title: "Cleanup",
+                subtitle: "Caches & Junk",
                 icon: "trash.fill",
                 color: Color(nsColor: .systemBlue)
             )
 
             pillarCard(
                 category: .performance,
-                title: String(localized: "Performance"),
-                subtitle: String(localized: "Memory & Tasks"),
+                title: "Performance",
+                subtitle: "Memory & Tasks",
                 icon: "gauge.with.dots.needle.67percent",
                 color: Color(nsColor: .systemOrange)
             )
 
             pillarCard(
                 category: .applications,
-                title: String(localized: "Applications"),
-                subtitle: String(localized: "Uninstall & Updates"),
+                title: "Applications",
+                subtitle: "Uninstall & Updates",
                 icon: "square.stack.3d.up.fill",
                 color: Color(nsColor: .systemPurple)
             )
@@ -420,10 +415,10 @@ struct HomeDashboardView: View {
     }
 
     private var hardwareIcon: String {
-        if specs.batteryLevel != nil {
+        if controller.specs.batteryLevel != nil {
             return "laptopcomputer"
         }
-        let lower = specs.modelName.lowercased()
+        let lower = controller.specs.modelName.lowercased()
         if lower.contains("mini") {
             return "macmini"
         } else if lower.contains("studio") || (lower.contains("pro") && !lower.contains("book")) {
@@ -432,14 +427,5 @@ struct HomeDashboardView: View {
             return "desktopcomputer"
         }
         return "macbook.gen2"
-    }
-
-    private var uptimeFormatted: String {
-        let hours = Int(specs.uptime / 3600)
-        let days = hours / 24
-        if days > 0 {
-            return "\(days)d \(hours % 24)h"
-        }
-        return "\(hours)h"
     }
 }

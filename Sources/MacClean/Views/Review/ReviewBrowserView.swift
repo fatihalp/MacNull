@@ -11,13 +11,7 @@ struct ReviewBrowserView: View {
     var onReset: (() -> Void)? = nil
     var onClean: (() -> Void)? = nil
 
-    @State private var sectionID: String
-    @State private var categoryID: Int?
-    @State private var drillPath: [ReviewNode] = []
-    @State private var childCache: [String: [ReviewNode]] = [:]
-    @State private var loadingNodeID: String?
-    @State private var searchText: String = ""
-    @State private var onlyLargeFiles: Bool = false
+    @State private var controller: ReviewBrowserController
 
     private static let maxRows = 1_000
 
@@ -38,16 +32,7 @@ struct ReviewBrowserView: View {
         self.onDone = onDone
         self.onReset = onReset
         self.onClean = onClean
-        let validSections = data.sections.filter { section in
-            section.size > 0 && section.categoryIDs.contains { data.categories[$0].size > 0 }
-        }
-        let section = validSections.first { $0.id == initialSectionID } ?? validSections.first ?? data.sections.first
-        _sectionID = State(initialValue: section?.id ?? "")
-        let sectionCategoryIDs: [Int] = section?.categoryIDs ?? []
-        let firstNonEmptyID: Int? = sectionCategoryIDs.first { data.categories[$0].size > 0 }
-        let fallbackID: Int? = data.categories.first(where: { $0.size > 0 })?.id ?? data.categories.first?.id
-        let initialCat: Int? = firstNonEmptyID ?? sectionCategoryIDs.first ?? fallbackID
-        _categoryID = State(initialValue: initialCat)
+        _controller = State(initialValue: ReviewBrowserController(data: data, initialSectionID: initialSectionID))
     }
 
     var body: some View {
@@ -70,14 +55,6 @@ struct ReviewBrowserView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
-    }
-
-    private var currentSection: ReviewSection? {
-        data.sections.first { $0.id == sectionID }
-    }
-
-    private var currentCategory: ReviewCategory? {
-        categoryID.map { data.categories[$0] }
     }
 
     private var categoriesMasterList: some View {
@@ -115,9 +92,7 @@ struct ReviewBrowserView: View {
             Divider()
 
             ScrollView {
-                let nonEmptySections = data.sections.filter { section in
-                    section.size > 0 && section.categoryIDs.contains { data.categories[$0].size > 0 }
-                }
+                let nonEmptySections = controller.nonEmptySections
                 if nonEmptySections.count > 1 {
                     LazyVStack(alignment: .leading, spacing: 14) {
                         ForEach(nonEmptySections) { section in
@@ -127,7 +102,7 @@ struct ReviewBrowserView: View {
                     .padding(.vertical, 8)
                 } else if let singleSection = nonEmptySections.first {
                     LazyVStack(spacing: 2) {
-                        ForEach(singleSection.categoryIDs.filter { data.categories[$0].size > 0 }, id: \.self) { id in
+                        ForEach(controller.nonEmptyCategoryIDs(in: singleSection), id: \.self) { id in
                             categoryRow(data.categories[id])
                         }
                     }
@@ -135,7 +110,7 @@ struct ReviewBrowserView: View {
                     .padding(.vertical, 8)
                 } else {
                     LazyVStack(spacing: 2) {
-                        ForEach(data.categories.filter { $0.size > 0 }.sorted { $0.size > $1.size }) { category in
+                        ForEach(controller.nonEmptyCategoriesBySize) { category in
                             categoryRow(category)
                         }
                     }
@@ -149,7 +124,7 @@ struct ReviewBrowserView: View {
     @ViewBuilder
     private func sectionGroup(_ section: ReviewSection) -> some View {
         let sectionSize = selection.selectedSize(ofSection: section)
-        let nonEmptyCatIDs = section.categoryIDs.filter { data.categories[$0].size > 0 }
+        let nonEmptyCatIDs = controller.nonEmptyCategoryIDs(in: section)
         if !nonEmptyCatIDs.isEmpty {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
@@ -189,7 +164,7 @@ struct ReviewBrowserView: View {
     }
 
     private func categoryRow(_ category: ReviewCategory) -> some View {
-        let isSelected = category.id == categoryID
+        let isSelected = category.id == controller.categoryID
         let selectedSize = selection.selectedSize(ofCategory: category.id)
         let isEmpty = category.size == 0
         return HStack(spacing: 8) {
@@ -200,15 +175,7 @@ struct ReviewBrowserView: View {
             .opacity(isEmpty ? 0.35 : 1)
 
             Button {
-                guard category.id != categoryID else {
-                    drillPath = []
-                    return
-                }
-                categoryID = category.id
-                drillPath = []
-                if let section = data.sections.first(where: { $0.categoryIDs.contains(category.id) }) {
-                    sectionID = section.id
-                }
+                controller.select(category)
             } label: {
                 HStack(spacing: 8) {
                     ReviewCategoryIcon(category: category.category, isEmpty: isEmpty)
@@ -250,13 +217,13 @@ struct ReviewBrowserView: View {
 
     @ViewBuilder
     private var detailPane: some View {
-        if let category = currentCategory {
+        if let category = controller.currentCategory {
             VStack(alignment: .leading, spacing: 0) {
                 detailHeader(category)
 
                 Divider()
 
-                if !drillPath.isEmpty {
+                if controller.isDrilled {
                     breadcrumb(category)
                     Divider()
                 }
@@ -302,13 +269,13 @@ struct ReviewBrowserView: View {
                         .foregroundStyle(.secondary)
                         .font(.system(size: 11))
 
-                    TextField("Search items...", text: $searchText)
+                    TextField("Search items...", text: $controller.searchText)
                         .textFieldStyle(.plain)
                         .font(.system(size: 12))
 
-                    if !searchText.isEmpty {
+                    if !controller.searchText.isEmpty {
                         Button {
-                            searchText = ""
+                            controller.searchText = ""
                         } label: {
                             Image(systemName: "xmark.circle.fill")
                                 .foregroundStyle(.secondary)
@@ -357,8 +324,8 @@ struct ReviewBrowserView: View {
                         .buttonStyle(.bordered)
                         .controlSize(.small)
 
-                        Toggle(isOn: $onlyLargeFiles) {
-                            Text(category.category == .projectJunk && drillPath.isEmpty ? "> 1 GB" : (drillPath.isEmpty ? "> 100 MB" : "> 50 MB"))
+                        Toggle(isOn: $controller.onlyLargeFiles) {
+                            Text(controller.largeFileFilterLabel(for: category))
                                 .font(.system(size: 11, weight: .medium))
                         }
                         .toggleStyle(.button)
@@ -374,12 +341,12 @@ struct ReviewBrowserView: View {
     private func breadcrumb(_ category: ReviewCategory) -> some View {
         HStack(spacing: 6) {
             Button {
-                drillPath.removeLast()
+                controller.goBack()
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 11, weight: .semibold))
-                    Text(drillPath.count > 1 ? drillPath[drillPath.count - 2].name : category.category.displayName)
+                    Text(controller.drillPath.count > 1 ? controller.drillPath[controller.drillPath.count - 2].name : category.category.displayName)
                         .font(.system(size: 12, weight: .medium))
                 }
                 .foregroundStyle(Color(nsColor: .systemBlue))
@@ -390,7 +357,7 @@ struct ReviewBrowserView: View {
             Text("›")
                 .foregroundStyle(.tertiary)
 
-            Text(drillPath.last?.name ?? "")
+            Text(controller.drillPath.last?.name ?? "")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.primary)
 
@@ -403,16 +370,8 @@ struct ReviewBrowserView: View {
 
     @ViewBuilder
     private func nodeList(_ category: ReviewCategory) -> some View {
-        let baseNodes = drillPath.last.flatMap { childCache[$0.id] } ?? category.groups
-        let isDrilled = !drillPath.isEmpty
-        let largeThreshold: UInt64 = isDrilled
-            ? (50 * 1024 * 1024)
-            : (category.category == .projectJunk ? 1_000_000_000 : 100 * 1024 * 1024)
-        let filteredNodes = baseNodes.filter { node in
-            let matchesSearch = searchText.isEmpty || node.name.localizedCaseInsensitiveContains(searchText)
-            let matchesSize = !onlyLargeFiles || node.size >= largeThreshold
-            return matchesSearch && matchesSize
-        }
+        let baseNodes = controller.baseNodes(in: category)
+        let filteredNodes = controller.filteredNodes(in: category)
 
         if category.groups.isEmpty {
             VStack(spacing: 8) {
@@ -426,7 +385,7 @@ struct ReviewBrowserView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let parent = drillPath.last, childCache[parent.id] == nil || loadingNodeID == parent.id {
+        } else if controller.isLoadingChildren {
             VStack {
                 Spacer()
                 ProgressView().controlSize(.small)
@@ -475,13 +434,13 @@ struct ReviewBrowserView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 4)
             }
-            .id(drillPath.last?.id ?? "category-\(category.id)")
+            .id(controller.drillPath.last?.id ?? "category-\(category.id)")
         }
     }
 
     private func nodeRow(_ node: ReviewNode, category: ReviewCategory) -> some View {
         let state = selection.state(of: node.range)
-        let showChevron = !node.isLeaf && category.category != .systemLogs && category.category != .userLogs || !drillPath.isEmpty && !node.isLeaf
+        let showChevron = !node.isLeaf && category.category != .systemLogs && category.category != .userLogs || controller.isDrilled && !node.isLeaf
         return HStack(spacing: 10) {
             ReviewCheckbox(state: state) {
                 selection.toggle(node, category: category.id)
@@ -526,7 +485,7 @@ struct ReviewBrowserView: View {
                     HStack(spacing: 8) {
                         if node.appIsRunning {
                             Label(
-                                String(localized: "App is open"),
+                                "App is open",
                                 systemImage: "lock.fill"
                             )
                             .font(.system(size: 10.5, weight: .medium))
@@ -542,7 +501,7 @@ struct ReviewBrowserView: View {
                         }
                         if node.isAIConversation {
                             Label(
-                                String(localized: "AI History"),
+                                "AI History",
                                 systemImage: "bubble.left.and.bubble.right.fill"
                             )
                             .font(.system(size: 10.5, weight: .medium))
@@ -550,7 +509,7 @@ struct ReviewBrowserView: View {
                         }
                         if node.isOldVersion {
                             Label(
-                                String(localized: "Old Version"),
+                                "Old Version",
                                 systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90"
                             )
                             .font(.system(size: 10.5, weight: .medium))
@@ -567,7 +526,7 @@ struct ReviewBrowserView: View {
                 .frame(width: 76, alignment: .trailing)
             if showChevron {
                 Button {
-                    drill(into: node)
+                    controller.drill(into: node)
                 } label: {
                     Image(systemName: "chevron.right")
                         .font(.system(size: 11, weight: .semibold))
@@ -593,7 +552,7 @@ struct ReviewBrowserView: View {
                 NSWorkspace.shared.activateFileViewerSelecting([URL(filePath: node.basePath)])
             }
             if !node.isLeaf {
-                Button("Show Contents") { drill(into: node) }
+                Button("Show Contents") { controller.drill(into: node) }
             }
         }
     }
@@ -612,25 +571,6 @@ struct ReviewBrowserView: View {
         let projectName = (parentDir as NSString).lastPathComponent
         return (junkName: junkName.isEmpty ? node.name : junkName,
                 projectName: projectName.isEmpty ? "" : projectName)
-    }
-
-    private func drill(into node: ReviewNode) {
-        guard !node.isLeaf else { return }
-        searchText = ""
-        onlyLargeFiles = false
-        drillPath.append(node)
-        guard childCache[node.id] == nil else { return }
-        loadingNodeID = node.id
-        let data = self.data
-        Task {
-            let children = await Task.detached(priority: .userInitiated) {
-                data.children(of: node)
-            }.value
-            await MainActor.run {
-                childCache[node.id] = children
-                if loadingNodeID == node.id { loadingNodeID = nil }
-            }
-        }
     }
 
     private var bottomBar: some View {
@@ -671,16 +611,16 @@ struct ReviewBrowserView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "house.fill")
                                 .font(.system(size: 11))
-                            Text(String(localized: "Dashboard"))
+                            Text("Dashboard")
                         }
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.regular)
-                    .help(String(localized: "Return to Home Dashboard"))
+                    .help("Return to Home Dashboard")
                 }
 
                 if let onClean {
-                    Button(String(localized: "Back"), action: onDone)
+                    Button("Back", action: onDone)
                         .buttonStyle(.bordered)
                         .controlSize(.regular)
 

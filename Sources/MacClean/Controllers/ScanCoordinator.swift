@@ -21,16 +21,8 @@ public final class ScanCoordinator {
 
     public init() {}
 
-    public func registerModule(_ module: ScanModule) {
-        modules.append(module)
-    }
-
     public func registerModules(_ newModules: [ScanModule]) {
         modules.append(contentsOf: newModules)
-    }
-
-    public func scanAll(onStateChange: (@MainActor (ScanState) -> Void)? = nil) {
-        scanSmart(mode: .safe, onStateChange: onStateChange)
     }
 
     public func scanSmart(mode: SmartScanMode, onStateChange: (@MainActor (ScanState) -> Void)? = nil) {

@@ -14,8 +14,4 @@ public struct DiskUsage: Sendable, Equatable {
     }
 
     public var used: UInt64 { total >= free ? total - free : 0 }
-
-    public var usedFraction: Double {
-        total > 0 ? Double(used) / Double(total) : 0
-    }
 }

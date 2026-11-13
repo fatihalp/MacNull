@@ -6,7 +6,7 @@ public struct SizeDisplay: View {
     let bytes: UInt64
     let subtitle: String
 
-    public init(size bytes: UInt64, label subtitle: String = String(localized: "can be cleaned")) {
+    public init(size bytes: UInt64, label subtitle: String = "can be cleaned") {
         self.bytes = bytes
         self.subtitle = subtitle
     }

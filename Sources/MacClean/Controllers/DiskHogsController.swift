@@ -22,11 +22,6 @@ final class DiskHogsController {
         self.client = client
     }
 
-    var dockerRows: [DockerDiskRow] {
-        if case .rows(let rows) = dockerState { return rows }
-        return []
-    }
-
     var selectedDevices: [SimulatorDevice] { devices.filter { selectedSim.contains($0.udid) } }
     var selectedRuntimes: [SimulatorRuntime] { runtimes.filter { selectedSim.contains($0.identifier) } }
 

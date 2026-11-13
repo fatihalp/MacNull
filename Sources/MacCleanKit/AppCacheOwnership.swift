@@ -2,22 +2,6 @@ import Foundation
 
 public enum AppCacheOwnership {
 
-    public static func runningOwnedURLs(
-        in results: [ScanResult],
-        runningBundleIDs: Set<String>
-    ) -> Set<URL> {
-        guard !runningBundleIDs.isEmpty else { return [] }
-        var urls: Set<URL> = []
-        for result in results {
-            for item in result.items {
-                if let id = owningBundleID(for: item.url), runningBundleIDs.contains(id) {
-                    urls.insert(item.url)
-                }
-            }
-        }
-        return urls
-    }
-
     public static func owningBundleID(for url: URL) -> String? {
         let components: [String] = url.pathComponents
 

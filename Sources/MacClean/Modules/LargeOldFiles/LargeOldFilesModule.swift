@@ -3,7 +3,7 @@ import MacCleanKit
 
 public struct LargeOldFilesModule: ScanModule {
     public let id = "large_old_files"
-    public var name: String { String(localized: "Large & Old Files") }
+    public var name: String { "Large & Old Files" }
     public let category = ModuleCategory.files
 
     public let includedInSmartScan = false

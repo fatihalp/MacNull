@@ -3,7 +3,7 @@ import MacCleanKit
 
 public struct MaintenanceModule: ScanModule {
     public let id = "maintenance"
-    public var name: String { String(localized: "Maintenance") }
+    public var name: String { "Maintenance" }
     public let category = ModuleCategory.performance
 
     public init() {}
@@ -43,7 +43,7 @@ public actor MaintenanceExecutor {
 
         guard let (command, args) = task.systemCommand else {
             return TaskResult(task: task, success: false, output: "",
-                              error: String(localized: "Task has no system command"))
+                              error: "Task has no system command")
         }
 
         guard task.systemCommandIsAvailable(existing: commandExists) else {
@@ -69,7 +69,7 @@ public actor MaintenanceExecutor {
         let err = result.error ?? ""
         if MaintenanceShell.isAuthorizationCancelled(err, errorNumber: result.errorNumber) {
             return TaskResult(task: task, success: false, output: "",
-                              error: String(localized: "Cancelled — administrator access was not granted."))
+                              error: "Cancelled — administrator access was not granted.")
         }
 
         return TaskResult(task: task, success: false, output: "",
@@ -122,7 +122,7 @@ public actor MaintenanceExecutor {
                 return TaskResult(
                     task: .speedUpMail,
                     success: true,
-                    output: String(localized: "Mail envelope index removed. Mail will rebuild it on next launch."),
+                    output: "Mail envelope index removed. Mail will rebuild it on next launch.",
                     error: nil
                 )
             } catch {
@@ -138,7 +138,7 @@ public actor MaintenanceExecutor {
         return TaskResult(
             task: .speedUpMail,
             success: true,
-            output: String(localized: "Mail envelope index not found — Mail may use a different version directory."),
+            output: "Mail envelope index not found — Mail may use a different version directory.",
             error: nil
         )
     }
@@ -149,7 +149,7 @@ public actor MaintenanceExecutor {
         }) else {
             return TaskResult(
                 task: .pruneDocker, success: false, output: "",
-                error: String(localized: "Docker CLI not found. Make sure Docker Desktop is installed."))
+                error: "Docker CLI not found. Make sure Docker Desktop is installed.")
         }
         return await runProcess(task: .pruneDocker, command: docker, args: ["system", "prune", "-f"])
     }

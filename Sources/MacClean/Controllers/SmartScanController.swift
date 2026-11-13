@@ -32,7 +32,7 @@ final class SmartScanController {
         self.scanMode = mode
         if case .cleaning = scanState { return }
         resetScan()
-        let initialModuleName = String(localized: "System Junk")
+        let initialModuleName = "System Junk"
         currentModuleName = initialModuleName
         scanState = .scanning(
             phase: initialModuleName, progress: 0.0, filesFound: 0, sizeFound: 0
@@ -70,7 +70,7 @@ final class SmartScanController {
             return
         }
         scanState = .scanning(
-            phase: String(localized: "Preparing results..."), progress: 1,
+            phase: "Preparing results...", progress: 1,
             filesFound: fileCount, sizeFound: totalSize
         )
         let generation = generation

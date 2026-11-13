@@ -228,7 +228,7 @@ struct UninstallerView: View {
                         controller.loadAssociatedFiles(for: app)
                     } label: {
                         HStack(spacing: 10) {
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: app.path.path(percentEncoded: false)))
+                            Image(nsImage: AppIconProvider.icon(forPath: app.path.path(percentEncoded: false)))
                                 .resizable()
                                 .frame(width: 24, height: 24)
 
@@ -268,7 +268,7 @@ struct UninstallerView: View {
     private func appDetailView(_ app: AppInfo) -> some View {
         VStack(spacing: 12) {
             HStack {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: app.path.path(percentEncoded: false)))
+                Image(nsImage: AppIconProvider.icon(forPath: app.path.path(percentEncoded: false)))
                     .resizable()
                     .frame(width: 32, height: 32)
 
@@ -285,8 +285,8 @@ struct UninstallerView: View {
                     ProgressView()
                         .controlSize(.small)
                     Text(controller.isResetting
-                         ? String(localized: "Resetting…")
-                         : String(localized: "Uninstalling…"))
+                         ? "Resetting…"
+                         : "Uninstalling…")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 } else {

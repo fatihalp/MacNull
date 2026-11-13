@@ -3,7 +3,7 @@ import MacCleanKit
 
 public struct TrashBinsModule: ScanModule {
     public let id = "trash_bins"
-    public var name: String { String(localized: "Trash Bins") }
+    public var name: String { "Trash Bins" }
     public let category = ModuleCategory.cleanup
 
     private let scanner = TargetedScanner()

@@ -79,17 +79,17 @@ enum PreferredWiFiClientError: Error, Equatable {
     case adminCancelled
     case commandFailed(String)
 
-    var localizedMessage: String {
+    var userMessage: String {
         switch self {
         case .noWiFiHardware:
-            String(localized: "No Wi-Fi hardware found.")
+            "No Wi-Fi hardware found."
         case .invalidDevice:
-            String(localized: "The Wi-Fi interface name was invalid, so the action was cancelled.")
+            "The Wi-Fi interface name was invalid, so the action was cancelled."
         case .adminCancelled:
-            String(localized: "Cancelled — administrator access was not granted.")
+            "Cancelled — administrator access was not granted."
         case .commandFailed(let message):
             message.isEmpty
-                ? String(localized: "Couldn't update saved Wi-Fi networks.")
+                ? "Couldn't update saved Wi-Fi networks."
                 : message
         }
     }

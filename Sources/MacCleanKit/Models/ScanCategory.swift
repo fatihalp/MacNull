@@ -6,7 +6,6 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
     case systemCaches = "system_caches"
     case userLogs = "user_logs"
     case systemLogs = "system_logs"
-    case languageFiles = "language_files"
     case brokenPreferences = "broken_preferences"
     case brokenLoginItems = "broken_login_items"
     case documentVersions = "document_versions"
@@ -42,71 +41,69 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
 
     public var displayName: String {
         switch self {
-        case .userCaches: String(localized: "User Cache Files")
-        case .systemCaches: String(localized: "System Cache Files")
-        case .userLogs: String(localized: "User Log Files")
-        case .systemLogs: String(localized: "System Log Files")
-        case .languageFiles: String(localized: "Language Files")
-        case .brokenPreferences: String(localized: "Broken Preferences")
-        case .brokenLoginItems: String(localized: "Broken Login Items")
-        case .documentVersions: String(localized: "Document Versions")
-        case .brokenDownloads: String(localized: "Broken Downloads")
-        case .iosDeviceBackups: String(localized: "iOS Device Backups")
-        case .oldUpdates: String(localized: "Old Updates")
-        case .universalBinaries: String(localized: "Universal Binaries")
-        case .xcodeJunk: String(localized: "Xcode Junk")
-        case .deletedUsers: String(localized: "Deleted Users")
-        case .unusedDiskImages: String(localized: "Unused Disk Images")
-        case .incompleteDownloads: String(localized: "Incomplete Downloads")
-        case .appLeftovers: String(localized: "Leftovers from Deleted Apps")
-        case .packageManagerCaches: String(localized: "Package Manager Caches")
-        case .ideCaches: String(localized: "IDE & Editor Caches")
-        case .aiToolCaches: String(localized: "AI Tool Caches")
-        case .appCaches: String(localized: "Application Caches")
-        case .mailAttachments: String(localized: "Mail Attachments")
-        case .trashBins: String(localized: "Trash Bins")
-        case .malware: String(localized: "Malware")
-        case .browserPrivacy: String(localized: "Browser Caches")
-        case .systemPrivacy: String(localized: "System Privacy")
-        case .largeFiles: String(localized: "Large Files")
-        case .oldFiles: String(localized: "Old Files")
-        case .duplicates: String(localized: "Duplicates")
-        case .projectJunk: String(localized: "Project Junk")
+        case .userCaches: "User Cache Files"
+        case .systemCaches: "System Cache Files"
+        case .userLogs: "User Log Files"
+        case .systemLogs: "System Log Files"
+        case .brokenPreferences: "Broken Preferences"
+        case .brokenLoginItems: "Broken Login Items"
+        case .documentVersions: "Document Versions"
+        case .brokenDownloads: "Broken Downloads"
+        case .iosDeviceBackups: "iOS Device Backups"
+        case .oldUpdates: "Old Updates"
+        case .universalBinaries: "Universal Binaries"
+        case .xcodeJunk: "Xcode Junk"
+        case .deletedUsers: "Deleted Users"
+        case .unusedDiskImages: "Unused Disk Images"
+        case .incompleteDownloads: "Incomplete Downloads"
+        case .appLeftovers: "Leftovers from Deleted Apps"
+        case .packageManagerCaches: "Package Manager Caches"
+        case .ideCaches: "IDE & Editor Caches"
+        case .aiToolCaches: "AI Tool Caches"
+        case .appCaches: "Application Caches"
+        case .mailAttachments: "Mail Attachments"
+        case .trashBins: "Trash Bins"
+        case .malware: "Malware"
+        case .browserPrivacy: "Browser Caches"
+        case .systemPrivacy: "System Privacy"
+        case .largeFiles: "Large Files"
+        case .oldFiles: "Old Files"
+        case .duplicates: "Duplicates"
+        case .projectJunk: "Project Junk"
         }
     }
 
     public var subtitle: String {
         switch self {
-        case .userCaches: String(localized: "App temporary files. Regenerated next launch.")
-        case .systemCaches: String(localized: "macOS-managed caches. Rebuilt automatically.")
-        case .userLogs: String(localized: "Diagnostic logs written by your apps.")
-        case .systemLogs: String(localized: "macOS diagnostic logs.")
-        case .languageFiles: String(localized: "Unused localizations bundled with apps.")
-        case .brokenPreferences: String(localized: "Corrupt or orphaned preference files.")
-        case .brokenLoginItems: String(localized: "Login items pointing at apps that are gone.")
-        case .documentVersions: String(localized: "Old autosaved document revisions.")
-        case .brokenDownloads: String(localized: "Failed or orphaned download leftovers.")
-        case .iosDeviceBackups: String(localized: "Local backups of iPhone and iPad devices.")
-        case .oldUpdates: String(localized: "Installer packages left behind after updating.")
-        case .universalBinaries: String(localized: "Unused CPU slices inside app binaries.")
-        case .xcodeJunk: String(localized: "Derived data, archives, and simulator caches.")
-        case .deletedUsers: String(localized: "Leftover data from removed user accounts.")
-        case .unusedDiskImages: String(localized: "Disk images you mounted once and forgot.")
-        case .incompleteDownloads: String(localized: "Partially downloaded files.")
-        case .appLeftovers: String(localized: "Support files from apps you've deleted.")
-        case .packageManagerCaches: String(localized: "Regenerable caches from npm, pnpm, Cargo, Pub, pip, uv, Composer, Homebrew, and Gradle.")
-        case .ideCaches: String(localized: "Caches from code editors like Cursor and Windsurf.")
-        case .aiToolCaches: String(localized: "Caches, runtimes, and sessions from AI coding tools (Gemini, Claude, Codex).")
-        case .appCaches: String(localized: "Caches and temporary files from messaging and desktop applications (WhatsApp, etc.).")
-        case .mailAttachments: String(localized: "Saved copies of Mail attachments.")
-        case .trashBins: String(localized: "Items currently sitting in the Trash.")
-        case .malware: String(localized: "Known malicious files found on disk.")
-        case .browserPrivacy: String(localized: "Temporary cache files and web storage from web browsers.")
-        case .systemPrivacy: String(localized: "Recent-items lists and other privacy traces.")
-        case .largeFiles: String(localized: "The files taking up the most space.")
-        case .oldFiles: String(localized: "Files you haven't opened in a long time.")
-        case .duplicates: String(localized: "Identical copies of the same file.")
-        case .projectJunk: String(localized: "Dependency and build folders inside your code projects.")
+        case .userCaches: "App temporary files. Regenerated next launch."
+        case .systemCaches: "macOS-managed caches. Rebuilt automatically."
+        case .userLogs: "Diagnostic logs written by your apps."
+        case .systemLogs: "macOS diagnostic logs."
+        case .brokenPreferences: "Corrupt or orphaned preference files."
+        case .brokenLoginItems: "Login items pointing at apps that are gone."
+        case .documentVersions: "Old autosaved document revisions."
+        case .brokenDownloads: "Failed or orphaned download leftovers."
+        case .iosDeviceBackups: "Local backups of iPhone and iPad devices."
+        case .oldUpdates: "Installer packages left behind after updating."
+        case .universalBinaries: "Unused CPU slices inside app binaries."
+        case .xcodeJunk: "Derived data, archives, and simulator caches."
+        case .deletedUsers: "Leftover data from removed user accounts."
+        case .unusedDiskImages: "Disk images you mounted once and forgot."
+        case .incompleteDownloads: "Partially downloaded files."
+        case .appLeftovers: "Support files from apps you've deleted."
+        case .packageManagerCaches: "Regenerable caches from npm, pnpm, Cargo, Pub, pip, uv, Composer, Homebrew, and Gradle."
+        case .ideCaches: "Caches from code editors like Cursor and Windsurf."
+        case .aiToolCaches: "Caches, runtimes, and sessions from AI coding tools (Gemini, Claude, Codex)."
+        case .appCaches: "Caches and temporary files from messaging and desktop applications (WhatsApp, etc.)."
+        case .mailAttachments: "Saved copies of Mail attachments."
+        case .trashBins: "Items currently sitting in the Trash."
+        case .malware: "Known malicious files found on disk."
+        case .browserPrivacy: "Temporary cache files and web storage from web browsers."
+        case .systemPrivacy: "Recent-items lists and other privacy traces."
+        case .largeFiles: "The files taking up the most space."
+        case .oldFiles: "Files you haven't opened in a long time."
+        case .duplicates: "Identical copies of the same file."
+        case .projectJunk: "Dependency and build folders inside your code projects."
         }
     }
 
@@ -114,78 +111,37 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         "\(displayName)\n\(subtitle)"
     }
 
-    public enum CleanupSafety: CaseIterable, Sendable {
-
-        case regenerates
-
-        case safeToRemove
-
-        case reviewFirst
-
-        public var label: String {
-            switch self {
-            case .regenerates: String(localized: "Recreated automatically")
-            case .safeToRemove: String(localized: "Safe to remove")
-            case .reviewFirst: String(localized: "Review before cleaning")
-            }
-        }
-
-        public var systemImage: String {
-            switch self {
-            case .regenerates: "arrow.triangle.2.circlepath.circle"
-            case .safeToRemove: "checkmark.shield"
-            case .reviewFirst: "exclamationmark.shield"
-            }
-        }
-    }
-
-    public var cleanupSafety: CleanupSafety {
-        switch self {
-        case .userCaches, .systemCaches, .packageManagerCaches, .ideCaches, .aiToolCaches, .appCaches:
-            .regenerates
-        case .userLogs, .systemLogs, .brokenPreferences, .brokenLoginItems,
-             .brokenDownloads, .incompleteDownloads, .oldUpdates, .appLeftovers:
-            .safeToRemove
-        case .languageFiles, .documentVersions, .iosDeviceBackups, .universalBinaries,
-             .xcodeJunk, .deletedUsers, .unusedDiskImages, .mailAttachments, .trashBins,
-             .malware, .browserPrivacy, .systemPrivacy, .largeFiles, .oldFiles, .duplicates,
-             .projectJunk:
-            .reviewFirst
-        }
-    }
-
     public var safetyRationale: String {
         switch self {
-        case .userCaches: String(localized: "App temp files. Recreated automatically the next time each app launches.")
-        case .systemCaches: String(localized: "Caches macOS manages itself. It rebuilds them automatically as needed.")
-        case .packageManagerCaches: String(localized: "Download and build caches. npm, pnpm, Cargo, pip, uv, Homebrew, and Gradle re-download what they need on the next install or build.")
-        case .ideCaches: String(localized: "Editor caches only. Cursor and Antigravity recreate them on next launch; your settings and extensions aren't touched.")
-        case .aiToolCaches: String(localized: "AI tools accumulate heavy models, runtimes, and sessions. Safe Clean preserves conversations; Deep Clean recovers maximum space.")
-        case .appCaches: String(localized: "Temporary files and media caches from apps like WhatsApp. The app regenerates them as needed.")
-        case .userLogs: String(localized: "Diagnostic text your apps wrote for troubleshooting. Apps don't read old logs back, and they start new ones as they run.")
-        case .systemLogs: String(localized: "macOS diagnostic logs. Only useful when investigating a past problem; macOS keeps writing fresh ones.")
-        case .brokenPreferences: String(localized: "Settings files that can't be read, or whose app is no longer installed. Nothing on this Mac uses them.")
-        case .brokenLoginItems: String(localized: "Login entries that point to apps that no longer exist, so they can't start anything.")
-        case .brokenDownloads: String(localized: "Leftovers of downloads that failed or were abandoned. Download the file again if you still want it.")
-        case .incompleteDownloads: String(localized: "Partial files from unfinished downloads and day-old temp files. Don't clean while a download is still running.")
-        case .oldUpdates: String(localized: "Installer packages apps downloaded more than a week ago. Installers aren't needed once they've run, and can be downloaded again.")
-        case .appLeftovers: String(localized: "Support folders named after an app that's no longer installed (the name on each row is that app's ID). Reinstalling the app later starts it fresh.")
-        case .languageFiles: String(localized: "Translations for languages you don't use. Removing them changes the app bundle; reinstall the app to get them back.")
-        case .documentVersions: String(localized: "Older autosaved revisions of your documents. The current version stays, but older ones can't be browsed after cleaning.")
-        case .iosDeviceBackups: String(localized: "Local iPhone and iPad backups older than 30 days. If it's a device's only backup, keep it or back up to iCloud first.")
-        case .universalBinaries: String(localized: "Removes CPU code this Mac can't run from inside apps. Changes the apps in place; only reinstalling them undoes it.")
-        case .xcodeJunk: String(localized: "DerivedData and Previews are rebuilt on the next build, and Device Support is copied again when a device connects. Archives and simulator data can't be regenerated; keep them if you need old builds or crash symbols.")
-        case .deletedUsers: String(localized: "Whole home folders of accounts no longer on this Mac. Check each name: a network account that's briefly offline looks the same.")
-        case .unusedDiskImages: String(localized: "Disk images in Downloads older than a week, usually installers that already ran. Download them again if you need them.")
-        case .mailAttachments: String(localized: "Copies of attachments Mail saved on disk. Mail can download them again from the server for IMAP and Exchange accounts, not for POP.")
-        case .trashBins: String(localized: "Already in the Trash. Emptying it is permanent and can't be undone.")
-        case .malware: String(localized: "Matched a known malware signature. Check the path first if it belongs to software you installed on purpose.")
-        case .browserPrivacy: String(localized: "Temporary files and web caches from web browsers. Can be safely removed to free up disk space while preserving logins and cookies.")
-        case .systemPrivacy: String(localized: "Recent-items lists and similar traces. Apps' Open Recent menus will start empty.")
-        case .largeFiles: String(localized: "Your own files, picked only by size. Nothing here is junk by definition; check each one.")
-        case .oldFiles: String(localized: "Your own files you haven't opened in a long time. Old doesn't mean unneeded; check each one.")
-        case .duplicates: String(localized: "Byte-for-byte identical copies. Keep at least one copy of each file you need.")
-        case .projectJunk: String(localized: "Installed dependencies and build output inside your projects. Running the project's install or build command brings them back; the first build afterwards takes longer.")
+        case .userCaches: "App temp files. Recreated automatically the next time each app launches."
+        case .systemCaches: "Caches macOS manages itself. It rebuilds them automatically as needed."
+        case .packageManagerCaches: "Download and build caches. npm, pnpm, Cargo, pip, uv, Homebrew, and Gradle re-download what they need on the next install or build."
+        case .ideCaches: "Editor caches only. Cursor and Antigravity recreate them on next launch; your settings and extensions aren't touched."
+        case .aiToolCaches: "AI tools accumulate heavy models, runtimes, and sessions. Safe Clean preserves conversations; Deep Clean recovers maximum space."
+        case .appCaches: "Temporary files and media caches from apps like WhatsApp. The app regenerates them as needed."
+        case .userLogs: "Diagnostic text your apps wrote for troubleshooting. Apps don't read old logs back, and they start new ones as they run."
+        case .systemLogs: "macOS diagnostic logs. Only useful when investigating a past problem; macOS keeps writing fresh ones."
+        case .brokenPreferences: "Settings files that can't be read, or whose app is no longer installed. Nothing on this Mac uses them."
+        case .brokenLoginItems: "Login entries that point to apps that no longer exist, so they can't start anything."
+        case .brokenDownloads: "Leftovers of downloads that failed or were abandoned. Download the file again if you still want it."
+        case .incompleteDownloads: "Partial files from unfinished downloads and day-old temp files. Don't clean while a download is still running."
+        case .oldUpdates: "Installer packages apps downloaded more than a week ago. Installers aren't needed once they've run, and can be downloaded again."
+        case .appLeftovers: "Support folders named after an app that's no longer installed (the name on each row is that app's ID). Reinstalling the app later starts it fresh."
+        case .documentVersions: "Older autosaved revisions of your documents. The current version stays, but older ones can't be browsed after cleaning."
+        case .iosDeviceBackups: "Local iPhone and iPad backups older than 30 days. If it's a device's only backup, keep it or back up to iCloud first."
+        case .universalBinaries: "Removes CPU code this Mac can't run from inside apps. Changes the apps in place; only reinstalling them undoes it."
+        case .xcodeJunk: "DerivedData and Previews are rebuilt on the next build, and Device Support is copied again when a device connects. Archives and simulator data can't be regenerated; keep them if you need old builds or crash symbols."
+        case .deletedUsers: "Whole home folders of accounts no longer on this Mac. Check each name: a network account that's briefly offline looks the same."
+        case .unusedDiskImages: "Disk images in Downloads older than a week, usually installers that already ran. Download them again if you need them."
+        case .mailAttachments: "Copies of attachments Mail saved on disk. Mail can download them again from the server for IMAP and Exchange accounts, not for POP."
+        case .trashBins: "Already in the Trash. Emptying it is permanent and can't be undone."
+        case .malware: "Matched a known malware signature. Check the path first if it belongs to software you installed on purpose."
+        case .browserPrivacy: "Temporary files and web caches from web browsers. Can be safely removed to free up disk space while preserving logins and cookies."
+        case .systemPrivacy: "Recent-items lists and similar traces. Apps' Open Recent menus will start empty."
+        case .largeFiles: "Your own files, picked only by size. Nothing here is junk by definition; check each one."
+        case .oldFiles: "Your own files you haven't opened in a long time. Old doesn't mean unneeded; check each one."
+        case .duplicates: "Byte-for-byte identical copies. Keep at least one copy of each file you need."
+        case .projectJunk: "Installed dependencies and build output inside your projects. Running the project's install or build command brings them back; the first build afterwards takes longer."
         }
     }
 
@@ -193,7 +149,6 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .userCaches, .systemCaches: "folder.badge.gearshape"
         case .userLogs, .systemLogs: "doc.text"
-        case .languageFiles: "globe"
         case .brokenPreferences: "gearshape.triangle.fill"
         case .brokenLoginItems: "person.crop.circle.badge.exclamationmark"
         case .documentVersions: "doc.on.doc"

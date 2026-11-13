@@ -63,11 +63,6 @@ public final class AppState {
         Task.detached(priority: .background) {
             CleanLogManager.pruneOldEntries()
         }
-
-        Task.detached(priority: .background) {
-            let found = LanguageScanner().discoverLproj(in: LanguageScanner.defaultRoots)
-            await MainActor.run { LanguagePreferences.discoveredLproj = found }
-        }
     }
 
     private func registerModules() {

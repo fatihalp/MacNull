@@ -203,7 +203,7 @@ public actor CleaningEngine {
                 } catch let nsError as NSError where Self.isBenignMissingFile(nsError) {
 
                     skippedCount += 1
-                    logSkip(path: item.url, reason: String(localized: "already gone"))
+                    logSkip(path: item.url, reason: "already gone")
                 } catch {
                     let msg = error.localizedDescription
                     errors.append(CleanError(
@@ -221,7 +221,7 @@ public actor CleaningEngine {
                     logOperation(path: item.url, size: realSize, dryRun: false)
                 } catch let nsError as NSError where Self.isBenignMissingFile(nsError) {
                     skippedCount += 1
-                    logSkip(path: item.url, reason: String(localized: "already gone"))
+                    logSkip(path: item.url, reason: "already gone")
                 } catch {
                     let msg = error.localizedDescription
                     errors.append(CleanError(
@@ -268,7 +268,7 @@ public actor CleaningEngine {
     }
 
     private nonisolated func logOperation(path: URL, size: UInt64, dryRun: Bool) {
-        let sizeStr = ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
+        let sizeStr = FileSizeFormatter.format(size)
         let prefix = dryRun ? "[DRY-RUN]" : "[REMOVED]"
         appendLogLine("\(prefix) \(path.path(percentEncoded: false)) (\(sizeStr))")
     }

@@ -24,9 +24,10 @@
 - Express intent purely through clear, descriptive, and unambiguous type, function, and variable names.
 - Type signatures, protocols, and control flow should communicate behavior directly.
 
-### 5. English-Only Localization
-- All user-facing strings, category names, descriptions, log messages, and resource files must remain strictly in English.
-- No multi-language translation files or non-English string literals are permitted in the codebase.
+### 5. English Only, No Language Support
+- All user-facing strings, category names, descriptions, and log messages are plain English string literals written directly in code.
+- There is no language or localization structure of any kind: no localization layer, string catalogs, `.lproj` resources, `String(localized:)` lookups, language settings, or language-file cleanup. Do not reintroduce any of them.
+- Non-English string literals are not permitted.
 
 ---
 
@@ -34,25 +35,29 @@
 
 ```
 MacSai/
-├── Package.swift                    # SwiftPM manifest (MacClean, macclean, MacCleanMenu, MacCleanKit)
+├── Package.swift                    # SwiftPM manifest (MacClean, MacCleanMenu, MacCleanKit)
 ├── agents.md                        # Agent guidelines and architectural documentation
 ├── Sources/
 │   ├── MacClean/
 │   │   ├── Main.swift               # Dual-mode entry point (dispatches to GUI App or CLI)
 │   │   ├── App/                     # AppState, App Delegate, MacCleanApp, ContentView
 │   │   ├── CLI/                     # CLIRunner command-line processing engine
-│   │   ├── Controllers/             # Observable controllers (SmartScanController, ScanCoordinator, etc.)
-│   │   ├── Models/                  # View models and module interfaces (ScanModule, SmartScanState)
+│   │   ├── Controllers/             # Observable controllers owning view state and workflows
+│   │   ├── Models/                  # View models and module interfaces (ScanModule, ReviewData)
 │   │   ├── Modules/                 # Individual module implementations (SystemJunk, ProjectJunk, etc.)
-│   │   ├── Services/                # ReviewService, ReviewDataBuilder, SystemSpecsProvider
-│   │   └── Views/                   # SwiftUI presentation layers
+│   │   ├── Services/                # Scanners, CleaningEngine, AppIconProvider, ReviewDataBuilder
+│   │   └── Views/                   # SwiftUI presentation only
 │   ├── MacCleanKit/
 │   │   ├── Categories/              # Junk category definitions (Developer, System, App Caches)
-│   │   ├── Cleaner/                 # File removal and trash execution
-│   │   ├── Models/                  # Core primitives (FileItem, ScanTarget, ScanResult, SmartScanMode)
-│   │   ├── Resources/               # Pure English string catalogs (en.lproj)
-│   │   └── TargetedScanner.swift   # High-throughput asynchronous target scanner
-│   └── MacCleanMenu/                # Lightweight menu bar accessory
+│   │   ├── Cleaner/                 # Binary thinning and Mach-O operations
+│   │   ├── Models/                  # Core primitives (FileItem, ScanResult, SmartScanMode)
+│   │   ├── SystemStats/             # CPU, memory, disk, and network samplers
+│   │   └── *.swift                  # Domain policies, safety guards, shared utilities
+│   └── MacCleanMenu/
+│       ├── MacCleanMenuApp.swift    # Menu bar scene
+│       ├── Controllers/             # Process-level guards
+│       ├── SystemStats/             # Stat collectors and tips
+│       └── Views/                   # Menu bar presentation
 ```
 
 ---
@@ -71,6 +76,13 @@ The unified entry point in `Sources/MacClean/Main.swift` inspects arguments on s
 
 ---
 
+## Refactoring Rules
+
+- Views never touch `FileManager`, `NSWorkspace` lookups, `Process`, or background tasks directly; that work lives in a controller or service.
+- Byte sizes are formatted only through `FileSizeFormatter.format(_:)`.
+- App and file icons are resolved only through `AppIconProvider`.
+- There are no test targets; correctness is verified with `swift build` and the CLI.
+
 ## Build & Verification Standards
 
 When making changes:
@@ -80,7 +92,7 @@ When making changes:
    ```
 2. Verify CLI scan execution:
    ```bash
-   swift run macclean scan --module trash_bins
+   swift run MacClean scan --module trash_bins
    ```
 3. Ensure no comment lines were introduced:
    ```bash

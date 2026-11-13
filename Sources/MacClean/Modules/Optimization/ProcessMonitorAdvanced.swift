@@ -40,14 +40,6 @@ public actor ProcessStatsCollector {
         return results.sorted { $0.cpuPercent > $1.cpuPercent }
     }
 
-    public func getHungApps() -> [ProcessStats] {
-        getProcessStats().filter { !$0.isResponsive }
-    }
-
-    public func getHeavyConsumers(cpuThreshold: Double = 50.0) -> [ProcessStats] {
-        getProcessStats().filter { $0.cpuPercent > cpuThreshold }
-    }
-
     private func cpuUsage(for pid: Int32) -> Double {
         var taskInfo = proc_taskinfo()
         let size = MemoryLayout<proc_taskinfo>.size

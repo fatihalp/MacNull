@@ -9,7 +9,7 @@ enum ScanFeature: CaseIterable {
         case .mailAttachments: MailAttachmentsModule()
         case .trashBins: TrashBinsModule()
         case .malware: MalwareModule()
-        case .privacy: PrivacyModule()
+        case .privacy: BrowserCleanupModule()
         case .largeOldFiles: LargeOldFilesModule()
         }
     }

@@ -16,18 +16,18 @@ public enum MenuBarMetric: String, CaseIterable, Identifiable, Sendable {
         rawValue.flatMap(Self.init(rawValue:)) ?? fallback
     }
 
-    public var localizedName: String {
+    public var displayName: String {
         switch self {
         case .diskFree:
-            String(localized: "Free disk space")
+            "Free disk space"
         case .gpuUsage:
-            String(localized: "GPU usage")
+            "GPU usage"
         case .memoryUsage:
-            String(localized: "Memory usage")
+            "Memory usage"
         case .batteryTemperature:
-            String(localized: "Battery temperature")
+            "Battery temperature"
         case .iconOnly:
-            String(localized: "Icon only")
+            "Icon only"
         }
     }
 

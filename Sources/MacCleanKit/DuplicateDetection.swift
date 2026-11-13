@@ -106,13 +106,11 @@ public struct DuplicateDisplayGroup: Identifiable, Hashable, Sendable {
         self.duplicates = duplicates
     }
 
-    public var allFiles: [FileItem] { [original] + duplicates }
-
     public var copyCount: Int { duplicates.count + 1 }
 
     public var wastedSpace: UInt64 { original.size * UInt64(duplicates.count) }
 
     public var formattedWastedSpace: String {
-        ByteCountFormatter.string(fromByteCount: Int64(wastedSpace), countStyle: .file)
+        FileSizeFormatter.format(wastedSpace)
     }
 }
