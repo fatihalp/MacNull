@@ -7,7 +7,7 @@ public enum CLIRunner {
         var mode: SmartScanMode = .deep
         var targetModule: String? = nil
         var isDryRun: Bool = false
-        var isPermanent: Bool = true
+        var isPermanent: Bool = false
         var isVerbose: Bool = false
         var isJson: Bool = false
         var autoConfirm: Bool = false
@@ -64,8 +64,6 @@ public enum CLIRunner {
                 config.isDryRun = true
             case "--permanent":
                 config.isPermanent = true
-            case "--trash":
-                config.isPermanent = false
             case "-v", "--verbose":
                 config.isVerbose = true
             case "--json":
@@ -98,8 +96,7 @@ public enum CLIRunner {
     --mode <safe|deep>   Scan depth mode (default: deep)
     --module <name>      Limit to a specific module (e.g. system_junk, trash_bins, project_junk, browser_cleanup)
     --dry-run            Simulate cleaning without actually deleting any files
-    --permanent          Delete permanently (default for clean)
-    --trash              Move items to Trash instead of permanent deletion
+    --permanent          Delete permanently instead of moving to Trash
     -y, --yes            Skip confirmation prompt before cleaning
     -v, --verbose        Display detailed file lists and categories
     --json               Output scan results formatted as JSON

@@ -5,27 +5,26 @@ import MacCleanKit
 struct MacCleanApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State private var appState = AppState()
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @AppStorage(OnboardingController.completedKey) private var hasCompletedOnboarding = false
     @AppStorage("showMenuBarWidget") private var showMenuBarWidget = true
     @AppStorage("menuBarFirstLaunchDone") private var menuBarFirstLaunchDone = false
-    @State private var showOnboarding = false
 
     var body: some Scene {
         Window(MCConstants.appName, id: "main") {
-            ContentView()
+            Group {
+                if hasCompletedOnboarding {
+                    ContentView()
+                } else {
+                    OnboardingFlowView(scan: appState.smartScanController) {
+                        hasCompletedOnboarding = true
+                    }
+                }
+            }
                 .environment(appState)
                 .preferredColorScheme(.light)
                 .frame(minWidth: 880, minHeight: 580)
-                .sheet(isPresented: $showOnboarding) {
-                    OnboardingView(isPresented: $showOnboarding)
-                        .preferredColorScheme(.light)
-                }
                 .onAppear {
                     AppearanceManager.apply(.light)
-                    if !hasCompletedOnboarding {
-                        showOnboarding = true
-                        hasCompletedOnboarding = true
-                    }
                     syncMenuBarOnLaunch()
                 }
                 .onOpenURL { url in

@@ -1,6 +1,10 @@
 import Foundation
 import MacCleanKit
 
+extension Notification.Name {
+    static let cleanCompleted = Notification.Name("cleanCompleted")
+}
+
 public enum CleanActions {
 
     @discardableResult
@@ -23,7 +27,15 @@ public enum CleanActions {
             }
         }
 
-        let dedupedItems = Self.prunedToParents(deleteItems)
+        let prunedItems = Self.prunedToParents(deleteItems)
+        let busy = await OpenFileGuard.busyURLs(among: prunedItems.map(\.url))
+        let dedupedItems = prunedItems.filter { !busy.contains($0.url) }
+        let busyErrors = prunedItems.filter { busy.contains($0.url) }.map {
+            CleaningEngine.CleanError(
+                path: $0.url.path(percentEncoded: false),
+                error: "In use by another app, skipped"
+            )
+        }
         let totalItemsCount = max(dedupedItems.count, 1)
 
         onProgress?(CleaningEngine.Progress(
@@ -35,15 +47,22 @@ public enum CleanActions {
 
         let deleteResult = await engine.clean(
             items: dedupedItems,
-            mode: .permanent,
+            mode: .trash,
             onProgress: onProgress
         )
+        let skipped = CleaningEngine.CleanResult(
+            removedCount: 0, freedBytes: 0, removedURLs: [],
+            errors: busyErrors, skippedCount: busyErrors.count
+        )
+        let merged = deleteResult.merging(skipped)
+        CleanHistoryRecorder.record(trashedItems: merged.trashedItems)
+        await MainActor.run { NotificationCenter.default.post(name: .cleanCompleted, object: nil) }
         if Task.isCancelled {
-            return deleteResult
+            return merged
         }
 
         let thinResult = await thinSelectedBinaries(thinItems)
-        return deleteResult.merging(thinResult)
+        return merged.merging(thinResult)
     }
 
     private static func thinSelectedBinaries(
@@ -101,8 +120,9 @@ public enum CleanActions {
     ) async -> CleaningEngine.CleanResult {
         let filtered = items.filter { selectedItems.contains($0.url) }
         let deduped = Self.prunedToParents(filtered)
-        let result = await engine.clean(items: deduped, mode: .permanent,
-                                  onProgress: onProgress)
+        let result = await engine.clean(items: deduped, mode: .trash, onProgress: onProgress)
+        CleanHistoryRecorder.record(trashedItems: result.trashedItems)
+        await MainActor.run { NotificationCenter.default.post(name: .cleanCompleted, object: nil) }
         return result
     }
 

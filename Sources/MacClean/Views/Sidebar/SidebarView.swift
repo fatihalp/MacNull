@@ -2,6 +2,7 @@ import SwiftUI
 import MacCleanKit
 
 public struct SidebarView: View {
+    @Environment(AppState.self) private var appState
     @Binding var selection: SidebarCategory
     var onSelectCategory: ((SidebarCategory) -> Void)? = nil
 
@@ -23,6 +24,7 @@ public struct SidebarView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 0) {
                 Divider()
+                trashFooter
                 settingsFooter
             }
             .background(Color(nsColor: .windowBackgroundColor))
@@ -31,6 +33,22 @@ public struct SidebarView: View {
             minWidth: 205,
             idealWidth: 220
         )
+    }
+
+    private var trashFooter: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "trash")
+                .font(.system(size: 11))
+            Text("\(FileSizeFormatter.format(appState.trashSizeController.bytes)) in Trash")
+                .font(.system(size: 11.5))
+            Spacer()
+        }
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 18)
+        .padding(.top, 8)
+        .onAppear { appState.trashSizeController.refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: .cleanCompleted)) { _ in appState.trashSizeController.refresh() }
+        .help("Cleaned items stay in the Trash until you empty it, so you can put them back.")
     }
 
     private var settingsFooter: some View {

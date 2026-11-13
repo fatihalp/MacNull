@@ -332,7 +332,7 @@ struct SmartScanView: View {
                 controller.runCleanup()
             }
         } message: {
-            Text("Selected items will be permanently deleted.")
+            Text("Selected items move to the Trash. Items already in the Trash are deleted for good.")
         }
         .alert("Delete AI Conversations?", isPresented: $showAIWarningAlert) {
             Button("Cancel", role: .cancel) { }
@@ -624,7 +624,7 @@ struct SmartScanView: View {
             Text("Cleanup Complete")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(.primary)
-            SizeDisplay(size: freedSize, label: "freed")
+            SizeDisplay(size: freedSize, label: "moved to Trash")
                 .foregroundStyle(.primary)
 
             if !breakdown.isEmpty {
@@ -656,7 +656,7 @@ struct SmartScanView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
 
-            Text("Your selected items have been permanently deleted.")
+            Text("Your selected items are in the Trash. Empty it to free the space.")
                 .font(.system(size: 13))
                 .foregroundStyle(.primary.opacity(0.65))
                 .multilineTextAlignment(.center)

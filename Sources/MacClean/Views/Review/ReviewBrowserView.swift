@@ -186,9 +186,14 @@ struct ReviewBrowserView: View {
                             .foregroundStyle(isEmpty ? Color.secondary : Color.primary)
                             .lineLimit(1)
 
-                        Text(FileSizeFormatter.format(category.size))
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
+                        HStack(spacing: 6) {
+                            Text(FileSizeFormatter.format(category.size))
+                                .font(.system(size: 11))
+                                .foregroundStyle(.secondary)
+                            if !isEmpty {
+                                SafetyBadge(level: category.category.safetyLevel)
+                            }
+                        }
                     }
 
                     Spacer(minLength: 4)
@@ -252,6 +257,8 @@ struct ReviewBrowserView: View {
                         Text(FileSizeFormatter.format(category.size))
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(.secondary)
+
+                        SafetyBadge(level: category.category.safetyLevel)
                     }
 
                     Text(ReviewCategoryInfo.description(for: category.category))
@@ -548,6 +555,9 @@ struct ReviewBrowserView: View {
         }
         .help(node.basePath)
         .contextMenu {
+            Button("Quick Look") {
+                QuickLookPresenter.shared.preview(path: node.basePath)
+            }
             Button("Reveal in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([URL(filePath: node.basePath)])
             }

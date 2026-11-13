@@ -11,6 +11,8 @@ public final class AppState {
     let cleaningEngine = CleaningEngine()
     @ObservationIgnored lazy var smartScanController = SmartScanController(coordinator: scanCoordinator, engine: cleaningEngine)
     let systemJunkController = SystemJunkController()
+    let trashSizeController = TrashSizeController()
+    let commandLineToolsController = CommandLineToolsController()
     @ObservationIgnored lazy var uninstallerController = UninstallerController(engine: cleaningEngine)
     @ObservationIgnored lazy var unusedAppsController = UnusedAppsController(engine: cleaningEngine)
     @ObservationIgnored lazy var extensionsController = ExtensionsController(engine: cleaningEngine)

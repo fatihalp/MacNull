@@ -424,7 +424,7 @@ struct ModuleContainerView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 52))
                     .foregroundStyle(.primary)
-                SizeDisplay(size: summary.freedBytes, label: "cleaned up")
+                SizeDisplay(size: summary.freedBytes, label: "moved to Trash")
                     .foregroundStyle(.primary)
                 if summary.removedCount < summary.selectedCount {
                     Text("\(summary.removedCount) of \(summary.selectedCount) items removed" +
@@ -486,7 +486,7 @@ private struct CleanConfirmationModifier: ViewModifier {
                 Button("Cancel", role: .cancel) { }
                 Button("Empty Trash", role: .destructive) { onClean() }
             } message: {
-                Text("This permanently deletes \(selectedCount.formatted()) item\(selectedCount == 1 ? "" : "s") (\(formattedSelectedSize)) and cannot be undone.")
+                Text("This moves \(selectedCount.formatted()) item\(selectedCount == 1 ? "" : "s") (\(formattedSelectedSize)) to the Trash. Items already in the Trash are deleted for good.")
             }
     }
 }
