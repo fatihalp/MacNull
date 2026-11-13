@@ -7,7 +7,7 @@ if [ -z "$BIN" ]; then
     for cand in \
         ".build/release/MacClean" \
         ".build/debug/MacClean" \
-        "/Applications/Mac Sai.app/Contents/MacOS/MacClean"; do
+        "/Applications/MacNull.app/Contents/MacOS/MacClean"; do
         if [ -f "$cand" ]; then BIN="$cand"; break; fi
     done
 fi

@@ -70,7 +70,7 @@ public actor CleaningEngine {
 
     public func clean(
         items: [FileItem],
-        mode: CleanMode = .permanent,
+        mode: CleanMode = .trash,
         onProgress: (@Sendable (Progress) -> Void)? = nil
     ) async -> CleanResult {
 
@@ -187,6 +187,24 @@ public actor CleaningEngine {
                 removedURLs.insert(item.url)
                 logOperation(path: item.url, size: realSize, dryRun: true)
 
+            case .trash where Self.isInsideTrash(item.url):
+                do {
+                    try FileManager.default.removeItem(at: item.url)
+                    removedCount += 1
+                    freedBytes += realSize
+                    removedURLs.insert(item.url)
+                    logOperation(path: item.url, size: realSize, dryRun: false)
+                } catch let nsError as NSError where Self.isBenignMissingFile(nsError) {
+                    skippedCount += 1
+                    logSkip(path: item.url, reason: "already gone")
+                } catch {
+                    let msg = error.localizedDescription
+                    errors.append(CleanError(
+                        path: item.url.path(percentEncoded: false), error: msg
+                    ))
+                    logError(path: item.url, reason: msg)
+                }
+
             case .trash:
                 do {
                     var resulting: NSURL?
@@ -253,6 +271,11 @@ public actor CleaningEngine {
             }
         }
         return total
+    }
+
+    private static func isInsideTrash(_ url: URL) -> Bool {
+        let path = url.path(percentEncoded: false)
+        return path.contains("/.Trash/") || path.contains("/.Trashes/")
     }
 
     private static func isBenignMissingFile(_ error: NSError) -> Bool {

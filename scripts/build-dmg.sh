@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-APP_NAME="Mac Sai"
+APP_NAME="MacNull"
 BUNDLE_ID="com.macclean.app"
 VERSION="${VERSION:-$(cat VERSION 2>/dev/null | tr -d '[:space:]' || echo '1.0.0')}"
 DMG_DIR=".build/dmg"
-DMG_NAME="MacSai-${VERSION}.dmg"
+DMG_NAME="MacNull-${VERSION}.dmg"
 
 APP_ONLY=false
 if [[ "${1:-}" == "--app-only" ]]; then
@@ -29,7 +29,7 @@ if [[ "${1:-}" == "--notarize" ]]; then
     SIGNING_IDENTITY="$APPLE_DEVELOPER_ID"
 fi
 
-echo "=== Building Mac Sai v${VERSION} ==="
+echo "=== Building MacNull v${VERSION} ==="
 echo "Signing identity: $SIGNING_IDENTITY"
 echo "Notarize: $NOTARIZE"
 echo ""
@@ -120,9 +120,9 @@ cat > "${MENU_APP}/Contents/Info.plist" << MENU_PLIST
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Mac Sai Menu</string>
+    <string>MacNull Menu</string>
     <key>CFBundleDisplayName</key>
-    <string>Mac Sai Menu</string>
+    <string>MacNull Menu</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

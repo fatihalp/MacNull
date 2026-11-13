@@ -2,8 +2,8 @@ cask "mac-sai" do
   version "1.9.0"
   sha256 "0000000000000000000000000000000000000000000000000000000000000000"
 
-  url "https://github.com/iliyami/MacSai/releases/download/v#{version}/MacSai-#{version}.dmg"
-  name "Mac Sai"
+  url "https://github.com/iliyami/MacSai/releases/download/v#{version}/MacNull-#{version}.dmg"
+  name "MacNull"
   desc "Open-source Mac cleaner, optimizer, and malware scanner"
   homepage "https://github.com/iliyami/MacSai"
 
@@ -14,7 +14,7 @@ cask "mac-sai" do
 
   depends_on macos: :sonoma
 
-  app "Mac Sai.app"
+  app "MacNull.app"
 
   uninstall quit: "com.macclean.app"
 

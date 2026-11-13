@@ -14,6 +14,7 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
     case maintenance = "Maintenance"
     case uninstaller = "Uninstaller"
     case unusedApps = "Unused Apps"
+    case commandLineTools = "Command-Line Tools"
     case extensions = "Extensions"
     case updater = "Updater"
     case spaceLens = "Space Lens"
@@ -53,6 +54,7 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
         case .projectJunk: "project-junk"
         case .cleanHistory: "clean-history"
         case .unusedApps: "unused-apps"
+        case .commandLineTools: "command-line-tools"
         case .settings: "settings"
         }
     }
@@ -68,7 +70,7 @@ public enum SidebarItem: String, CaseIterable, Identifiable {
         case .systemJunk, .mailAttachments, .trashBins, .diskHogs, .projectJunk, .cleanHistory: .cleanup
         case .malwareRemoval, .privacy, .wifiNetworks, .appPermissions, .browserExtensions: .cleanup
         case .optimization, .maintenance: .performance
-        case .uninstaller, .unusedApps, .extensions, .updater: .applications
+        case .uninstaller, .unusedApps, .commandLineTools, .extensions, .updater: .applications
         case .spaceLens, .largeOldFiles, .duplicates, .shredder: .files
         case .settings: .settings
         }
@@ -105,7 +107,7 @@ public enum SidebarCategory: String, CaseIterable, Identifiable {
         case .performance:
             [.optimization, .maintenance]
         case .applications:
-            [.uninstaller, .updater, .unusedApps, .extensions]
+            [.uninstaller, .updater, .unusedApps, .commandLineTools, .extensions]
         case .files:
             [.spaceLens, .largeOldFiles, .duplicates, .shredder]
         case .settings:

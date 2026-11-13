@@ -26,7 +26,7 @@ public enum DockerDiskCategory: String, Equatable, Sendable, CaseIterable, Ident
         case .containers:
             "Pruning permanently deletes every stopped container and the data inside it. Running containers are not touched."
         case .volumes:
-            "Volumes can hold database data, so Mac Sai leaves them alone. To remove them, use Docker Desktop or the Docker CLI."
+            "Volumes can hold database data, so MacNull leaves them alone. To remove them, use Docker Desktop or the Docker CLI."
         case .buildCache:
             "Pruning removes dangling build cache. Your next build may be slower."
         }

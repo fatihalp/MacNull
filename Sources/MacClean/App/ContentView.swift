@@ -191,6 +191,8 @@ struct ContentView: View {
             UninstallerView(controller: appState.uninstallerController)
         case .unusedApps:
             UnusedAppsView(controller: appState.unusedAppsController)
+        case .commandLineTools:
+            CommandLineToolsView(controller: appState.commandLineToolsController)
         case .extensions:
             ExtensionsView(controller: appState.extensionsController)
         case .updater:

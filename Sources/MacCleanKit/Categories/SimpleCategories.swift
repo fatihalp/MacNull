@@ -140,7 +140,7 @@ public struct UnusedDiskImagesCategory: JunkCategory {
                 path: MCConstants.downloads,
                 recursive: true,
                 maxDepth: 3,
-                fileExtensions: ["dmg", "iso", "sparseimage", "pkg"],
+                fileExtensions: ["dmg", "iso", "sparseimage", "pkg", "ipsw"],
                 minAge: 7 * 24 * 3600
             ),
         ]
@@ -171,7 +171,7 @@ public struct IncompleteDownloadsCategory: JunkCategory {
             ScanTarget(
                 path: MCConstants.downloads,
                 recursive: false,
-                fileExtensions: ["download", "crdownload", "part", "partial", "tmp"]
+                fileExtensions: ["download", "crdownload", "part", "partial", "tmp", "prlupd-part"]
             ),
             ScanTarget(
                 path: FileManager.default.temporaryDirectory,

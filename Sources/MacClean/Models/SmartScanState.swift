@@ -49,3 +49,16 @@ enum SmartScanState {
     case cleaning(progress: Double)
     case done(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow])
 }
+
+extension SmartScanState {
+    var phaseKey: String {
+        switch self {
+        case .idle: "idle"
+        case .scanning: "scanning"
+        case .results: "results"
+        case .empty: "empty"
+        case .cleaning: "cleaning"
+        case .done: "done"
+        }
+    }
+}

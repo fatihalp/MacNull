@@ -25,6 +25,7 @@ extension SidebarItem {
         case .projectJunk: "shippingbox.fill"
         case .cleanHistory: "clock.arrow.circlepath"
         case .unusedApps: "clock.badge.xmark.fill"
+        case .commandLineTools: "terminal.fill"
         case .settings: "gearshape.fill"
         }
     }
@@ -49,6 +50,8 @@ extension SidebarItem {
             Color(nsColor: .systemRed)
         case .unusedApps:
             Color(nsColor: .systemOrange)
+        case .commandLineTools:
+            Color(nsColor: .systemGray)
         case .extensions:
             Color(nsColor: .systemPurple)
         case .updater:
@@ -80,7 +83,7 @@ extension SidebarItem {
         case .systemJunk, .mailAttachments, .trashBins, .projectJunk, .diskHogs, .cleanHistory: .cleanup
         case .malwareRemoval, .privacy, .browserExtensions, .wifiNetworks, .appPermissions: .cleanup
         case .optimization, .maintenance: .performance
-        case .uninstaller, .unusedApps, .extensions, .updater: .applications
+        case .uninstaller, .unusedApps, .commandLineTools, .extensions, .updater: .applications
         case .spaceLens, .largeOldFiles, .duplicates, .shredder: .files
         case .settings: .settings
         }
@@ -120,6 +123,8 @@ extension SidebarItem {
             "Completely remove apps with their leftover files and caches."
         case .unusedApps:
             "Detect applications not opened in over 6 months to free space."
+        case .commandLineTools:
+            "Remove Homebrew tools you installed and no longer use."
         case .extensions:
             "Inspect preference panes, QuickLook plugins, and system extensions."
         case .updater:
@@ -155,6 +160,7 @@ extension SidebarItem {
         case .maintenance: "Run Tasks"
         case .uninstaller: "Open Uninstaller"
         case .unusedApps: "Scan Unused"
+        case .commandLineTools: "List Tools"
         case .extensions: "Manage Extensions"
         case .updater: "Check Updates"
         case .spaceLens: "Analyze Storage"

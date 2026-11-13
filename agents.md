@@ -1,4 +1,4 @@
-# MacClean (MacSai) - Agent Guidelines & Architecture
+# MacNull - Agent Guidelines & Architecture
 
 ## Core Architectural Principles
 

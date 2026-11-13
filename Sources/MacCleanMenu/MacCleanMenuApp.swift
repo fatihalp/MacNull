@@ -14,7 +14,7 @@ struct MacCleanMenuApp: App {
 
     private static let labelIcon: NSImage = {
         let img = NSImage(systemSymbolName: "sparkles",
-                          accessibilityDescription: "Mac Sai")!
+                          accessibilityDescription: "MacNull")!
         img.isTemplate = true
         return img
     }()
