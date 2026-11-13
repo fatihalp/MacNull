@@ -1,0 +1,49 @@
+{
+  "schema": "markilo/kit@1",
+  "brand": "macnull",
+  "name": "MacNull",
+  "concept": "null-zero",
+  "locked": false,
+  "lead": "wordmark",
+  "files": {
+    "symbol": "symbol.svg",
+    "wordmark": "wordmark.svg",
+    "symbolSmall": "symbol-small.svg",
+    "lockupHorizontal": "lockup-horizontal.svg",
+    "lockupStacked": "lockup-stacked.svg",
+    "lockupCompact": "lockup-compact.svg"
+  },
+  "palette": {
+    "primary": "#3b82f6",
+    "ink": "#0f172a",
+    "paper": "#f8fafc",
+    "dark": "#0a0d12"
+  },
+  "typography": {
+    "fontId": "space-grotesk",
+    "weight": 700,
+    "family": "Space Grotesk",
+    "license": "OFL-1.1"
+  },
+  "tagline": "Deep cleaning for developers' Macs.",
+  "approvedAt": "2026-11-13T19:59:52.798Z",
+  "originality": {
+    "verdict": "insufficient-evidence",
+    "confidence": "low",
+    "acceptedRisk": true,
+    "report": "../reports/originality-null-zero.md",
+    "evidence": {
+      "visual": "0 brand(s) from 0 reference file(s): 0 direct competitor, 0 category/form-family; sources 0 official, 0 app store, 0 logo catalog, 0 unverified",
+      "registry": "no registry searches logged for \"MacNull\"",
+      "registryCoverage": "none"
+    }
+  },
+  "gate": {
+    "status": "failed",
+    "average": 6,
+    "reasons": [
+      "distinctiveness 5 < 6 (blind)"
+    ],
+    "userChoice": "Combine B + C, icon C (solid l + hollow l); approved, accepting the insufficient-evidence originality risk"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "markilo/answers@1",
+  "questions": [
+    {
+      "id": "Q1",
+      "question": "Stance?",
+      "answer": "Calm and exact: terminal/developer language, dark graphite, one signal colour, the null idea. No brooms or sparkles.",
+      "askedAt": "2026-11-13T19:34:55.992Z",
+      "answeredAt": "2026-11-13T19:34:55.992Z"
+    },
+    {
+      "id": "Q2",
+      "question": "Collect competitor marks over the network?",
+      "answer": "No. Design from the brief; originality evidence stays local.",
+      "askedAt": "2026-11-13T19:34:56.936Z",
+      "answeredAt": "2026-11-13T19:34:56.937Z"
+    },
+    {
+      "id": "Q3",
+      "question": "References?",
+      "answer": "None. Proceed from the brief.",
+      "askedAt": "2026-11-13T19:34:57.749Z",
+      "answeredAt": "2026-11-13T19:34:57.750Z"
+    },
+    {
+      "id": "Q4",
+      "question": "Round 1 decision?",
+      "answer": "Combine B + C: the emptied-l wordmark idea of null-stem with the backslash-zero icon and blue of slashed-zero.",
+      "askedAt": "2026-11-13T19:49:17.047Z",
+      "answeredAt": "2026-11-13T19:49:17.047Z"
+    },
+    {
+      "id": "Q5",
+      "question": "Which icon?",
+      "answer": "C: solid l + hollow l, derived from the word.",
+      "askedAt": "2026-11-13T19:58:34.317Z",
+      "answeredAt": "2026-11-13T19:58:34.323Z"
+    }
+  ]
+}

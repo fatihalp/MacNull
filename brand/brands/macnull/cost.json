@@ -1,0 +1,53 @@
+{
+  "schema": "markilo/cost@1",
+  "budgetUsd": 12,
+  "entries": [
+    {
+      "phase": "understand",
+      "at": "2026-11-13T19:29:30.363Z",
+      "tokens": 60000,
+      "minutes": 4
+    },
+    {
+      "phase": "explore",
+      "at": "2026-11-13T19:39:41.194Z",
+      "tokens": 69000,
+      "minutes": 15,
+      "note": "null-stem"
+    },
+    {
+      "phase": "explore",
+      "at": "2026-11-13T19:41:11.831Z",
+      "tokens": 70000,
+      "minutes": 15,
+      "note": "slashed-zero"
+    },
+    {
+      "phase": "explore",
+      "at": "2026-11-13T19:46:22.055Z",
+      "tokens": 90000,
+      "minutes": 15,
+      "note": "empty-vessel"
+    },
+    {
+      "phase": "refine",
+      "at": "2026-11-13T19:55:20.272Z",
+      "tokens": 110000,
+      "minutes": 15,
+      "note": "null-zero combine"
+    },
+    {
+      "phase": "verify",
+      "at": "2026-11-13T19:56:30.790Z",
+      "tokens": 43000,
+      "minutes": 5,
+      "note": "critic final"
+    },
+    {
+      "phase": "export",
+      "at": "2026-11-13T20:01:22.159Z",
+      "tokens": 60000,
+      "minutes": 8
+    }
+  ]
+}

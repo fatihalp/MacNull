@@ -1,0 +1,26 @@
+:root {
+  --macnull-primary-50: #f2f7ff;
+  --macnull-primary-100: #e1ecfe;
+  --macnull-primary-200: #bed6fc;
+  --macnull-primary-300: #8fb8fb;
+  --macnull-primary-400: #5796fe;
+  --macnull-primary-500: #3b82f6;
+  --macnull-primary-600: #065ad1;
+  --macnull-primary-700: #0245a6;
+  --macnull-primary-800: #02327b;
+  --macnull-primary-900: #00225a;
+  --macnull-primary-950: #011338;
+  --macnull-neutral-50: #f2f7fe;
+  --macnull-neutral-100: #e6ebf3;
+  --macnull-neutral-200: #d0d4dc;
+  --macnull-neutral-300: #b3b8bf;
+  --macnull-neutral-400: #9499a0;
+  --macnull-neutral-500: #767b82;
+  --macnull-neutral-600: #5f636a;
+  --macnull-neutral-700: #494d54;
+  --macnull-neutral-800: #34383e;
+  --macnull-neutral-900: #23272c;
+  --macnull-neutral-950: #13161c;
+  --macnull-ink: #0f172a;
+  --macnull-paper: #f8fafc;
+}

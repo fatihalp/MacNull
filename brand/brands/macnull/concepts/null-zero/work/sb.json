@@ -1,0 +1,14 @@
+{
+  "params": { "wall": 150, "b": 128, "a": 26, "end": 150 },
+  "defs": {
+    "outer": { "path": { "d": "M512 64C730 64 840 160 840 384L840 640C840 864 730 960 512 960C294 960 184 864 184 640L184 384C184 160 294 64 512 64Z" } },
+    "inner": { "offset": { "shape": { "ref": "outer" }, "by": "-wall" } },
+    "blade": { "path": { "d": "M{512-560*sin(a)} {512-560*cos(a)}L{512+end*sin(a)} {512+end*cos(a)}", "width": "b", "cap": "butt" } }
+  },
+  "layers": [
+    { "fill": "primary", "shape": { "union": [
+      { "subtract": [ { "ref": "outer" }, { "ref": "inner" } ] },
+      { "intersect": [ { "ref": "blade" }, { "ref": "outer" } ] }
+    ] } }
+  ]
+}

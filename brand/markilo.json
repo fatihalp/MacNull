@@ -1,0 +1,12 @@
+{
+  "schema": "markilo/workspace@1",
+  "name": "MacNull",
+  "createdAt": "2026-11-13T19:29:01.113Z",
+  "brands": [
+    {
+      "slug": "macnull",
+      "name": "MacNull",
+      "role": "master"
+    }
+  ]
+}

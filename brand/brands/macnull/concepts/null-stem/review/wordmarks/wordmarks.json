@@ -1,0 +1,57 @@
+{
+  "concept": "null-stem",
+  "candidates": [
+    {
+      "id": "w1",
+      "font": "space-grotesk",
+      "family": "Space Grotesk",
+      "weight": 700,
+      "tracking": -20,
+      "checks": {
+        "pass": 4,
+        "warn": 0,
+        "fail": 0
+      },
+      "failing": []
+    },
+    {
+      "id": "w2",
+      "font": "sora",
+      "family": "Sora",
+      "weight": 700,
+      "tracking": -20,
+      "checks": {
+        "pass": 4,
+        "warn": 0,
+        "fail": 0
+      },
+      "failing": []
+    },
+    {
+      "id": "w3",
+      "font": "familjen-grotesk",
+      "family": "Familjen Grotesk",
+      "weight": 700,
+      "tracking": -20,
+      "checks": {
+        "pass": 4,
+        "warn": 0,
+        "fail": 0
+      },
+      "failing": []
+    },
+    {
+      "id": "w4",
+      "font": "archivo",
+      "family": "Archivo",
+      "weight": 700,
+      "tracking": -20,
+      "checks": {
+        "pass": 4,
+        "warn": 0,
+        "fail": 0
+      },
+      "failing": []
+    }
+  ]
+}

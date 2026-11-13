@@ -1,0 +1,287 @@
+{
+  "subject": "null-zero/symbol.svg",
+  "role": "symbol",
+  "measuredAt": "2026-11-13T19:58:55.627Z",
+  "checks": [
+    {
+      "id": "symbol:svg-integrity",
+      "label": "symbol: Clean vector master",
+      "status": "pass",
+      "value": "0 errors, 0 warnings",
+      "message": "Pure vector, self-contained, scalable."
+    },
+    {
+      "id": "symbol:fidelity-16",
+      "label": "symbol: Legibility at 16 px",
+      "status": "pass",
+      "value": 0.93,
+      "message": "93% of the shape survives at 16 px (≥ 85% reads clearly)."
+    },
+    {
+      "id": "symbol:fidelity-32",
+      "label": "symbol: Legibility at 32 px",
+      "status": "pass",
+      "value": 0.93,
+      "message": "93% of the shape survives at 32 px (≥ 85% reads clearly)."
+    },
+    {
+      "id": "symbol:thin-detail",
+      "label": "symbol: Thinnest detail at 16 px",
+      "status": "warn",
+      "value": 1.13,
+      "message": "Thin strokes/gaps are ~1.13 px wide at 16 px (≥ 1.2 px stays crisp)."
+    },
+    {
+      "id": "symbol:balance",
+      "label": "symbol: Optical balance",
+      "status": "pass",
+      "value": 0.02,
+      "message": "Visual centroid sits 2% from center."
+    },
+    {
+      "id": "symbol:artboard-fit",
+      "label": "symbol: Artboard fit",
+      "status": "pass",
+      "value": 0.85,
+      "message": "Mark spans 85% of the artboard (80–98% keeps icon exports consistent)."
+    },
+    {
+      "id": "symbol:square-fit",
+      "label": "symbol: Fits a square icon",
+      "status": "pass",
+      "value": 1.7,
+      "message": "The mark is 1.7:1 and fills a square icon well."
+    },
+    {
+      "id": "symbol:genericity",
+      "label": "symbol: Distinct from stock primitives",
+      "status": "pass",
+      "value": 0.442,
+      "message": "Closest stock shape is a hexagon at 44% overlap."
+    },
+    {
+      "id": "symbol:complexity",
+      "label": "symbol: Construction complexity",
+      "status": "pass",
+      "value": 18,
+      "message": "1 paths, 18 path commands, compactness 9.07."
+    },
+    {
+      "id": "symbol:monochrome",
+      "label": "symbol: One-color reproduction",
+      "status": "pass",
+      "value": 0,
+      "message": "Shapes stay separable in a single color."
+    },
+    {
+      "id": "symbol:ground-contrast",
+      "label": "symbol: Visible on its paper (#f8fafc)",
+      "status": "pass",
+      "value": "3.52:1",
+      "message": "Reads on its own background (strongest color ≥ 3:1)."
+    },
+    {
+      "id": "symbol:contrast-3b82f6",
+      "label": "symbol: Contrast of #3b82f6",
+      "status": "pass",
+      "value": "3.68:1 light / 5.05:1 dark",
+      "message": "Meets the 3:1 non-text contrast guideline (WCAG 1.4.11) on light and dark grounds."
+    },
+    {
+      "id": "small:svg-integrity",
+      "label": "small: Clean vector master",
+      "status": "pass",
+      "value": "0 errors, 0 warnings",
+      "message": "Pure vector, self-contained, scalable."
+    },
+    {
+      "id": "small:fidelity-16",
+      "label": "small: Legibility at 16 px",
+      "status": "pass",
+      "value": 0.96,
+      "message": "96% of the shape survives at 16 px (≥ 85% reads clearly)."
+    },
+    {
+      "id": "small:fidelity-32",
+      "label": "small: Legibility at 32 px",
+      "status": "pass",
+      "value": 0.94,
+      "message": "94% of the shape survives at 32 px (≥ 85% reads clearly)."
+    },
+    {
+      "id": "small:thin-detail",
+      "label": "small: Thinnest detail at 16 px",
+      "status": "pass",
+      "value": 1.38,
+      "message": "Thin strokes/gaps are ~1.38 px wide at 16 px (≥ 1.2 px stays crisp)."
+    },
+    {
+      "id": "small:balance",
+      "label": "small: Optical balance",
+      "status": "pass",
+      "value": 0.03,
+      "message": "Visual centroid sits 3% from center."
+    },
+    {
+      "id": "small:artboard-fit",
+      "label": "small: Artboard fit",
+      "status": "pass",
+      "value": 0.85,
+      "message": "Mark spans 85% of the artboard (80–98% keeps icon exports consistent)."
+    },
+    {
+      "id": "small:square-fit",
+      "label": "small: Fits a square icon",
+      "status": "pass",
+      "value": 1.57,
+      "message": "The mark is 1.57:1 and fills a square icon well."
+    },
+    {
+      "id": "small:genericity",
+      "label": "small: Distinct from stock primitives",
+      "status": "pass",
+      "value": 0.484,
+      "message": "Closest stock shape is a hexagon at 48% overlap."
+    },
+    {
+      "id": "small:complexity",
+      "label": "small: Construction complexity",
+      "status": "pass",
+      "value": 18,
+      "message": "1 paths, 18 path commands, compactness 8.04."
+    },
+    {
+      "id": "small:monochrome",
+      "label": "small: One-color reproduction",
+      "status": "pass",
+      "value": 0,
+      "message": "Shapes stay separable in a single color."
+    },
+    {
+      "id": "small:ground-contrast",
+      "label": "small: Visible on its paper (#f8fafc)",
+      "status": "pass",
+      "value": "3.52:1",
+      "message": "Reads on its own background (strongest color ≥ 3:1)."
+    },
+    {
+      "id": "small:contrast-3b82f6",
+      "label": "small: Contrast of #3b82f6",
+      "status": "pass",
+      "value": "3.68:1 light / 5.05:1 dark",
+      "message": "Meets the 3:1 non-text contrast guideline (WCAG 1.4.11) on light and dark grounds."
+    },
+    {
+      "id": "small:same-mark",
+      "label": "small: Reads as the main symbol",
+      "status": "pass",
+      "value": 0.827,
+      "message": "83% like the main symbol: the same mark, simplified."
+    },
+    {
+      "id": "wordmark:svg-integrity",
+      "label": "wordmark: Clean vector master",
+      "status": "pass",
+      "value": "0 errors, 0 warnings",
+      "message": "Pure vector, self-contained, scalable."
+    },
+    {
+      "id": "wordmark:complexity",
+      "label": "wordmark: Construction complexity",
+      "status": "pass",
+      "value": 134,
+      "message": "1 paths, 134 path commands, compactness 30.9."
+    },
+    {
+      "id": "wordmark:monochrome",
+      "label": "wordmark: One-color reproduction",
+      "status": "pass",
+      "value": 0,
+      "message": "Shapes stay separable in a single color."
+    },
+    {
+      "id": "wordmark:ground-contrast",
+      "label": "wordmark: Visible on its paper (#f8fafc)",
+      "status": "pass",
+      "value": "17.06:1",
+      "message": "Reads on its own background (every color ≥ 3:1)."
+    },
+    {
+      "id": "wordmark:contrast-0f172a",
+      "label": "wordmark: Contrast of #0f172a",
+      "status": "info",
+      "value": "17.85:1 light / 1.04:1 dark",
+      "message": "Works on light grounds; use a reversed variant on the other."
+    },
+    {
+      "id": "wordmark:letters",
+      "label": "wordmark: Letters read as themselves",
+      "status": "pass",
+      "value": 0,
+      "message": "Every changed letter still looks more like itself than like any other letter, and keeps its counters."
+    },
+    {
+      "id": "lockup:svg-integrity",
+      "label": "lockup: Clean vector master",
+      "status": "pass",
+      "value": "0 errors, 0 warnings",
+      "message": "Pure vector, self-contained, scalable."
+    },
+    {
+      "id": "lockup:complexity",
+      "label": "lockup: Construction complexity",
+      "status": "pass",
+      "value": 163,
+      "message": "2 paths, 163 path commands, compactness 34.65."
+    },
+    {
+      "id": "lockup:monochrome",
+      "label": "lockup: One-color reproduction",
+      "status": "pass",
+      "value": 0,
+      "message": "Shapes stay separable in a single color."
+    },
+    {
+      "id": "lockup:ground-contrast",
+      "label": "lockup: Visible on its paper (#f8fafc)",
+      "status": "pass",
+      "value": "3.52:1",
+      "message": "Reads on its own background (every color ≥ 3:1)."
+    },
+    {
+      "id": "lockup:contrast-0f172a",
+      "label": "lockup: Contrast of #0f172a",
+      "status": "info",
+      "value": "17.85:1 light / 1.04:1 dark",
+      "message": "Works on light grounds; use a reversed variant on the other."
+    },
+    {
+      "id": "lockup:contrast-3b82f6",
+      "label": "lockup: Contrast of #3b82f6",
+      "status": "pass",
+      "value": "3.68:1 light / 5.05:1 dark",
+      "message": "Meets the 3:1 non-text contrast guideline (WCAG 1.4.11) on light and dark grounds."
+    },
+    {
+      "id": "lockup:palette-separation",
+      "label": "lockup: Palette separation",
+      "status": "pass",
+      "value": 41.69,
+      "message": "Closest pair of colors differs by ΔE₀₀ 41.69. Under 20, shapes separated only by these colors blur together for many viewers; vary lightness too."
+    },
+    {
+      "id": "lockup:lightness-contrast",
+      "label": "lockup: Lightness contrast inside the mark",
+      "status": "pass",
+      "value": 99,
+      "message": "Lightness difference between brand colors (matters for grayscale print and color-vision deficiencies)."
+    }
+  ],
+  "summary": {
+    "pass": 36,
+    "warn": 1,
+    "fail": 0,
+    "info": 2
+  },
+  "note": "Measured technical checks. Brand fit, memorability, cultural fit and timelessness require visual review and are recorded as judgment."
+}

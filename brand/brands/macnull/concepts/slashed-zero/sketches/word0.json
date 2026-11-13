@@ -1,0 +1,7 @@
+{
+  "role": "wordmark",
+  "size": [4200, 1000],
+  "layers": [
+    { "fill": "ink", "shape": { "glyph": { "text": "macnull", "font": "jetbrains-mono", "weight": 700, "size": 1000, "at": [0, 850] } } }
+  ]
+}
