@@ -94,7 +94,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         case .unusedDiskImages: String(localized: "Disk images you mounted once and forgot.")
         case .incompleteDownloads: String(localized: "Partially downloaded files.")
         case .appLeftovers: String(localized: "Support files from apps you've deleted.")
-        case .packageManagerCaches: String(localized: "Regenerable caches from npm, Cargo, Pub, pip, Composer, Homebrew, and Gradle.")
+        case .packageManagerCaches: String(localized: "Regenerable caches from npm, pnpm, Cargo, Pub, pip, uv, Composer, Homebrew, and Gradle.")
         case .ideCaches: String(localized: "Caches from code editors like Cursor and Windsurf.")
         case .aiToolCaches: String(localized: "Caches, runtimes, and sessions from AI coding tools (Gemini, Claude, Codex).")
         case .appCaches: String(localized: "Caches and temporary files from messaging and desktop applications (WhatsApp, etc.).")
@@ -158,7 +158,7 @@ public enum ScanCategory: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .userCaches: String(localized: "App temp files. Recreated automatically the next time each app launches.")
         case .systemCaches: String(localized: "Caches macOS manages itself. It rebuilds them automatically as needed.")
-        case .packageManagerCaches: String(localized: "Download and build caches. npm, Cargo, pip, Homebrew, and Gradle re-download what they need on the next install or build.")
+        case .packageManagerCaches: String(localized: "Download and build caches. npm, pnpm, Cargo, pip, uv, Homebrew, and Gradle re-download what they need on the next install or build.")
         case .ideCaches: String(localized: "Editor caches only. Cursor and Antigravity recreate them on next launch; your settings and extensions aren't touched.")
         case .aiToolCaches: String(localized: "AI tools accumulate heavy models, runtimes, and sessions. Safe Clean preserves conversations; Deep Clean recovers maximum space.")
         case .appCaches: String(localized: "Temporary files and media caches from apps like WhatsApp. The app regenerates them as needed.")

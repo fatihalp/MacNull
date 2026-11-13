@@ -19,6 +19,12 @@ public enum DiskHogsText {
     public static var dockerNotResponding: String {
         String(localized: "Docker is installed but not responding. Start Docker Desktop, then click Refresh.")
     }
+    public static var dockerDiskImage: String {
+        String(localized: "Docker Desktop disk image")
+    }
+    public static var dockerDiskImageNote: String {
+        String(localized: "Docker's virtual disk. It holds all your images, containers, and volumes, so Mac Sai never deletes it. Pruning Docker items frees space inside it, and Docker Desktop then gives that space back to macOS. To cap its size, lower the disk limit in Docker Desktop's Resources settings.")
+    }
     public static var nothingFound: String {
         String(localized: "No Docker or Xcode simulators found on this Mac.")
     }
@@ -45,7 +51,7 @@ public enum DiskHogsText {
 
     static var all: [String] {
         [title, subtitle, refresh, size, xcodeSection, unavailableSimulator, olderRuntime, pruneButton,
-         deleteButton, dockerNotResponding, nothingFound, pruneConfirmTitle, pruneConfirmButton,
+         deleteButton, dockerNotResponding, dockerDiskImage, dockerDiskImageNote, nothingFound, pruneConfirmTitle, pruneConfirmButton,
          deleteConfirmTitle, deleteConfirmButton, runtimeShutdownNote, permanentNote, cancel, pruned,
          deleted, failed, timedOut, stopped]
         + DockerDiskCategory.allCases.flatMap { [$0.label, $0.pruneNote] }

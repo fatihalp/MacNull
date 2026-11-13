@@ -129,6 +129,10 @@ public enum MCConstants {
     public static let xcodeArchives = userLibrary.appending(path: "Developer/Xcode/Archives")
     public static let xcodeDeviceSupport = userLibrary.appending(path: "Developer/Xcode/iOS DeviceSupport")
     public static let coreSimulator = userLibrary.appending(path: "Developer/CoreSimulator")
+    public static let dockerDesktopDiskImages = [
+        userContainers.appending(path: "com.docker.docker/Data/vms/0/data/Docker.raw"),
+        userContainers.appending(path: "com.docker.docker/Data/vms/0/data/Docker.qcow2"),
+    ]
     public static let xcodePreviews = userLibrary.appending(path: "Developer/Xcode/UserData/Previews")
 
     public static let safariCache = userLibrary.appending(path: "Caches/com.apple.Safari")
@@ -168,6 +172,9 @@ public enum MCConstants {
     public static let cocoapodsCache = userCaches.appending(path: "CocoaPods")
     public static let swiftpmCache = userCaches.appending(path: "org.swift.swiftpm")
     public static let uvCache = userCaches.appending(path: "uv")
+    public static let uvXDGCache = home.appending(path: ".cache/uv")
+    public static let pnpmCache = userCaches.appending(path: "pnpm")
+    public static let pnpmXDGCache = home.appending(path: ".cache/pnpm")
     public static let ruffCache = userCaches.appending(path: "ruff")
     public static let playwrightCache = userCaches.appending(path: "ms-playwright")
     public static let cypressCache = userCaches.appending(path: "Cypress")
@@ -226,6 +233,9 @@ public enum MCConstants {
     public static let claudeShellSnapshots = home.appending(path: ".claude/shell-snapshots")
     public static let codexTmp = home.appending(path: ".codex/.tmp")
     public static let codexCache = home.appending(path: ".codex/cache")
+    public static let openClawHome = home.appending(path: ".openclaw")
+    public static let openClawLogs = openClawHome.appending(path: "logs")
+    public static let openClawWorkspace = openClawHome.appending(path: "workspace")
     public static let codexRuntimesCache = home.appending(path: ".cache/codex-runtimes")
     public static let opencodeCache = home.appending(path: ".cache/opencode")
     public static let phpactorCache = home.appending(path: ".cache/phpactor")
@@ -348,6 +358,7 @@ public enum MCConstants {
             playwrightCache,
             cypressCache,
             uvCache,
+            pnpmCache,
             ruffCache,
             zedCache,
             copilotSdkCache,

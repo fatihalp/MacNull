@@ -113,7 +113,7 @@ public enum OldToolchainsScanner {
     }
 
     private static func directorySize(at url: URL) -> UInt64 {
-        let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey]
+        let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey, .linkCountKey]
         guard let enumerator: FileManager.DirectoryEnumerator = FileManager.default.enumerator(
             at: url,
             includingPropertiesForKeys: keys,
@@ -121,9 +121,11 @@ public enum OldToolchainsScanner {
         ) else { return 0 }
 
         var total: UInt64 = 0
+        var hardLinks = HardLinkTracker()
         for case let fileURL as URL in enumerator {
             let values = try? fileURL.resourceValues(forKeys: Set(keys))
-            if values?.isRegularFile == true {
+            if values?.isRegularFile == true,
+               hardLinks.shouldCount(fileURL, linkCount: values?.linkCount) {
                 total += UInt64(values?.totalFileAllocatedSize ?? values?.fileSize ?? 0)
             }
         }

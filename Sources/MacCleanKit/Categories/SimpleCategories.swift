@@ -48,6 +48,13 @@ public struct UserLogCategory: JunkCategory {
         [
             ScanTarget(path: MCConstants.userLogs, recursive: true),
             ScanTarget(path: MCConstants.userDiagnosticReports, recursive: true),
+            ScanTarget(path: MCConstants.openClawLogs, recursive: true),
+            ScanTarget(
+                path: MCConstants.openClawHome,
+                recursive: false,
+                fileExtensions: ["log"],
+                excludedPaths: [MCConstants.openClawLogs, MCConstants.openClawWorkspace]
+            ),
         ]
     }
 }

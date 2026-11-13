@@ -31,6 +31,15 @@ public struct DiskHogsClient: Sendable {
         }
     }
 
+    public func dockerDiskImageSize() -> UInt64? {
+        let sizes = MCConstants.dockerDesktopDiskImages.compactMap { url -> UInt64? in
+            guard let values = try? url.resourceValues(forKeys: [.totalFileAllocatedSizeKey, .fileAllocatedSizeKey])
+            else { return nil }
+            return UInt64(values.totalFileAllocatedSize ?? values.fileAllocatedSize ?? 0)
+        }
+        return sizes.isEmpty ? nil : sizes.reduce(0, +)
+    }
+
     public func dockerState() async -> DockerState {
         guard let docker = Self.dockerPath() else { return .notInstalled }
         let outcome = await BoundedProcess.run(docker, DockerSystemDFParser.arguments, timeout: Self.probeTimeout)

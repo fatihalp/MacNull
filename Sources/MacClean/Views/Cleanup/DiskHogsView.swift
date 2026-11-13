@@ -40,7 +40,7 @@ struct DiskHogsView: View {
                         dockerSection
                         simulatorSection
 
-                        if controller.dockerState == .notInstalled && controller.devices.isEmpty && controller.runtimes.isEmpty {
+                        if controller.dockerState == .notInstalled && controller.dockerDiskImageSize == nil && controller.devices.isEmpty && controller.runtimes.isEmpty {
                             Text(DiskHogsText.nothingFound)
                                 .foregroundStyle(.secondary)
                         }
@@ -95,60 +95,71 @@ struct DiskHogsView: View {
     }
 
     @ViewBuilder private var dockerSection: some View {
-        switch controller.dockerState {
-        case .notInstalled:
-            EmptyView()
-        case .notResponding:
+        if controller.dockerState != .notInstalled || controller.dockerDiskImageSize != nil {
             Section {
-                Text(DiskHogsText.dockerNotResponding)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text(verbatim: "Docker")
-            }
-        case .rows(let rows):
-            Section {
-                ForEach(rows) { row in
-                    if row.category.isPrunable {
-                        Toggle(isOn: Binding(
-                            get: { controller.selectedDocker.contains(row.category) },
-                            set: { on in
-                                if on { controller.selectedDocker.insert(row.category) }
-                                else { controller.selectedDocker.remove(row.category) }
+                if let bytes = controller.dockerDiskImageSize {
+                    lockedRow(infoLabel(
+                        title: DiskHogsText.dockerDiskImage + "  ·  " + DiskHogsText.size + " "
+                            + ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file),
+                        note: DiskHogsText.dockerDiskImageNote
+                    ))
+                }
+                switch controller.dockerState {
+                case .notInstalled:
+                    EmptyView()
+                case .notResponding:
+                    Text(DiskHogsText.dockerNotResponding)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                case .rows(let rows):
+                    ForEach(rows) { row in
+                        if row.category.isPrunable {
+                            Toggle(isOn: Binding(
+                                get: { controller.selectedDocker.contains(row.category) },
+                                set: { on in
+                                    if on { controller.selectedDocker.insert(row.category) }
+                                    else { controller.selectedDocker.remove(row.category) }
+                                }
+                            )) {
+                                dockerRowLabel(row)
                             }
-                        )) {
-                            dockerRowLabel(row)
-                        }
-                    } else {
-
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: "lock.fill")
-                                .font(.system(size: 11))
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 2)
-                            dockerRowLabel(row)
+                        } else {
+                            lockedRow(dockerRowLabel(row))
                         }
                     }
+                    Button(DiskHogsText.pruneButton) { confirmingPrune = true }
+                        .disabled(controller.selectedDocker.isEmpty || controller.isWorking)
                 }
-                Button(DiskHogsText.pruneButton) { confirmingPrune = true }
-                    .disabled(controller.selectedDocker.isEmpty || controller.isWorking)
             } header: {
                 Text(verbatim: "Docker")
             }
         }
     }
 
+    private func lockedRow<Label: View>(_ label: Label) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
+            label
+        }
+    }
+
     private func dockerRowLabel(_ row: DockerDiskRow) -> some View {
+        infoLabel(title: row.category.label + "  ·  " + DiskHogsText.size + " " + row.size, note: row.category.pruneNote)
+    }
+
+    private func infoLabel(title: String, note: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(row.category.label + "  ·  " + DiskHogsText.size + " " + row.size)
+            Text(title)
                 .font(.system(size: 13, weight: .medium))
-            Text(row.category.pruneNote)
+            Text(note)
                 .font(.system(size: 11))
                 .foregroundStyle(.secondary)
                 .lineLimit(3)
         }
     }
-
     @ViewBuilder private var simulatorSection: some View {
         if !controller.devices.isEmpty || !controller.runtimes.isEmpty {
             Section(DiskHogsText.xcodeSection) {

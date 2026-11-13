@@ -47,7 +47,7 @@ public actor FileTreeScanner {
         let fm = FileManager.default
         guard let children = try? fm.contentsOfDirectory(
             at: root,
-            includingPropertiesForKeys: [.isDirectoryKey, .nameKey, .fileAllocatedSizeKey],
+            includingPropertiesForKeys: [.isDirectoryKey, .nameKey, .fileAllocatedSizeKey, .linkCountKey],
             options: []
         ) else {
             return []
@@ -55,20 +55,23 @@ public actor FileTreeScanner {
 
         var nodes: [FileNode] = []
         var scanned = 0
+        var hardLinks = HardLinkTracker()
 
         for child in children.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
             if Task.isCancelled { break }
 
             let values = try? child.resourceValues(
-                forKeys: [.isDirectoryKey, .nameKey, .fileAllocatedSizeKey])
+                forKeys: [.isDirectoryKey, .nameKey, .fileAllocatedSizeKey, .linkCountKey])
             let isDir = values?.isDirectory ?? false
             let name = values?.name ?? child.lastPathComponent
             let ext = (name as NSString).pathExtension.lowercased()
-            var total = UInt64(values?.fileAllocatedSize ?? 0)
+            var total = isDir || hardLinks.shouldCount(child, linkCount: values?.linkCount)
+                ? UInt64(values?.fileAllocatedSize ?? 0)
+                : 0
 
             if isDir, let enumerator = fm.enumerator(
                 at: child,
-                includingPropertiesForKeys: [.fileAllocatedSizeKey],
+                includingPropertiesForKeys: [.fileAllocatedSizeKey, .linkCountKey],
                 options: [.skipsPackageDescendants]
             ) {
 
@@ -80,7 +83,8 @@ public actor FileTreeScanner {
                         await Task.yield()
                     }
                     guard let url = obj as? URL,
-                          let v = try? url.resourceValues(forKeys: [.fileAllocatedSizeKey])
+                          let v = try? url.resourceValues(forKeys: [.fileAllocatedSizeKey, .linkCountKey]),
+                          hardLinks.shouldCount(url, linkCount: v.linkCount)
                     else { continue }
                     total += UInt64(v.fileAllocatedSize ?? 0)
                 }

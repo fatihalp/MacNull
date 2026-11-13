@@ -235,7 +235,7 @@ public actor TargetedScanner {
     }
 
     public static func directorySize(at url: URL) -> UInt64 {
-        let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey]
+        let keys: [URLResourceKey] = [.totalFileAllocatedSizeKey, .fileSizeKey, .isRegularFileKey, .linkCountKey]
         guard let enumerator = FileManager.default.enumerator(
             at: url,
             includingPropertiesForKeys: keys,
@@ -243,10 +243,12 @@ public actor TargetedScanner {
         ) else { return 0 }
 
         var total: UInt64 = 0
+        var hardLinks = HardLinkTracker()
         for case let fileURL as URL in enumerator {
             if Task.isCancelled { break }
             if let values = try? fileURL.resourceValues(forKeys: Set(keys)),
-               values.isRegularFile == true {
+               values.isRegularFile == true,
+               hardLinks.shouldCount(fileURL, linkCount: values.linkCount) {
                 total += UInt64(values.totalFileAllocatedSize ?? values.fileSize ?? 0)
             }
         }

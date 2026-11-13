@@ -167,7 +167,7 @@
 "Empty Trash" = "Empty Trash";
 "Empty all trash locations including external drives" = "Empty all trash locations including external drives";
 "Empty the Trash?" = "Empty the Trash?";
-"English, Base resources, Chinese, Russian, and German are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk." = "English, Base resources, Chinese, Russian, and German are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk.";
+"English, Base resources, Chinese, Russian, German, and the languages in your Mac's Language & Region settings are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk." = "English, Base resources, Chinese, Russian, German, and the languages in your Mac's Language & Region settings are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk.";
 "Error" = "Error";
 "Errors only" = "Errors only";
 "Exclude" = "Exclude";

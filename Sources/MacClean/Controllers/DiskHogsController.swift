@@ -6,6 +6,7 @@ import MacCleanKit
 @MainActor @Observable
 final class DiskHogsController {
     private(set) var dockerState: DiskHogsClient.DockerState = .notInstalled
+    private(set) var dockerDiskImageSize: UInt64?
     var selectedDocker: Set<DockerDiskCategory> = DockerPrune.defaultSelection
     private(set) var devices: [SimulatorDevice] = []
     private(set) var runtimes: [SimulatorRuntime] = []
@@ -41,6 +42,7 @@ final class DiskHogsController {
         let (state, simulators) = await (docker, sims)
         if Task.isCancelled { return }
         dockerState = state
+        dockerDiskImageSize = client.dockerDiskImageSize()
         devices = simulators.devices
         runtimes = simulators.runtimes
         selectedDocker = DockerPrune.defaultSelection
@@ -56,6 +58,7 @@ final class DiskHogsController {
         selectedDocker = []
         if Task.isCancelled { return }
         dockerState = await client.dockerState()
+        dockerDiskImageSize = client.dockerDiskImageSize()
     }
 
     func deleteSims(devices: [SimulatorDevice], runtimes: [SimulatorRuntime]) async {

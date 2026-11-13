@@ -164,7 +164,7 @@ struct SettingsPageView: View {
 
     private var languageSection: some View {
         Section("Language Cleanup") {
-            Text("English, Base resources, Chinese, Russian, and German are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk.")
+            Text("English, Base resources, Chinese, Russian, German, and the languages in your Mac's Language & Region settings are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
