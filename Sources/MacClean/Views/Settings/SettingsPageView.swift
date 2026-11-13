@@ -19,7 +19,6 @@ struct SettingsPageView: View {
             headerSection
             generalSection
             appearanceSection
-            languageSection
             excludedFoldersSection
             aboutSection
         }
@@ -29,7 +28,7 @@ struct SettingsPageView: View {
         .frame(maxWidth: .infinity)
         .task {
             launchAtLogin = loginLauncher.refreshStatus()
-            await controller.loadPreferences()
+            controller.loadPreferences()
         }
     }
 
@@ -115,7 +114,7 @@ struct SettingsPageView: View {
             widgetStatusRow
             Picker(selection: $menuBarMetricRaw) {
                 ForEach(MenuBarMetric.allCases) { metric in
-                    Text(metric.localizedName).tag(metric.rawValue)
+                    Text(metric.displayName).tag(metric.rawValue)
                 }
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
@@ -162,54 +161,6 @@ struct SettingsPageView: View {
         }
     }
 
-    private var languageSection: some View {
-        Section("Language Cleanup") {
-            Text("English, Base resources, Chinese, Russian, German, and the languages in your Mac's Language & Region settings are always kept. Checked languages are preserved; unchecked language files can be removed by System Junk.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            if controller.selectable.isEmpty {
-                Text("Detecting installed languages…")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                TextField("Search languages", text: $controller.languageSearch)
-                    .textFieldStyle(.roundedBorder)
-
-                if controller.filteredLanguages.isEmpty {
-                    Text("No languages match “\(controller.languageSearch)”.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(controller.filteredLanguages, id: \.name) { lang in
-
-                            HStack {
-                                Text(lang.name)
-                                Spacer()
-                                Toggle(lang.name, isOn: Binding(
-                                    get: { lang.lprojs.allSatisfy { controller.keptLanguages.contains($0) } },
-                                    set: { on in
-                                        controller.setLanguage(lang.lprojs, kept: on)
-                                    }
-                                ))
-                                .toggleStyle(.switch)
-                                .controlSize(.small)
-                                .labelsHidden()
-                            }
-                            .padding(.vertical, 5)
-                            .padding(.trailing, 6)
-                            Divider().opacity(0.5)
-                        }
-                    }
-                }
-                .frame(height: 250)
-            }
-        }
-    }
-
     private var excludedFoldersSection: some View {
         Section("Excluded Folders") {
             Text("These folders and their contents are hidden from cleanup scans and cannot be deleted by \(MCConstants.appName) (including Shredder). Only paths under your home folder or /Volumes.")
@@ -251,16 +202,16 @@ struct SettingsPageView: View {
     private var aboutSection: some View {
         Section("About") {
             aboutRow(icon: "chevron.left.forwardslash.chevron.right", tint: .orange,
-                     title: String(localized: "Source code"), caption: String(localized: "Browse the codebase on GitHub"),
+                     title: "Source code", caption: "Browse the codebase on GitHub",
                      url: MCConstants.repoURL)
             aboutRow(icon: "exclamationmark.bubble", tint: .blue,
-                     title: String(localized: "Report an issue"), caption: String(localized: "Bug reports and feature requests"),
+                     title: "Report an issue", caption: "Bug reports and feature requests",
                      url: MCConstants.issuesURL)
             aboutRow(icon: "tag", tint: .green,
-                     title: String(localized: "Release notes"), caption: String(localized: "Changelog and previous versions"),
+                     title: "Release notes", caption: "Changelog and previous versions",
                      url: MCConstants.releasesURL)
             aboutRow(icon: "cup.and.saucer.fill", tint: .yellow,
-                     title: String(localized: "Support Mac Sai"), caption: String(localized: "Buy the developer a coffee"),
+                     title: "Support Mac Sai", caption: "Buy the developer a coffee",
                      url: MCConstants.supportURL)
         }
     }
@@ -327,11 +278,11 @@ struct SettingsPageView: View {
 
     private var statusText: String {
         switch launcher.statusSnapshot {
-        case .enabled: return String(localized: "Running")
-        case .notRegistered: return String(localized: "not registered")
-        case .notFound: return String(localized: "helper not found in bundle")
-        case .requiresApproval: return String(localized: "needs approval in System Settings → Login Items")
-        @unknown default: return String(localized: "Unknown")
+        case .enabled: return "Running"
+        case .notRegistered: return "not registered"
+        case .notFound: return "helper not found in bundle"
+        case .requiresApproval: return "needs approval in System Settings → Login Items"
+        @unknown default: return "Unknown"
         }
     }
 }

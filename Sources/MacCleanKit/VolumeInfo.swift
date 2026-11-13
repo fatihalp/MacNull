@@ -23,16 +23,6 @@ public struct VolumeInfo: Identifiable, Sendable, Equatable {
         self.fileSystemType = fileSystemType
     }
 
-    public var usedCapacity: UInt64 {
-        guard totalCapacity > availableCapacity else { return 0 }
-        return totalCapacity - availableCapacity
-    }
-
-    public var usagePercentage: Double {
-        guard totalCapacity > 0 else { return 0 }
-        return Double(usedCapacity) / Double(totalCapacity)
-    }
-
     public static func == (lhs: VolumeInfo, rhs: VolumeInfo) -> Bool {
         lhs.url == rhs.url
     }

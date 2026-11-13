@@ -33,7 +33,7 @@ public struct AppInfo: Identifiable, Hashable, Sendable {
     }
 
     public var formattedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
+        FileSizeFormatter.format(size)
     }
 
     public var isUnused: Bool {

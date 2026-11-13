@@ -17,7 +17,7 @@ final class SystemJunkController {
     private(set) var results: [ScanResult] = []
     private(set) var review: ReviewSelection?
     private(set) var filesFound = 0
-    private(set) var scanPhase = String(localized: "Scanning...")
+    private(set) var scanPhase = "Scanning..."
 
     @ObservationIgnored private var scanTask: Task<Void, Never>?
     @ObservationIgnored private var cleanTask: Task<Void, Never>?
@@ -39,7 +39,7 @@ final class SystemJunkController {
         scanTask = Task {
             let scanResults = await module.scan()
             guard !Task.isCancelled, generation == self.generation else { return }
-            scanPhase = String(localized: "Analyzing results...")
+            scanPhase = "Analyzing results..."
             filesFound = scanResults.reduce(0) { $0 + $1.fileCount }
             let data = await ReviewService.build(
                 modules: [ModuleScanResult(
@@ -100,6 +100,6 @@ final class SystemJunkController {
         results = []
         review = nil
         filesFound = 0
-        scanPhase = String(localized: "Scanning...")
+        scanPhase = "Scanning..."
     }
 }

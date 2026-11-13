@@ -355,10 +355,10 @@ enum ReviewSelectMode {
 
     var label: String {
         switch self {
-        case .smart: String(localized: "Smartly")
-        case .all: String(localized: "All")
-        case .none: String(localized: "None")
-        case .custom: String(localized: "Custom")
+        case .smart: "Smartly"
+        case .all: "All"
+        case .none: "None"
+        case .custom: "Custom"
         }
     }
 }

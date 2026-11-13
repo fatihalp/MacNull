@@ -4,7 +4,7 @@ import MacCleanKit
 
 public struct OptimizationModule: ScanModule {
     public let id = "optimization"
-    public var name: String { String(localized: "Optimization") }
+    public var name: String { "Optimization" }
     public let category = ModuleCategory.performance
 
     public init() {}
@@ -29,11 +29,11 @@ public struct AutoStartItem: Identifiable, Sendable {
         case launchAgent
         case launchDaemon
 
-        public var localizedName: String {
+        public var displayName: String {
             switch self {
-            case .loginItem:    return String(localized: "Login Item")
-            case .launchAgent:  return String(localized: "Launch Agent")
-            case .launchDaemon: return String(localized: "Launch Daemon")
+            case .loginItem:    return "Login Item"
+            case .launchAgent:  return "Launch Agent"
+            case .launchDaemon: return "Launch Daemon"
             }
         }
     }
@@ -42,26 +42,10 @@ public struct AutoStartItem: Identifiable, Sendable {
         guard let p = configFilePath else { return false }
         return !p.isEmpty
     }
-
-    public var hasAppPath: Bool {
-        guard let p = programPath else { return false }
-        return !p.isEmpty
-    }
 }
 
 public final class AutoStartManager: @unchecked Sendable {
     public init() {}
-
-    public func getItems() -> [AutoStartItem] {
-        var seen = Set<String>()
-        let all = getLoginItems() + getLaunchAgents() + getLaunchDaemons()
-        return all.filter { item in
-            let key = item.bundleIdentifier ?? item.name
-            if seen.contains(key) { return false }
-            seen.insert(key)
-            return true
-        }
-    }
 
     public func getLoginItems() -> [AutoStartItem] {
         loadLoginItemsViaSystemEvents()
@@ -96,11 +80,6 @@ public final class AutoStartManager: @unchecked Sendable {
 
     public func openConfigInFinder(_ item: AutoStartItem) {
         guard let path = item.configFilePath else { return }
-        NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
-    }
-
-    public func openAppInFinder(_ item: AutoStartItem) {
-        guard let path = item.programPath else { return }
         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
     }
 
@@ -171,9 +150,6 @@ public final class AutoStartManager: @unchecked Sendable {
         }
         return items
     }
-
-    @available(*, deprecated, message: "sfltool dumpbtm only shows system-level items, not user login items")
-    public func reloadLoginItemsViaSfltool() -> [AutoStartItem] { [] }
 
     private func scanPlistDir(_ dir: URL, type: AutoStartItem.SourceType, isSystem: Bool) -> [AutoStartItem] {
         guard let contents = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else {
@@ -294,99 +270,6 @@ public final class AutoStartManager: @unchecked Sendable {
     }
 }
 
-public final class LoginItemsManager: @unchecked Sendable {
-    public struct LoginItem: Identifiable, Sendable {
-        public let id: UUID = UUID()
-        public let name: String
-        public let path: URL
-        public let bundleIdentifier: String?
-        public var isEnabled: Bool
-
-        public var asAutoStartItem: AutoStartItem {
-            AutoStartItem(
-                name: name,
-                bundleIdentifier: bundleIdentifier,
-                programPath: path.path,
-                configFilePath: path.path,
-                sourceType: .loginItem,
-                isSystem: false,
-                isEnabled: isEnabled
-            )
-        }
-    }
-
-    private let inner = AutoStartManager()
-    public init() {}
-
-    public func getLoginItems() -> [LoginItem] {
-
-        inner.getLoginItems().map { item in
-            LoginItem(
-                name: item.name,
-                path: URL(fileURLWithPath: item.configFilePath ?? item.programPath ?? ""),
-                bundleIdentifier: item.bundleIdentifier,
-                isEnabled: item.isEnabled
-            )
-        }
-    }
-
-    public func toggleItem(_ item: LoginItem, enabled: Bool) throws {
-        try inner.toggleItem(item.asAutoStartItem, enabled: enabled)
-    }
-}
-
-public final class LaunchAgentsManager: @unchecked Sendable {
-    public struct LaunchAgent: Identifiable, Sendable {
-        public let id: UUID = UUID()
-        public let label: String
-        public let path: URL
-        public let program: String?
-        public let isSystem: Bool
-        public var isEnabled: Bool
-
-        public var asAutoStartItem: AutoStartItem {
-            AutoStartItem(
-                name: label,
-                bundleIdentifier: label,
-                programPath: program,
-                configFilePath: path.path,
-                sourceType: .launchAgent,
-                isSystem: isSystem,
-                isEnabled: isEnabled
-            )
-        }
-    }
-
-    private let inner = AutoStartManager()
-    public init() {}
-
-    public func getLaunchAgents() -> [LaunchAgent] {
-        inner.getLaunchAgents().map { item in
-            LaunchAgent(
-                label: item.name,
-                path: URL(fileURLWithPath: item.configFilePath ?? ""),
-                program: item.programPath,
-                isSystem: item.isSystem,
-                isEnabled: item.isEnabled
-            )
-        }
-    }
-
-    public enum ToggleError: Error { case systemAgentReadOnly, unreadablePlist }
-
-    public func toggleAgent(_ agent: LaunchAgent, enabled: Bool) throws {
-        do {
-            try inner.toggleItem(agent.asAutoStartItem, enabled: enabled)
-        } catch AutoStartManager.ToggleError.systemItemReadOnly {
-            throw ToggleError.systemAgentReadOnly
-        } catch AutoStartManager.ToggleError.unreadablePlist {
-            throw ToggleError.unreadablePlist
-        } catch {
-            throw ToggleError.unreadablePlist
-        }
-    }
-}
-
 public final class ProcessMonitor: @unchecked Sendable {
     public struct ProcessInfo: Identifiable, Sendable {
         public let id: Int32
@@ -397,19 +280,6 @@ public final class ProcessMonitor: @unchecked Sendable {
     }
 
     public init() {}
-
-    public func getRunningApps() -> [ProcessInfo] {
-        NSWorkspace.shared.runningApplications.compactMap { app in
-            guard let name = app.localizedName, !app.isHidden else { return nil }
-            return ProcessInfo(
-                id: app.processIdentifier,
-                name: name,
-                cpuUsage: 0,
-                memoryBytes: 0,
-                isResponsive: !app.isTerminated
-            )
-        }
-    }
 
     public func forceQuit(pid: Int32) {
         if let app = NSRunningApplication(processIdentifier: pid) {

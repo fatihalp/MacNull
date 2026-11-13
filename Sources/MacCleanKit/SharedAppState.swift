@@ -17,23 +17,6 @@ public enum SharedAppState {
             self.threatsFound = threatsFound
             self.scanDepth = scanDepth
         }
-
-        public var localizedScanDepth: String {
-            switch scanDepth.lowercased() {
-            case "quick":
-                String(localized: "Quick")
-            case "balanced":
-                String(localized: "Balanced")
-            case "deep":
-                String(localized: "Deep")
-            default:
-                scanDepth
-            }
-        }
-
-        public var isStale: Bool {
-            Date().timeIntervalSince(lastScanDate) > 7 * 24 * 3600
-        }
     }
 
     private static let protectionStatusKey = "protectionStatus"

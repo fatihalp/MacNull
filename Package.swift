@@ -5,13 +5,11 @@ import PackageDescription
 
 let package = Package(
     name: "MacClean",
-    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],
     products: [
         .executable(name: "MacClean", targets: ["MacClean"]),
-        .executable(name: "macclean", targets: ["MacClean"]),
         .executable(name: "MacCleanMenu", targets: ["MacCleanMenu"]),
         .library(name: "MacCleanKit", targets: ["MacCleanKit"]),
     ],
@@ -35,10 +33,7 @@ let package = Package(
         .target(
             name: "MacCleanKit",
             dependencies: [],
-            path: "Sources/MacCleanKit",
-            resources: [
-                .process("Resources")
-            ]
+            path: "Sources/MacCleanKit"
         ),
     ]
 )

@@ -8,17 +8,17 @@ public enum SmartScanMode: String, CaseIterable, Identifiable, Sendable {
 
     public var title: String {
         switch self {
-        case .safe: String(localized: "Safe Clean")
-        case .deep: String(localized: "Deep Clean")
+        case .safe: "Safe Clean"
+        case .deep: "Deep Clean"
         }
     }
 
     public var subtitle: String {
         switch self {
         case .safe:
-            String(localized: "Cleans temporary system and application caches safely. Project builds, source code, and developer packages remain untouched.")
+            "Cleans temporary system and application caches safely. Project builds, source code, and developer packages remain untouched."
         case .deep:
-            String(localized: "For low-disk emergencies: removes regenerable project build outputs (target, build, .dart_tool) and heavy developer caches to recover maximum space.")
+            "For low-disk emergencies: removes regenerable project build outputs (target, build, .dart_tool) and heavy developer caches to recover maximum space."
         }
     }
 
@@ -31,8 +31,8 @@ public enum SmartScanMode: String, CaseIterable, Identifiable, Sendable {
 
     public var badge: String {
         switch self {
-        case .safe: String(localized: "Recommended")
-        case .deep: String(localized: "Maximum Space")
+        case .safe: "Recommended"
+        case .deep: "Maximum Space"
         }
     }
 }

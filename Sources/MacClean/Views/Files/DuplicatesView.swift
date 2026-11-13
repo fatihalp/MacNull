@@ -17,10 +17,10 @@ struct DuplicatesView: View {
                 scanningView
             } else if controller.scanComplete && controller.results.isEmpty {
                 ModuleContainerView(
-                    title: String(localized: "Duplicates"),
+                    title: "Duplicates",
                     subtitle: "",
                     theme: .files,
-                    emptyMessage: String(localized: "No duplicates found"),
+                    emptyMessage: "No duplicates found",
                     results: controller.results,
                     selectedItems: $controller.selectedItems,
                     isScanning: false,
@@ -33,7 +33,7 @@ struct DuplicatesView: View {
                 )
             } else if !controller.results.isEmpty {
                 ModuleContainerView(
-                    title: String(localized: "Duplicates"),
+                    title: "Duplicates",
                     subtitle: "",
                     theme: .files,
                     results: controller.results,
@@ -68,8 +68,8 @@ struct DuplicatesView: View {
                                 .padding(.horizontal, 20)
 
                                 Text(actionMode == .consolidate
-                                    ? String(localized: "Selected copies stay in place as clones. Only the wasted duplicate space is freed, nothing is deleted.")
-                                    : String(localized: "Selected copies will be permanently deleted, one original is kept per group."))
+                                    ? "Selected copies stay in place as clones. Only the wasted duplicate space is freed, nothing is deleted."
+                                    : "Selected copies will be permanently deleted, one original is kept per group.")
                                     .font(.system(size: 12))
                                     .foregroundStyle(.primary.opacity(0.6))
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -84,12 +84,12 @@ struct DuplicatesView: View {
                         )
                     },
                     actionLabel: actionMode == .consolidate
-                        ? String(localized: "Consolidate")
+                        ? "Consolidate"
                         : nil
                 )
             } else if controller.completion != nil {
                 ModuleContainerView(
-                    title: String(localized: "Duplicates"),
+                    title: "Duplicates",
                     subtitle: "",
                     theme: .files,
                     results: [],
@@ -113,7 +113,7 @@ struct DuplicatesView: View {
             canClean: false
         )
         .confirmationDialog(
-            String(localized: "Consolidate selected copies?"),
+            "Consolidate selected copies?",
             isPresented: $consolidateConfirm, titleVisibility: .visible
         ) {
             Button("Consolidate") { controller.consolidate() }

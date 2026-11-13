@@ -16,16 +16,16 @@ public enum MaintenanceTask: String, CaseIterable, Identifiable, Sendable {
     public var id: String { rawValue }
     public var title: String {
         switch self {
-        case .freeUpRAM: String(localized: rawValue)
-        case .freeUpPurgeableSpace: String(localized: rawValue)
-        case .runMaintenanceScripts: String(localized: rawValue)
-        case .verifyStartupDisk: String(localized: rawValue)
-        case .speedUpMail: String(localized: rawValue)
-        case .rebuildLaunchServices: String(localized: rawValue)
-        case .reindexSpotlight: String(localized: rawValue)
-        case .flushDNSCache: String(localized: rawValue)
-        case .thinTimeMachineSnapshots: String(localized: rawValue)
-        case .pruneDocker: String(localized: rawValue)
+        case .freeUpRAM: rawValue
+        case .freeUpPurgeableSpace: rawValue
+        case .runMaintenanceScripts: rawValue
+        case .verifyStartupDisk: rawValue
+        case .speedUpMail: rawValue
+        case .rebuildLaunchServices: rawValue
+        case .reindexSpotlight: rawValue
+        case .flushDNSCache: rawValue
+        case .thinTimeMachineSnapshots: rawValue
+        case .pruneDocker: rawValue
         }
     }
 
@@ -47,25 +47,25 @@ public enum MaintenanceTask: String, CaseIterable, Identifiable, Sendable {
     public var description: String {
         switch self {
         case .freeUpRAM:
-            String(localized: "Purge inactive memory to give active apps more breathing room")
+            "Purge inactive memory to give active apps more breathing room"
         case .freeUpPurgeableSpace:
-            String(localized: "Reclaim purgeable disk space by thinning low-priority local snapshots")
+            "Reclaim purgeable disk space by thinning low-priority local snapshots"
         case .runMaintenanceScripts:
-            String(localized: "Execute macOS built-in daily, weekly, and monthly maintenance routines")
+            "Execute macOS built-in daily, weekly, and monthly maintenance routines"
         case .verifyStartupDisk:
-            String(localized: "Check file system integrity of the boot disk")
+            "Check file system integrity of the boot disk"
         case .speedUpMail:
-            String(localized: "Reindex the Mail.app database to fix search and performance issues")
+            "Reindex the Mail.app database to fix search and performance issues"
         case .rebuildLaunchServices:
-            String(localized: "Repair Finder's file-type-to-application mapping database")
+            "Repair Finder's file-type-to-application mapping database"
         case .reindexSpotlight:
-            String(localized: "Rebuild the Spotlight search index for improved search accuracy")
+            "Rebuild the Spotlight search index for improved search accuracy"
         case .flushDNSCache:
-            String(localized: "Clear the local DNS cache and force fresh lookups")
+            "Clear the local DNS cache and force fresh lookups"
         case .thinTimeMachineSnapshots:
-            String(localized: "Reduce local Time Machine snapshot sizes to reclaim disk space")
+            "Reduce local Time Machine snapshot sizes to reclaim disk space"
         case .pruneDocker:
-            String(localized: "Remove unused Docker images, stopped containers, and build cache")
+            "Remove unused Docker images, stopped containers, and build cache"
         }
     }
 
@@ -96,25 +96,25 @@ public enum MaintenanceTask: String, CaseIterable, Identifiable, Sendable {
     public var sideEffects: String {
         switch self {
         case .freeUpRAM:
-            String(localized: "Apps that had memory paged out may take a moment to come back to foreground.")
+            "Apps that had memory paged out may take a moment to come back to foreground."
         case .freeUpPurgeableSpace:
-            String(localized: "Time Machine local snapshots that macOS already flagged for cleanup are removed; nothing the user actively needs is deleted.")
+            "Time Machine local snapshots that macOS already flagged for cleanup are removed; nothing the user actively needs is deleted."
         case .runMaintenanceScripts:
-            String(localized: "No visible effect — these are the same scripts macOS runs on its own overnight.")
+            "No visible effect — these are the same scripts macOS runs on its own overnight."
         case .verifyStartupDisk:
-            String(localized: "A few minutes of disk activity. Read-only — nothing on disk is changed regardless of the outcome.")
+            "A few minutes of disk activity. Read-only — nothing on disk is changed regardless of the outcome."
         case .speedUpMail:
-            String(localized: "Mail.app's search index is rebuilt from scratch. Mail search and unread counts will be wrong until the rebuild finishes (typically 10–30 minutes on a large mailbox).")
+            "Mail.app's search index is rebuilt from scratch. Mail search and unread counts will be wrong until the rebuild finishes (typically 10–30 minutes on a large mailbox)."
         case .rebuildLaunchServices:
-            String(localized: "macOS's database of \"which app opens which file type\" is erased and rebuilt. Until it finishes (often several hours), double-clicking files may fail or open the wrong app, default-app settings may reset, and launching apps via Spotlight may not work. A reboot speeds this up.")
+            "macOS's database of \"which app opens which file type\" is erased and rebuilt. Until it finishes (often several hours), double-clicking files may fail or open the wrong app, default-app settings may reset, and launching apps via Spotlight may not work. A reboot speeds this up."
         case .reindexSpotlight:
-            String(localized: "Spotlight's entire search index is erased and rebuilt. Spotlight search will return empty results for several hours (longer for large home directories). System search and Smart Folders are affected too.")
+            "Spotlight's entire search index is erased and rebuilt. Spotlight search will return empty results for several hours (longer for large home directories). System search and Smart Folders are affected too."
         case .flushDNSCache:
-            String(localized: "Browsers and other network apps re-resolve hostnames on next request — milliseconds of impact.")
+            "Browsers and other network apps re-resolve hostnames on next request — milliseconds of impact."
         case .thinTimeMachineSnapshots:
-            String(localized: "Local Time Machine snapshots are deleted to free disk space. Remote/backup-drive snapshots are unaffected; you can still restore from the Time Machine backup itself.")
+            "Local Time Machine snapshots are deleted to free disk space. Remote/backup-drive snapshots are unaffected; you can still restore from the Time Machine backup itself."
         case .pruneDocker:
-            String(localized: "Runs docker system prune, removing unused images, stopped containers, unused networks, and build cache. This is irreversible (it does not go to the Trash). Running containers, in-use images, and named volumes are untouched, and the Docker.raw disk image is never deleted directly.")
+            "Runs docker system prune, removing unused images, stopped containers, unused networks, and build cache. This is irreversible (it does not go to the Trash). Running containers, in-use images, and named volumes are untouched, and the Docker.raw disk image is never deleted directly."
         }
     }
 

@@ -163,14 +163,14 @@ struct AppPermissionsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(
                 controller.snapshot.listing == .needsFullDiskAccess
-                    ? String(localized: "Full Disk Access needed to list apps")
-                    : String(localized: "Couldn't read the permission database")
+                    ? "Full Disk Access needed to list apps"
+                    : "Couldn't read the permission database"
             )
             .font(.system(size: 13, weight: .semibold))
             Text(
                 controller.snapshot.listing == .needsFullDiskAccess
                     ? "macOS is blocking the by-app overview. Grant \(MCConstants.appName) Full Disk Access, then refresh. The buttons below still open System Settings."
-                    : String(localized: "This app can't list which apps hold which grants. You can still open System Settings with the buttons below.")
+                    : "This app can't list which apps hold which grants. You can still open System Settings with the buttons below."
             )
             .font(.system(size: 12))
             .foregroundStyle(.primary.opacity(0.7))
@@ -192,11 +192,11 @@ struct AppPermissionsView: View {
 
     private func permissionTitle(_ permission: PrivacyPermission) -> String {
         switch permission {
-        case .camera: String(localized: "Camera")
-        case .microphone: String(localized: "Microphone")
-        case .fullDiskAccess: String(localized: "Full Disk Access")
-        case .screenRecording: String(localized: "Screen Recording")
-        case .automation: String(localized: "Automation")
+        case .camera: "Camera"
+        case .microphone: "Microphone"
+        case .fullDiskAccess: "Full Disk Access"
+        case .screenRecording: "Screen Recording"
+        case .automation: "Automation"
         }
     }
 
@@ -214,19 +214,13 @@ struct AppPermissionsView: View {
         if app.clientIsPath {
             return URL(filePath: app.client).deletingPathExtension().lastPathComponent
         }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.client) {
-            return FileManager.default.displayName(atPath: url.path(percentEncoded: false))
-        }
-        return app.client
+        return AppIconProvider.displayName(forBundleID: app.client) ?? app.client
     }
 
     private func icon(for app: AppPermissionApp) -> NSImage {
         if app.clientIsPath {
-            return NSWorkspace.shared.icon(forFile: app.client)
+            return AppIconProvider.icon(forPath: app.client)
         }
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app.client) {
-            return NSWorkspace.shared.icon(forFile: url.path(percentEncoded: false))
-        }
-        return NSWorkspace.shared.icon(for: .application)
+        return AppIconProvider.icon(forBundleID: app.client) ?? AppIconProvider.genericApplicationIcon
     }
 }

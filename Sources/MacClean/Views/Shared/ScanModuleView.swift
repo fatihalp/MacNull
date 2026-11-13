@@ -15,35 +15,35 @@ struct ScanModuleView: View {
 
     private var subtitle: String {
         switch feature {
-        case .mailAttachments: String(localized: "Find cached email attachments from Mail, Outlook, and Spark")
-        case .trashBins: String(localized: "Empty all trash locations including external drives")
-        case .malware: String(localized: "Scan for viruses, adware, and other threats")
-        case .privacy: String(localized: "Clean browser caches, temporary web files, and site storage")
-        case .largeOldFiles: String(localized: "Find files larger than 50 MB that haven't been accessed recently")
+        case .mailAttachments: "Find cached email attachments from Mail, Outlook, and Spark"
+        case .trashBins: "Empty all trash locations including external drives"
+        case .malware: "Scan for viruses, adware, and other threats"
+        case .privacy: "Clean browser caches, temporary web files, and site storage"
+        case .largeOldFiles: "Find files larger than 50 MB that haven't been accessed recently"
         }
     }
 
     private var emptyMessage: String {
         switch feature {
-        case .mailAttachments: String(localized: "No attachments found")
-        case .trashBins: String(localized: "Trash is empty")
-        case .malware: String(localized: "No threats detected")
-        case .privacy: String(localized: "No browser caches found")
-        case .largeOldFiles: String(localized: "No large or old files found")
+        case .mailAttachments: "No attachments found"
+        case .trashBins: "Trash is empty"
+        case .malware: "No threats detected"
+        case .privacy: "No browser caches found"
+        case .largeOldFiles: "No large or old files found"
         }
     }
 
     var body: some View {
         @Bindable var controller = appState.scanController(for: feature)
         ModuleContainerView(
-            title: String(localized: feature.item.title),
+            title: feature.item.title,
             subtitle: subtitle,
             theme: theme,
             emptyMessage: emptyMessage,
             results: controller.results,
             selectedItems: $controller.selectedItems,
             isScanning: controller.isScanning,
-            scanPhase: String(localized: "Scanning..."),
+            scanPhase: "Scanning...",
             scanComplete: controller.scanComplete,
             completion: controller.completion,
             cleaning: controller.cleaning,

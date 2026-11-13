@@ -62,7 +62,7 @@ public struct DiskHogsClient: Sendable {
         guard let docker = Self.dockerPath() else {
             return commands.map {
                 ItemResult(name: $0.category.label, outcome: .launchFailed(
-                    String(localized: "Docker not found")))
+                    "Docker not found"))
             }
         }
         var results: [ItemResult] = []

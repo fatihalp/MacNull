@@ -91,7 +91,7 @@ extension SidebarItem {
         case .smartScan:
             "One-click comprehensive analysis of junk, malware, and performance."
         case .systemJunk:
-            "Clean caches, logs, Xcode remnants, and localization files."
+            "Clean caches, logs, and Xcode remnants."
         case .mailAttachments:
             "Remove local copies of email downloads and cached attachments."
         case .trashBins:

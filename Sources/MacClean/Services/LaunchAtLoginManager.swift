@@ -11,7 +11,7 @@ public final class LaunchAtLoginManager {
         public var errorDescription: String? {
             switch self {
             case .updateFailed(let enabling, let message):
-                let action = enabling ? String(localized: "enable") : String(localized: "disable")
+                let action = enabling ? "enable" : "disable"
                 return "Couldn't \(action) launch at login: \(message)"
             }
         }

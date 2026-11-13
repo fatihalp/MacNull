@@ -31,7 +31,7 @@ final class MaintenanceController {
         if result.success {
             taskStates[task] = .completed(result.output)
         } else {
-            taskStates[task] = .failed(result.error ?? String(localized: "Unknown error"))
+            taskStates[task] = .failed(result.error ?? "Unknown error")
         }
     }
 

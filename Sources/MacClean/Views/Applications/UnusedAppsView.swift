@@ -40,6 +40,7 @@ struct UnusedAppsView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .labelsHidden()
                 .frame(width: 240)
                 Button {
                     Task { await controller.reload() }
@@ -94,7 +95,7 @@ struct UnusedAppsView: View {
                             .toggleStyle(.checkbox)
                             .labelsHidden()
 
-                            Image(nsImage: NSWorkspace.shared.icon(forFile: app.path))
+                            Image(nsImage: AppIconProvider.icon(forPath: app.path))
                                 .resizable()
                                 .frame(width: 28, height: 28)
                             VStack(alignment: .leading, spacing: 2) {
@@ -183,11 +184,11 @@ struct UnusedAppsView: View {
         if let date = app.lastUsed {
             last = date.formatted(date: .abbreviated, time: .omitted)
         } else {
-            last = String(localized: "Unknown")
+            last = "Unknown"
         }
         let support = FileSizeFormatter.format(app.supportBytes)
-        let lastLabel = String(localized: "Last opened")
-        let supportLabel = String(localized: "Support files")
+        let lastLabel = "Last opened"
+        let supportLabel = "Support files"
         return "\(lastLabel) \(last) · \(supportLabel) \(support)"
     }
 }

@@ -16,17 +16,17 @@ public enum FileTypeCategory: String, Sendable, CaseIterable {
 
     public var label: String {
         switch self {
-        case .folders: String(localized: "Folders")
-        case .documents: String(localized: "Documents")
-        case .images: String(localized: "Images")
-        case .video: String(localized: "Video")
-        case .audio: String(localized: "Audio")
-        case .archives: String(localized: "Archives")
-        case .code: String(localized: "Code")
-        case .diskImages: String(localized: "Disk Images")
-        case .applications: String(localized: "Applications")
-        case .system: String(localized: "System")
-        case .other: String(localized: "Other")
+        case .folders: "Folders"
+        case .documents: "Documents"
+        case .images: "Images"
+        case .video: "Video"
+        case .audio: "Audio"
+        case .archives: "Archives"
+        case .code: "Code"
+        case .diskImages: "Disk Images"
+        case .applications: "Applications"
+        case .system: "System"
+        case .other: "Other"
         }
     }
 
@@ -81,7 +81,7 @@ public struct TreemapNode: Sendable {
     }
 
     public var formattedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
+        FileSizeFormatter.format(size)
     }
 }
 

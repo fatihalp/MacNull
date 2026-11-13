@@ -10,10 +10,10 @@ public enum DockerDiskCategory: String, Equatable, Sendable, CaseIterable, Ident
 
     public var label: String {
         switch self {
-        case .images: String(localized: "Images")
-        case .containers: String(localized: "Containers")
-        case .volumes: String(localized: "Volumes")
-        case .buildCache: String(localized: "Build Cache")
+        case .images: "Images"
+        case .containers: "Containers"
+        case .volumes: "Volumes"
+        case .buildCache: "Build Cache"
         }
     }
 
@@ -22,13 +22,13 @@ public enum DockerDiskCategory: String, Equatable, Sendable, CaseIterable, Ident
     public var pruneNote: String {
         switch self {
         case .images:
-            String(localized: "Pruning removes only dangling (untagged) images. Tagged images are kept.")
+            "Pruning removes only dangling (untagged) images. Tagged images are kept."
         case .containers:
-            String(localized: "Pruning permanently deletes every stopped container and the data inside it. Running containers are not touched.")
+            "Pruning permanently deletes every stopped container and the data inside it. Running containers are not touched."
         case .volumes:
-            String(localized: "Volumes can hold database data, so Mac Sai leaves them alone. To remove them, use Docker Desktop or the Docker CLI.")
+            "Volumes can hold database data, so Mac Sai leaves them alone. To remove them, use Docker Desktop or the Docker CLI."
         case .buildCache:
-            String(localized: "Pruning removes dangling build cache. Your next build may be slower.")
+            "Pruning removes dangling build cache. Your next build may be slower."
         }
     }
 }

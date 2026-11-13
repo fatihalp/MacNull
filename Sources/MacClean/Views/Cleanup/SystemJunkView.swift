@@ -60,7 +60,7 @@ struct SystemJunkView: View {
                     .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(.primary)
 
-                Text("Find and remove system caches, logs,\nlanguage files, and other junk")
+                Text("Find and remove system caches, logs,\nand other junk")
                     .font(.system(size: 13.5))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -99,7 +99,7 @@ struct SystemJunkView: View {
             ReviewBrowserView(
                 data: review.data,
                 selection: review,
-                doneTitle: String(localized: "Clean"),
+                doneTitle: "Clean",
                 doneDisabled: controller.selectedCount == 0,
                 onDone: requestClean
             )
@@ -112,7 +112,7 @@ struct SystemJunkView: View {
                     controller.startCleaning(engine: appState.cleaningEngine)
                 }
             } message: {
-                Text("That's about \(ByteCountFormatter.string(fromByteCount: Int64(controller.currentSelectedSize), countStyle: .file)) of data and may take several minutes. You can cancel mid-cleanup.")
+                Text("That's about \(FileSizeFormatter.format(controller.currentSelectedSize)) of data and may take several minutes. You can cancel mid-cleanup.")
             }
         }
     }
@@ -209,7 +209,7 @@ struct SystemJunkView: View {
 
     private func cleaningPhaseText(_ progress: CleaningEngine.Progress?) -> String {
         guard let progress, progress.totalItems > 0 else {
-            return String(localized: "Starting cleanup...")
+            return "Starting cleanup..."
         }
         let pct = Int((progress.fraction * 100).rounded())
         return "Cleaning… \(pct)%"
@@ -247,7 +247,7 @@ struct SystemJunkView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 52))
                     .foregroundStyle(.primary)
-                SizeDisplay(size: summary.freedBytes, label: String(localized: "cleaned up"))
+                SizeDisplay(size: summary.freedBytes, label: "cleaned up")
                     .foregroundStyle(.primary)
                 if summary.removedCount < summary.selectedCount {
 

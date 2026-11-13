@@ -4,7 +4,7 @@ import MacCleanKit
 
 public struct UpdaterModule: ScanModule {
     public let id = "updater"
-    public var name: String { String(localized: "Updater") }
+    public var name: String { "Updater" }
     public let category = ModuleCategory.applications
 
     public init() {}

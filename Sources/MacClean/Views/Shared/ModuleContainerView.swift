@@ -37,12 +37,12 @@ struct ModuleContainerView: View {
         title: String,
         subtitle: String,
         theme: ModuleTheme,
-        emptyMessage: String = String(localized: "No items found"),
+        emptyMessage: String = "No items found",
         results: [ScanResult],
         selectedItems: Binding<Set<URL>>,
         isScanning: Bool,
         scanProgress: Double = 0.5,
-        scanPhase: String = String(localized: "Scanning..."),
+        scanPhase: String = "Scanning...",
         scanComplete: Bool = false,
         completion: CleanSummary? = nil,
         cleaning: CleaningEngine.Progress? = nil,
@@ -101,11 +101,15 @@ struct ModuleContainerView: View {
     }
 
     private var formattedSelectedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(totalSelected), countStyle: .file)
+        FileSizeFormatter.format(totalSelected)
     }
 
     private var resultsKey: String {
-        fileListResultsSignature(sort: .sizeDescending, results: results)
+        results.map {
+            let generation = $0.items.first?.id.uuidString ?? "empty"
+            return "\($0.category.rawValue):\($0.items.count):\(generation)"
+        }
+        .joined(separator: ",")
     }
 
     var body: some View {
@@ -189,7 +193,7 @@ struct ModuleContainerView: View {
                 progress: progress.fraction,
                 phase: progress.totalItems > 0
                     ? "Cleaning… \(Int((progress.fraction * 100).rounded()))%"
-                    : String(localized: "Starting cleanup..."),
+                    : "Starting cleanup...",
                 theme: theme
             )
             if progress.totalItems > 0 {
@@ -301,7 +305,7 @@ struct ModuleContainerView: View {
         if let resultsContent {
             VStack(spacing: 0) {
                 HStack {
-                    SizeDisplay(size: totalSelected, label: String(localized: "Selected"))
+                    SizeDisplay(size: totalSelected, label: "Selected")
                         .foregroundStyle(.primary)
                     Spacer()
                     Button(actionLabel ?? "Clean") {
@@ -420,7 +424,7 @@ struct ModuleContainerView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 52))
                     .foregroundStyle(.primary)
-                SizeDisplay(size: summary.freedBytes, label: String(localized: "cleaned up"))
+                SizeDisplay(size: summary.freedBytes, label: "cleaned up")
                     .foregroundStyle(.primary)
                 if summary.removedCount < summary.selectedCount {
                     Text("\(summary.removedCount) of \(summary.selectedCount) items removed" +
@@ -476,7 +480,7 @@ private struct CleanConfirmationModifier: ViewModifier {
                 Text("That's about \(formattedSelectedSize) of data and may take several minutes. You can cancel mid-cleanup.")
             }
             .alert(
-                String(localized: "Empty the Trash?"),
+                "Empty the Trash?",
                 isPresented: $showEmptyTrashConfirm
             ) {
                 Button("Cancel", role: .cancel) { }

@@ -3,7 +3,7 @@ import MacCleanKit
 
 public struct BrowserCleanupModule: ScanModule {
     public let id = "browser_cleanup"
-    public var name: String { String(localized: "Browser Caches") }
+    public var name: String { "Browser Caches" }
     public let category = ModuleCategory.cleanup
     public let includedInSmartScan = true
 

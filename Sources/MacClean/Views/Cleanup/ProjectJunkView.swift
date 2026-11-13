@@ -10,7 +10,7 @@ struct ProjectJunkView: View {
 
     private var subtitle: String {
         if let rootURL = controller.rootURL {
-            let noAutoSelect = String(localized: "Nothing is auto-selected.")
+            let noAutoSelect = "Nothing is auto-selected."
             return "\(rootURL.path(percentEncoded: false)) · \(noAutoSelect)"
         }
         let defaults = controller.availableDefaultRoots
@@ -18,19 +18,19 @@ struct ProjectJunkView: View {
             let names = defaults.prefix(3).map { "~/" + $0.lastPathComponent }.joined(separator: ", ")
             return "Scans discovered project folders (\(names)) for regenerable build directories like node_modules, target, .venv, and .build, or choose a folder manually."
         }
-        return String(localized: "Choose a projects folder (e.g. ~/Code) to find regenerable folders like node_modules, venvs, target, and build.")
+        return "Choose a projects folder (e.g. ~/Code) to find regenerable folders like node_modules, venvs, target, and build."
     }
 
     private var emptyMessage: String {
         if controller.rootRefused {
-            return String(localized: "Choose your projects folder, not a system folder or Library.")
+            return "Choose your projects folder, not a system folder or Library."
         }
-        return String(localized: "No project junk found")
+        return "No project junk found"
     }
 
     var body: some View {
         ModuleContainerView(
-            title: String(localized: "Project Junk"),
+            title: "Project Junk",
             subtitle: subtitle,
             theme: .cleanup,
             emptyMessage: emptyMessage,
@@ -62,7 +62,7 @@ struct ProjectJunkView: View {
                     showPicker = true
                 } label: {
                     Label(
-                        String(localized: "Choose Custom Folder…"),
+                        "Choose Custom Folder…",
                         systemImage: "folder.badge.plus"
                     )
                     .font(.system(size: 12.5, weight: .medium))
@@ -127,7 +127,7 @@ struct ProjectJunkView: View {
                     showPicker = true
                 } label: {
                     Label(
-                        String(localized: "Choose Folder…"),
+                        "Choose Folder…",
                         systemImage: "folder"
                     )
                 }
@@ -244,8 +244,8 @@ struct ProjectJunkView: View {
         .background((isWarning ? Color.orange : Color.green).opacity(0.12), in: Capsule())
         .help(
             isWarning
-                ? String(localized: "This Git repository has uncommitted or unpushed changes")
-                : String(localized: "Working tree clean")
+                ? "This Git repository has uncommitted or unpushed changes"
+                : "Working tree clean"
         )
     }
 
@@ -258,7 +258,7 @@ struct ProjectJunkView: View {
             parts.append("↑\(status.ahead)")
         }
         if !status.hasUpstream {
-            parts.append(String(localized: "unpushed"))
+            parts.append("unpushed")
         }
         if parts.isEmpty {
             return status.branch

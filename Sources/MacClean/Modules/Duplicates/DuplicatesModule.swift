@@ -4,7 +4,7 @@ import MacCleanKit
 
 public struct DuplicatesModule: ScanModule {
     public let id = "duplicates"
-    public var name: String { String(localized: "Duplicates") }
+    public var name: String { "Duplicates" }
     public let category = ModuleCategory.files
     public let includedInSmartScan = false
 

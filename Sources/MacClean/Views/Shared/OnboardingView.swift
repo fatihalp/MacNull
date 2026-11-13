@@ -99,8 +99,8 @@ struct OnboardingView: View {
                 .frame(maxWidth: 420)
 
             VStack(alignment: .leading, spacing: 8) {
-                step("1", String(localized: "Open System Settings"))
-                step("2", String(localized: "Go to Privacy & Security → Full Disk Access"))
+                step("1", "Open System Settings")
+                step("2", "Go to Privacy & Security → Full Disk Access")
                 step("3", "Click the + button and add \(MCConstants.appName)")
                 step("4", "Restart \(MCConstants.appName)")
             }
@@ -121,12 +121,12 @@ struct OnboardingView: View {
                 .font(.system(size: 24, weight: .bold))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                featureCard("trash.circle", String(localized: "System Junk"), String(localized: "Clean caches, logs, and temp files"))
-                featureCard("shield.lefthalf.filled", String(localized: "Malware Scan"), String(localized: "Detect and remove threats"))
-                featureCard("xmark.app", String(localized: "Uninstaller"), String(localized: "Completely remove apps"))
-                featureCard("chart.pie", String(localized: "Space Lens"), String(localized: "Visualize disk usage"))
-                featureCard("plus.square.on.square", String(localized: "Duplicates"), String(localized: "Find duplicate files"))
-                featureCard("gauge.with.dots.needle.67percent", String(localized: "Performance"), String(localized: "Optimize your Mac"))
+                featureCard("trash.circle", "System Junk", "Clean caches, logs, and temp files")
+                featureCard("shield.lefthalf.filled", "Malware Scan", "Detect and remove threats")
+                featureCard("xmark.app", "Uninstaller", "Completely remove apps")
+                featureCard("chart.pie", "Space Lens", "Visualize disk usage")
+                featureCard("plus.square.on.square", "Duplicates", "Find duplicate files")
+                featureCard("gauge.with.dots.needle.67percent", "Performance", "Optimize your Mac")
             }
             .frame(maxWidth: 450)
         }

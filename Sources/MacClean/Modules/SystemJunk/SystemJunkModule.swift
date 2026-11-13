@@ -4,7 +4,7 @@ import MacCleanKit
 
 public struct SystemJunkModule: ScanModule {
     public let id = "system_junk"
-    public var name: String { String(localized: "System Junk") }
+    public var name: String { "System Junk" }
     public let category = ModuleCategory.cleanup
 
     private let scanner = TargetedScanner()
@@ -16,7 +16,6 @@ public struct SystemJunkModule: ScanModule {
         SystemCacheCategory(),
         UserLogCategory(),
         SystemLogCategory(),
-        LanguageFilesCategory(),
         BrokenPreferencesCategory(),
         BrokenLoginItemsCategory(),
         DocumentVersionsCategory(),

@@ -100,7 +100,7 @@ struct DiskHogsView: View {
                 if let bytes = controller.dockerDiskImageSize {
                     lockedRow(infoLabel(
                         title: DiskHogsText.dockerDiskImage + "  ·  " + DiskHogsText.size + " "
-                            + ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file),
+                            + FileSizeFormatter.format(bytes),
                         note: DiskHogsText.dockerDiskImageNote
                     ))
                 }
@@ -196,7 +196,7 @@ struct DiskHogsView: View {
 
     private func runtimeDetail(_ runtime: SimulatorRuntime) -> String {
         guard let bytes = runtime.sizeBytes, bytes > 0 else { return DiskHogsText.olderRuntime }
-        return DiskHogsText.olderRuntime + "  ·  " + ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+        return DiskHogsText.olderRuntime + "  ·  " + FileSizeFormatter.format(bytes)
     }
 
     private var pruneConfirmMessage: String {

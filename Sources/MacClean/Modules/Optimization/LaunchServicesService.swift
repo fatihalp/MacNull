@@ -67,7 +67,7 @@ public final class LaunchServicesService: @unchecked Sendable {
 
         guard let plistData = NSMutableDictionary(contentsOfFile: plistPath) else {
             throw LaunchServicesError.deleteFailed(
-                String(localized: "Cannot read plist")
+                "Cannot read plist"
             )
         }
 
@@ -85,7 +85,7 @@ public final class LaunchServicesService: @unchecked Sendable {
 
         guard plistData.write(toFile: plistPath, atomically: true) else {
             throw LaunchServicesError.deleteFailed(
-                String(localized: "Cannot write plist")
+                "Cannot write plist"
             )
         }
     }

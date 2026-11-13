@@ -31,7 +31,7 @@ final class ExtensionsController {
         isRemoving = true
         let urls = client.trashURLs(from: [item])
         guard !urls.isEmpty else {
-            errorMessage = String(localized: "This item was refused for safety reasons.")
+            errorMessage = "This item was refused for safety reasons."
             isRemoving = false
             return
         }

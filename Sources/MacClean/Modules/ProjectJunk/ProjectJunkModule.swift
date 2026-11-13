@@ -3,7 +3,7 @@ import MacCleanKit
 
 public struct ProjectJunkModule: ScanModule {
     public let id = "projectJunk"
-    public var name: String { String(localized: "Project Junk") }
+    public var name: String { "Project Junk" }
     public let category = ModuleCategory.cleanup
     public var includedInSmartScan: Bool { true }
 

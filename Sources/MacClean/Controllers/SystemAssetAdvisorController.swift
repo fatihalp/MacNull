@@ -35,9 +35,4 @@ public final class SystemAssetAdvisorController {
         guard let url: URL = item.settingsURL else { return }
         NSWorkspace.shared.open(url)
     }
-
-    public func openSettingsDirectly(urlString: String) {
-        guard let url: URL = URL(string: urlString) else { return }
-        NSWorkspace.shared.open(url)
-    }
 }

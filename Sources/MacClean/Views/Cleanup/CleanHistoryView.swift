@@ -79,7 +79,7 @@ struct CleanHistoryView: View {
         }
         .task { await controller.reload() }
         .alert(
-            String(localized: "Restore this clean?"),
+            "Restore this clean?",
             isPresented: Binding(
                 get: { pendingRestore != nil },
                 set: { if !$0 { pendingRestore = nil } }
@@ -96,7 +96,7 @@ struct CleanHistoryView: View {
             Text(Self.restoreMessage(for: session))
         }
         .alert(
-            String(localized: "Restore finished"),
+            "Restore finished",
             isPresented: Binding(
                 get: { controller.lastSummary != nil },
                 set: { if !$0 { controller.lastSummary = nil } }
@@ -109,7 +109,7 @@ struct CleanHistoryView: View {
             }
         }
         .alert(
-            String(localized: "Clear clean history?"),
+            "Clear clean history?",
             isPresented: $confirmClear
         ) {
             Button("Cancel", role: .cancel) {}
@@ -128,24 +128,24 @@ struct CleanHistoryView: View {
     static func restoreMessage(for session: CleanHistorySession) -> String {
         var lines = [
             itemCount(session.items.count),
-            String(localized: "Each item goes back to its original place. A file already at that place is never overwritten."),
+            "Each item goes back to its original place. A file already at that place is never overwritten.",
         ]
         if let omitted = session.omittedCount, omitted > 0 {
-            lines.append(String(format: String(localized: "This clean was too large to track in full: only the first %ld items can be restored. The other %ld are still in the Trash, and you can put them back from Finder."), session.items.count, omitted))
+            lines.append(String(format: "This clean was too large to track in full: only the first %ld items can be restored. The other %ld are still in the Trash, and you can put them back from Finder.", session.items.count, omitted))
         }
         return lines.joined(separator: "\n\n")
     }
 
     static func summaryMessage(_ summary: CleanHistoryRestoreSummary) -> String {
-        var lines = [String(format: String(localized: "Restored: %ld"), summary.restored)]
+        var lines = [String(format: "Restored: %ld", summary.restored)]
         if summary.emptied > 0 {
-            lines.append(String(format: String(localized: "Already emptied from the Trash: %ld"), summary.emptied))
+            lines.append(String(format: "Already emptied from the Trash: %ld", summary.emptied))
         }
         if summary.reappeared > 0 {
-            lines.append(String(format: String(localized: "Skipped, original place taken: %ld"), summary.reappeared))
+            lines.append(String(format: "Skipped, original place taken: %ld", summary.reappeared))
         }
         if summary.failed > 0 {
-            lines.append(String(format: String(localized: "Couldn't restore: %ld"), summary.failed))
+            lines.append(String(format: "Couldn't restore: %ld", summary.failed))
         }
         return lines.joined(separator: "\n")
     }

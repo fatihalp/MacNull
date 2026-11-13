@@ -62,7 +62,7 @@ struct ExtensionsView: View {
             canScan: !controller.isLoading && !controller.isRemoving
         )
         .alert(
-            String(localized: "Move to Trash?"),
+            "Move to Trash?",
             isPresented: Binding(
                 get: { pendingRemove != nil },
                 set: { if !$0 { pendingRemove = nil } }
@@ -79,7 +79,7 @@ struct ExtensionsView: View {
             Text("\(item.name) will be moved to the Trash. You can restore it from the Trash if needed.")
         }
         .alert(
-            String(localized: "Extensions"),
+            "Extensions",
             isPresented: Binding(
                 get: { controller.errorMessage != nil },
                 set: { if !$0 { controller.errorMessage = nil } }
@@ -103,14 +103,14 @@ struct ExtensionsView: View {
                 if controller.items.contains(where: { $0.kind == .preferencePane }) {
                     section(
                         kind: .preferencePane,
-                        title: String(localized: "Preference Panes"),
+                        title: "Preference Panes",
                         icon: "slider.horizontal.3"
                     )
                 }
                 if controller.items.contains(where: { $0.kind == .internetPlugin }) {
                     section(
                         kind: .internetPlugin,
-                        title: String(localized: "Internet Plug-Ins"),
+                        title: "Internet Plug-Ins",
                         icon: "puzzlepiece.extension"
                     )
                 }
@@ -141,7 +141,7 @@ struct ExtensionsView: View {
         } header: {
             HStack {
                 Label(
-                    String(localized: "Safari Extensions"),
+                    "Safari Extensions",
                     systemImage: "safari"
                 )
                 .font(.system(size: 13, weight: .semibold))
@@ -174,7 +174,7 @@ struct ExtensionsView: View {
 
     private func row(_ item: ManagedExtension) -> some View {
         HStack(spacing: 10) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: item.path.path(percentEncoded: false)))
+            Image(nsImage: AppIconProvider.icon(forPath: item.path.path(percentEncoded: false)))
                 .resizable()
                 .frame(width: 22, height: 22)
             VStack(alignment: .leading, spacing: 1) {
@@ -234,8 +234,8 @@ struct ExtensionsView: View {
 
     private func subtitle(for item: ManagedExtension) -> String {
         let location = item.domain == .user
-            ? String(localized: "User")
-            : String(localized: "This Mac")
+            ? "User"
+            : "This Mac"
         if let host = item.hostAppPath {
             return "\(location) · \(host.deletingPathExtension().lastPathComponent)"
         }

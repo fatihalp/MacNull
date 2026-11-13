@@ -15,7 +15,6 @@ public enum MCConstants {
     public static let maxTotalItemsPerCleanOperation = 500_000
 
     public static let cleanConfirmationThreshold = 50_000
-    public static let scanThrottleInterval: TimeInterval = 0.05
 
     public static let protectedPaths: Set<String> = [
         "/System",
@@ -136,9 +135,7 @@ public enum MCConstants {
     public static let xcodePreviews = userLibrary.appending(path: "Developer/Xcode/UserData/Previews")
 
     public static let safariCache = userLibrary.appending(path: "Caches/com.apple.Safari")
-    public static let chromeDefault = userAppSupport.appending(path: "Google/Chrome/Default")
     public static let chromeCache = userCaches.appending(path: "Google/Chrome")
-    public static let firefoxProfiles = userAppSupport.appending(path: "Firefox/Profiles")
     public static let firefoxCache = userCaches.appending(path: "Firefox/Profiles")
 
     public static let mailData = userLibrary.appending(path: "Mail")
@@ -147,9 +144,7 @@ public enum MCConstants {
         .appending(path: "com.apple.mail/Data/Library/Mail Downloads")
 
     public static let homebrewCache = userCaches.appending(path: "Homebrew")
-    public static let npmCache = userCaches.appending(path: "npm")
     public static let pipCache = userCaches.appending(path: "pip")
-    public static let cargoRegistry = home.appending(path: ".cargo/registry")
 
     public static let npmCacache = home.appending(path: ".npm/_cacache")
     public static let yarnCache = userCaches.appending(path: "Yarn")
@@ -228,15 +223,9 @@ public enum MCConstants {
             ]
     }
 
-    public static let claudeCache = home.appending(path: ".claude/cache")
-    public static let claudePasteCache = home.appending(path: ".claude/paste-cache")
-    public static let claudeShellSnapshots = home.appending(path: ".claude/shell-snapshots")
-    public static let codexTmp = home.appending(path: ".codex/.tmp")
-    public static let codexCache = home.appending(path: ".codex/cache")
     public static let openClawHome = home.appending(path: ".openclaw")
     public static let openClawLogs = openClawHome.appending(path: "logs")
     public static let openClawWorkspace = openClawHome.appending(path: "workspace")
-    public static let codexRuntimesCache = home.appending(path: ".cache/codex-runtimes")
     public static let opencodeCache = home.appending(path: ".cache/opencode")
     public static let phpactorCache = home.appending(path: ".cache/phpactor")
     public static let copilotSdkCache = userCaches.appending(path: "github-copilot-sdk")
@@ -381,17 +370,6 @@ public enum MCConstants {
             userCaches.appending(path: "com.spotify.client"),
         ]
     }
-
-    public static let preservedLanguages: Set<String> = [
-        "en.lproj", "English.lproj", "Base.lproj", "en_US.lproj", "en_GB.lproj",
-        "zh.lproj", "zh-Hans.lproj", "zh-Hant.lproj", "zh_CN.lproj", "zh_TW.lproj",
-        "Chinese.lproj", "Simplified Chinese.lproj", "Traditional Chinese.lproj",
-        "ru.lproj", "ru-RU.lproj", "ru_RU.lproj", "Russian.lproj",
-        "de.lproj", "de-DE.lproj", "de_DE.lproj", "de-AT.lproj", "de_AT.lproj",
-        "de-CH.lproj", "de_CH.lproj", "German.lproj",
-        "fr.lproj", "fr-FR.lproj", "fr_FR.lproj", "French.lproj",
-        "it.lproj", "it-IT.lproj", "it_IT.lproj", "it-CH.lproj", "it_CH.lproj", "Italian.lproj",
-    ]
 
     public static let operationLogDir = userLogs.appending(path: "MacClean")
     public static let operationLogFile = operationLogDir.appending(path: "operations.log")

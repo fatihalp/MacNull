@@ -32,10 +32,6 @@ public final class MenuBarLauncher {
     private var helperTerminationObserver: NSObjectProtocol?
     private var isLaunchingHelper = false
 
-    public var isRegistered: Bool {
-        service.status == .enabled
-    }
-
     public var status: SMAppService.Status {
         service.status
     }

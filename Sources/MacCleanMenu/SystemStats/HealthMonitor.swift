@@ -31,7 +31,7 @@ public actor HealthMonitor {
         if SharedAppState.recentlyNotified(kind: "disk_low", throttle: 15 * 60) { return }
         await fire(
             kind: "disk_low",
-            title: String(localized: "Storage critical"),
+            title: "Storage critical",
             body: "Only \(FileSizeFormatter.format(stats.diskFree)) free on your startup disk. Open \(MCConstants.appName) to free up space."
         )
     }
@@ -49,7 +49,7 @@ public actor HealthMonitor {
         memoryPressureSampleStreak = 0
         await fire(
             kind: "memory_high",
-            title: String(localized: "Memory pressure high"),
+            title: "Memory pressure high",
             body: "Sustained \(Int(stats.memoryPressure * 100))% memory pressure. \(MCConstants.appName)'s Maintenance module can free up RAM."
         )
     }
@@ -70,7 +70,7 @@ public actor HealthMonitor {
         if SharedAppState.recentlyNotified(kind: "battery_cycles", throttle: 7 * 24 * 3600) { return }
         await fire(
             kind: "battery_cycles",
-            title: String(localized: "Battery cycle count high"),
+            title: "Battery cycle count high",
             body: "Your battery has been through \(cycles) cycles. Apple rates most batteries for ~1000 before noticeable wear."
         )
     }

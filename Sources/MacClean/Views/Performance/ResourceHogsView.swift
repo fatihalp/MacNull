@@ -136,9 +136,8 @@ private struct ResourceHogRowView: View {
 
     @ViewBuilder
     private var appIcon: some View {
-        if let bid = row.snapshot.bundleIdentifier,
-           let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bid) {
-            Image(nsImage: NSWorkspace.shared.icon(forFile: url.path(percentEncoded: false)))
+        if let icon = row.snapshot.bundleIdentifier.flatMap(AppIconProvider.icon(forBundleID:)) {
+            Image(nsImage: icon)
                 .resizable()
         } else {
             Image(systemName: "app.dashed")

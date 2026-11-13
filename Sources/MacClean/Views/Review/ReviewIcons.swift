@@ -57,7 +57,6 @@ struct ReviewCategoryIcon: View {
         case .xcodeJunk: "hammer.fill"
         case .universalBinaries: "circle.lefthalf.filled"
         case .userLogs, .systemLogs: "doc.text.fill"
-        case .languageFiles: "bubble.left.fill"
         case .documentVersions: "checkmark.circle.fill"
         case .brokenLoginItems: "person.slash.fill"
         case .iosDeviceBackups: "arrow.clockwise.circle.fill"
@@ -73,28 +72,9 @@ struct ReviewFileIcon: View {
     let path: String
 
     var body: some View {
-        Image(nsImage: ReviewIconCache.icon(for: path))
+        Image(nsImage: AppIconProvider.icon(forPathOrBundleID: path))
             .resizable()
             .interpolation(.high)
             .aspectRatio(contentMode: .fit)
-    }
-}
-
-@MainActor
-enum ReviewIconCache {
-    private static let cache = NSCache<NSString, NSImage>()
-
-    static func icon(for path: String) -> NSImage {
-        if let cached = cache.object(forKey: path as NSString) { return cached }
-        let image: NSImage
-        if FileManager.default.fileExists(atPath: path) {
-            image = NSWorkspace.shared.icon(forFile: path)
-        } else if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: path) {
-            image = NSWorkspace.shared.icon(forFile: appURL.path(percentEncoded: false))
-        } else {
-            image = NSWorkspace.shared.icon(forFile: path)
-        }
-        cache.setObject(image, forKey: path as NSString)
-        return image
     }
 }

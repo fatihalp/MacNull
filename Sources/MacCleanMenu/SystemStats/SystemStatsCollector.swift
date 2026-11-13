@@ -10,6 +10,10 @@ public actor SystemStatsCollector {
         public let gpuUsage: Double?
         public let memoryTotal: UInt64
         public let memoryUsed: UInt64
+
+        public var memoryUsedFraction: Double {
+            memoryTotal > 0 ? Double(memoryUsed) / Double(memoryTotal) : 0
+        }
         public let memoryPressure: Double
         public let swapUsed: UInt64
         public let diskTotal: UInt64

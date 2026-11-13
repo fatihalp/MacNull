@@ -19,10 +19,6 @@ public struct SystemHardwareSpecs: Sendable {
     public let isCharging: Bool
     public let uptime: TimeInterval
 
-    public var memoryUsedFraction: Double {
-        memoryTotal > 0 ? Double(memoryUsed) / Double(memoryTotal) : 0
-    }
-
     public var diskUsedFraction: Double {
         diskTotal > 0 && diskTotal >= diskFree ? Double(diskTotal - diskFree) / Double(diskTotal) : 0
     }
@@ -37,14 +33,6 @@ public struct SystemHardwareSpecs: Sendable {
 
     public var diskPurgeableFormatted: String {
         FileSizeFormatter.format(diskPurgeable)
-    }
-
-    public var memoryUsedFormatted: String {
-        FileSizeFormatter.format(memoryUsed)
-    }
-
-    public var memoryTotalFormatted: String {
-        FileSizeFormatter.format(memoryTotal)
     }
 
     public var diskFreeFormatted: String {

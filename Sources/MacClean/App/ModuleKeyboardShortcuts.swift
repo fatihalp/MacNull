@@ -47,16 +47,3 @@ extension View {
         ))
     }
 }
-
-enum DuplicatesShortcutOwnership {
-    enum CleanOwner: Equatable {
-        case none
-        case container
-    }
-
-    static let outerCanClean = false
-
-    static func cleanOwner(showingContainerResults: Bool) -> CleanOwner {
-        showingContainerResults ? .container : .none
-    }
-}
