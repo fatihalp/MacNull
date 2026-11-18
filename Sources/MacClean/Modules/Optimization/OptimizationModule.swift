@@ -78,7 +78,7 @@ public final class AutoStartManager: @unchecked Sendable {
         }
     }
 
-    public func openConfigInFinder(_ item: AutoStartItem) {
+    @MainActor public func openConfigInFinder(_ item: AutoStartItem) {
         guard let path = item.configFilePath else { return }
         WorkspaceActions.revealInFinder(URL(fileURLWithPath: path))
     }
