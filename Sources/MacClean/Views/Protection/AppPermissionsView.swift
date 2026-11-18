@@ -13,7 +13,7 @@ struct AppPermissionsView: View {
                     Text("Permissions")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(.primary)
-                    Text("See which privacy grants each app holds. This list is read-only — buttons open System Settings. MacNull cannot turn a permission off.")
+                    Text("See which privacy grants each app holds. This list is read-only - buttons open System Settings. MacNull cannot turn a permission off.")
                     .font(.system(size: 12))
                     .foregroundStyle(.primary.opacity(0.6))
                 }
@@ -36,7 +36,7 @@ struct AppPermissionsView: View {
                         ProgressView()
                             .controlSize(.large)
                             .tint(.primary)
-                        Text("Reading permissions…")
+                        Text("Reading permissions...")
                             .font(.system(size: 13))
                             .foregroundStyle(.primary.opacity(0.6))
                         Spacer()

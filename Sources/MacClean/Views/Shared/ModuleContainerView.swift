@@ -154,7 +154,7 @@ struct ModuleContainerView: View {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(summary.topErrorGroups, id: \.message) { group in
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text("\(group.count.formatted())×")
+                        Text("\(group.count.formatted())x")
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                             .foregroundStyle(.primary.opacity(0.6))
                             .frame(minWidth: 50, alignment: .trailing)
@@ -167,7 +167,7 @@ struct ModuleContainerView: View {
                 }
                 if summary.errorCount > summary.topErrorGroups.reduce(0, { $0 + $1.count }) {
                     let shownTotal = summary.topErrorGroups.reduce(0) { $0 + $1.count }
-                    Text("…and \((summary.errorCount - shownTotal).formatted()) more")
+                    Text("...and \((summary.errorCount - shownTotal).formatted()) more")
                         .font(.system(size: 11))
                         .foregroundStyle(.primary.opacity(0.5))
                         .padding(.top, 2)
@@ -192,7 +192,7 @@ struct ModuleContainerView: View {
             ScanProgressRing(
                 progress: progress.fraction,
                 phase: progress.totalItems > 0
-                    ? "Cleaning… \(Int((progress.fraction * 100).rounded()))%"
+                    ? "Cleaning... \(Int((progress.fraction * 100).rounded()))%"
                     : "Starting cleanup...",
                 theme: theme
             )
@@ -255,7 +255,7 @@ struct ModuleContainerView: View {
             Text(emptyMessage)
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(.primary)
-            Text("Scan complete — nothing to clean up")
+            Text("Scan complete - nothing to clean up")
                 .font(.system(size: 13))
                 .foregroundStyle(.primary.opacity(0.55))
             Button("Done") { onReset() }
@@ -428,7 +428,7 @@ struct ModuleContainerView: View {
                     .foregroundStyle(.primary)
                 if summary.removedCount < summary.selectedCount {
                     Text("\(summary.removedCount) of \(summary.selectedCount) items removed" +
-                         (summary.errorCount > 0 ? " — \(summary.errorCount) error\(summary.errorCount == 1 ? "" : "s")" : ""))
+                         (summary.errorCount > 0 ? " - \(summary.errorCount) error\(summary.errorCount == 1 ? "" : "s")" : ""))
                         .font(.system(size: 12))
                         .foregroundStyle(.primary.opacity(0.65))
                 }

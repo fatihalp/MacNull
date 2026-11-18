@@ -86,7 +86,7 @@ enum PreferredWiFiClientError: Error, Equatable {
         case .invalidDevice:
             "The Wi-Fi interface name was invalid, so the action was cancelled."
         case .adminCancelled:
-            "Cancelled — administrator access was not granted."
+            "Cancelled - administrator access was not granted."
         case .commandFailed(let message):
             message.isEmpty
                 ? "Couldn't update saved Wi-Fi networks."

@@ -165,27 +165,4 @@ public final class LaunchServicesService: @unchecked Sendable {
         }
         return false
     }
-
-    public func getAppInfo(for bundleId: String?) -> (name: String, icon: NSImage)? {
-        guard let bid = bundleId, !bid.isEmpty,
-              let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bid) else {
-            return nil
-        }
-        let name = FileManager.default.displayName(atPath: url.path)
-        let icon = NSWorkspace.shared.icon(forFile: url.path)
-        icon.size = NSSize(width: 32, height: 32)
-        return (name, icon)
-    }
-
-    public func getURLSchemeAppInfo(for scheme: String?) -> (name: String, icon: NSImage)? {
-        guard let s = scheme, !s.isEmpty,
-              let url = URL(string: "\(s)://test"),
-              let appURL = NSWorkspace.shared.urlForApplication(toOpen: url) else {
-            return nil
-        }
-        let name = FileManager.default.displayName(atPath: appURL.path)
-        let icon = NSWorkspace.shared.icon(forFile: appURL.path)
-        icon.size = NSSize(width: 32, height: 32)
-        return (name, icon)
-    }
 }

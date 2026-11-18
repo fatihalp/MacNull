@@ -27,7 +27,7 @@ struct SpaceLensView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(.primary.opacity(0.6))
                     if !controller.totalFormattedSize.isEmpty {
-                        Text("·")
+                        Text("-")
                             .foregroundStyle(.primary.opacity(0.3))
                         Text(controller.totalFormattedSize)
                             .font(.system(size: 12, weight: .medium))
@@ -92,7 +92,7 @@ struct SpaceLensView: View {
                 ProgressView()
                     .controlSize(.large)
                     .tint(.primary)
-                Text("Scanning disk…")
+                Text("Scanning disk...")
                     .font(.system(size: 14))
                     .foregroundStyle(.primary.opacity(0.7))
                 if controller.itemsScanned > 0 {

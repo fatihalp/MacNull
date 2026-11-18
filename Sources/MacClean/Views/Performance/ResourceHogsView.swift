@@ -34,7 +34,7 @@ struct ResourceHogsView: View {
                         ProgressView()
                             .controlSize(.large)
                             .tint(.primary)
-                        Text("Reading processes…")
+                        Text("Reading processes...")
                             .font(.system(size: 13))
                             .foregroundStyle(.primary.opacity(0.6))
                         Spacer()
@@ -128,7 +128,7 @@ private struct ResourceHogRowView: View {
                     .font(.system(size: 10))
                     .foregroundStyle(.tertiary)
                     .frame(width: 52)
-                    .help("Protected — cannot quit")
+                    .help("Protected - cannot quit")
             }
         }
         .padding(.vertical, 2)

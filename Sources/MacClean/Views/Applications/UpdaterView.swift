@@ -55,7 +55,7 @@ struct UpdaterView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(update.app.name)
                                     .font(.system(size: 13, weight: .medium))
-                                Text("\(update.currentVersion) → \(update.availableVersion ?? "?")")
+                                Text("\(update.currentVersion) -> \(update.availableVersion ?? "?")")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }

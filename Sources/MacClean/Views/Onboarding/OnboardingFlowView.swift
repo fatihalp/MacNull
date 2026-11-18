@@ -27,7 +27,7 @@ struct OnboardingFlowView: View {
                         onReview: controller.reviewEverything
                     )
                 case .cleaning:
-                    OnboardingProgressStep(title: "Moving to Trash…")
+                    OnboardingProgressStep(title: "Moving to Trash...")
                 case .cleaned:
                     OnboardingCleanedStep(bytes: controller.safeBytes, onContinue: controller.continueAfterCleaning)
                 case .fullDiskAccess:

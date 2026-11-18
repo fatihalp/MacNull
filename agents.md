@@ -34,7 +34,7 @@
 ## Workspace Structure
 
 ```
-MacSai/
+MacNull/
 ├── Package.swift                    # SwiftPM manifest (MacClean, MacCleanMenu, MacCleanKit)
 ├── agents.md                        # Agent guidelines and architectural documentation
 ├── Sources/
@@ -81,6 +81,7 @@ The unified entry point in `Sources/MacClean/Main.swift` inspects arguments on s
 - Views never touch `FileManager`, `NSWorkspace` lookups, `Process`, or background tasks directly; that work lives in a controller or service.
 - Byte sizes are formatted only through `FileSizeFormatter.format(_:)`.
 - App and file icons are resolved only through `AppIconProvider`.
+- Finder reveals, URL opens, and clipboard writes from the UI go through `WorkspaceActions`.
 - There are no test targets; correctness is verified with `swift build` and the CLI.
 
 ## Build & Verification Standards

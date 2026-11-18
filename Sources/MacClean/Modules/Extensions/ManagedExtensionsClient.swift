@@ -35,12 +35,12 @@ struct ManagedExtensionsClient: Sendable {
             pluginKitOutput: { await Self.runPluginKit() },
             openURL: { url in
                 Task { @MainActor in
-                    NSWorkspace.shared.open(url)
+                    WorkspaceActions.open(url)
                 }
             },
             reveal: { url in
                 Task { @MainActor in
-                    NSWorkspace.shared.activateFileViewerSelecting([url])
+                    WorkspaceActions.revealInFinder(url)
                 }
             }
         )

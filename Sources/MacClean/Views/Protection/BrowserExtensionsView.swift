@@ -147,7 +147,7 @@ struct BrowserExtensionsView: View {
         var parts = [ext.browser.label]
         if !ext.profile.isEmpty { parts.append(ext.profile) }
         parts.append(date)
-        return parts.joined(separator: " · ")
+        return parts.joined(separator: " - ")
     }
 
     private func actionLabel(for ext: BrowserExtensionRecord) -> String {

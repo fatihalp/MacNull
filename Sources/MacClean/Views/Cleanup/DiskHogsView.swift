@@ -99,7 +99,7 @@ struct DiskHogsView: View {
             Section {
                 if let bytes = controller.dockerDiskImageSize {
                     lockedRow(infoLabel(
-                        title: DiskHogsText.dockerDiskImage + "  ·  " + DiskHogsText.size + " "
+                        title: DiskHogsText.dockerDiskImage + "  -  " + DiskHogsText.size + " "
                             + FileSizeFormatter.format(bytes),
                         note: DiskHogsText.dockerDiskImageNote
                     ))
@@ -147,7 +147,7 @@ struct DiskHogsView: View {
     }
 
     private func dockerRowLabel(_ row: DockerDiskRow) -> some View {
-        infoLabel(title: row.category.label + "  ·  " + DiskHogsText.size + " " + row.size, note: row.category.pruneNote)
+        infoLabel(title: row.category.label + "  -  " + DiskHogsText.size + " " + row.size, note: row.category.pruneNote)
     }
 
     private func infoLabel(title: String, note: String) -> some View {
@@ -165,7 +165,7 @@ struct DiskHogsView: View {
             Section(DiskHogsText.xcodeSection) {
                 ForEach(controller.devices) { device in
                     simToggle(id: device.udid, title: device.name,
-                              detail: DiskHogsText.unavailableSimulator + "  ·  " + device.runtimeDisplayName)
+                              detail: DiskHogsText.unavailableSimulator + "  -  " + device.runtimeDisplayName)
                 }
                 ForEach(controller.runtimes) { runtime in
                     simToggle(id: runtime.identifier, title: runtime.name,
@@ -196,17 +196,17 @@ struct DiskHogsView: View {
 
     private func runtimeDetail(_ runtime: SimulatorRuntime) -> String {
         guard let bytes = runtime.sizeBytes, bytes > 0 else { return DiskHogsText.olderRuntime }
-        return DiskHogsText.olderRuntime + "  ·  " + FileSizeFormatter.format(bytes)
+        return DiskHogsText.olderRuntime + "  -  " + FileSizeFormatter.format(bytes)
     }
 
     private var pruneConfirmMessage: String {
-        let lines = DockerPrune.commands(for: controller.selectedDocker).map { "• \($0.category.label): \($0.category.pruneNote)" }
+        let lines = DockerPrune.commands(for: controller.selectedDocker).map { "- \($0.category.label): \($0.category.pruneNote)" }
         return (lines + ["", DiskHogsText.permanentNote]).joined(separator: "\n")
     }
 
     private var deleteConfirmMessage: String {
-        var lines = controller.selectedDevices.map { "• \($0.name) (\(DiskHogsText.unavailableSimulator))" }
-        lines += controller.selectedRuntimes.map { "• \($0.name) (\(runtimeDetail($0)))" }
+        var lines = controller.selectedDevices.map { "- \($0.name) (\(DiskHogsText.unavailableSimulator))" }
+        lines += controller.selectedRuntimes.map { "- \($0.name) (\(runtimeDetail($0)))" }
         if !controller.selectedRuntimes.isEmpty { lines += ["", DiskHogsText.runtimeShutdownNote] }
         return (lines + ["", DiskHogsText.permanentNote]).joined(separator: "\n")
     }

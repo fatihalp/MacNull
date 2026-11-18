@@ -45,7 +45,7 @@ struct SupportCard: View {
                     Text("That cleanup cost you nothing.")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
-                    Text("No subscription, no ads, no tracking. I build Mac Sai on nights and weekends with a few volunteers. If it saved you from paying for a cleaner, a coffee keeps it free for everyone.")
+                    Text("No subscription, no ads, no tracking. I build \(MCConstants.appName) on nights and weekends with a few volunteers. If it saved you from paying for a cleaner, a coffee keeps it free for everyone.")
                     .font(.system(size: 12.5))
                     .foregroundStyle(.primary.opacity(0.68))
                     .lineSpacing(2)
@@ -124,7 +124,7 @@ struct SupportCard: View {
     }
 
     private func support() {
-        NSWorkspace.shared.open(MCConstants.supportURL)
+        WorkspaceActions.open(MCConstants.supportURL)
         SupportPrompt.optOut()
         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { phase = .thanked }
         cupBounce += 1

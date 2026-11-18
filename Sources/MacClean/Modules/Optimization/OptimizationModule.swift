@@ -80,7 +80,7 @@ public final class AutoStartManager: @unchecked Sendable {
 
     public func openConfigInFinder(_ item: AutoStartItem) {
         guard let path = item.configFilePath else { return }
-        NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
+        WorkspaceActions.revealInFinder(URL(fileURLWithPath: path))
     }
 
     private func loadLoginItemsViaSystemEvents() -> [AutoStartItem] {

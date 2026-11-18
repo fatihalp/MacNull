@@ -61,7 +61,7 @@ public struct ScanProgressRing: View {
                 .frame(width: 260)
 
             VStack(spacing: 4) {
-                Text("\(Int(progress * 100))% · \(phase)")
+                Text("\(Int(progress * 100))% - \(phase)")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(.primary)
                     .lineLimit(1)

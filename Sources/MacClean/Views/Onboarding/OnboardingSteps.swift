@@ -32,7 +32,7 @@ struct OnboardingScanStep: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            Text("Running your first scan…")
+            Text("Running your first scan...")
                 .font(.system(size: 22, weight: .semibold))
             ProgressView(value: progress)
                 .frame(maxWidth: 420)

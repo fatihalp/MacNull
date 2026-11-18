@@ -100,17 +100,17 @@ public enum MaintenanceTask: String, CaseIterable, Identifiable, Sendable {
         case .freeUpPurgeableSpace:
             "Time Machine local snapshots that macOS already flagged for cleanup are removed; nothing the user actively needs is deleted."
         case .runMaintenanceScripts:
-            "No visible effect — these are the same scripts macOS runs on its own overnight."
+            "No visible effect - these are the same scripts macOS runs on its own overnight."
         case .verifyStartupDisk:
-            "A few minutes of disk activity. Read-only — nothing on disk is changed regardless of the outcome."
+            "A few minutes of disk activity. Read-only - nothing on disk is changed regardless of the outcome."
         case .speedUpMail:
-            "Mail.app's search index is rebuilt from scratch. Mail search and unread counts will be wrong until the rebuild finishes (typically 10–30 minutes on a large mailbox)."
+            "Mail.app's search index is rebuilt from scratch. Mail search and unread counts will be wrong until the rebuild finishes (typically 10-30 minutes on a large mailbox)."
         case .rebuildLaunchServices:
             "macOS's database of \"which app opens which file type\" is erased and rebuilt. Until it finishes (often several hours), double-clicking files may fail or open the wrong app, default-app settings may reset, and launching apps via Spotlight may not work. A reboot speeds this up."
         case .reindexSpotlight:
             "Spotlight's entire search index is erased and rebuilt. Spotlight search will return empty results for several hours (longer for large home directories). System search and Smart Folders are affected too."
         case .flushDNSCache:
-            "Browsers and other network apps re-resolve hostnames on next request — milliseconds of impact."
+            "Browsers and other network apps re-resolve hostnames on next request - milliseconds of impact."
         case .thinTimeMachineSnapshots:
             "Local Time Machine snapshots are deleted to free disk space. Remote/backup-drive snapshots are unaffected; you can still restore from the Time Machine backup itself."
         case .pruneDocker:

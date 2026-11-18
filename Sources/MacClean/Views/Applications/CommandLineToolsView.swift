@@ -53,7 +53,7 @@ struct CommandLineToolsView: View {
             VStack(spacing: 12) {
                 Spacer()
                 ProgressView().controlSize(.large)
-                Text(controller.isUninstalling ? "Uninstalling…" : "Looking for tools…")
+                Text(controller.isUninstalling ? "Uninstalling..." : "Looking for tools...")
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -100,7 +100,7 @@ struct CommandLineToolsView: View {
 
     private var actionBar: some View {
         HStack(spacing: 12) {
-            Text("\(controller.selectedNames.count) selected · \(FileSizeFormatter.format(controller.selectedBytes))")
+            Text("\(controller.selectedNames.count) selected - \(FileSizeFormatter.format(controller.selectedBytes))")
                 .font(.system(size: 12.5, weight: .medium))
             if let failure = controller.failures.first {
                 Text("\(failure.name): \(failure.detail)")
@@ -109,7 +109,7 @@ struct CommandLineToolsView: View {
                     .lineLimit(1)
             }
             Spacer()
-            Button("Uninstall…") { showConfirm = true }
+            Button("Uninstall...") { showConfirm = true }
                 .buttonStyle(.borderedProminent)
                 .tint(.red)
         }

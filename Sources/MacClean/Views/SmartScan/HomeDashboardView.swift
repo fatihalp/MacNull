@@ -51,7 +51,7 @@ struct HomeDashboardView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
 
-                    Text("\(controller.specs.chipName) · \(controller.specs.cpuCores) Cores · \(controller.specs.osVersion)")
+                    Text("\(controller.specs.chipName) - \(controller.specs.cpuCores) Cores - \(controller.specs.osVersion)")
                         .font(.system(size: 11.5))
                         .foregroundStyle(.secondary)
                 }
@@ -86,7 +86,7 @@ struct HomeDashboardView: View {
                             Text(controller.specs.diskName)
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundStyle(.primary)
-                            Text("\(controller.specs.diskFormat) · \("Internal Storage")")
+                            Text("\(controller.specs.diskFormat) - \("Internal Storage")")
                                 .font(.system(size: 11))
                                 .foregroundStyle(.secondary)
                         }

@@ -361,7 +361,7 @@ struct ReviewBrowserView: View {
             }
             .buttonStyle(.plain)
 
-            Text("›")
+            Text(">")
                 .foregroundStyle(.tertiary)
 
             Text(controller.drillPath.last?.name ?? "")
@@ -559,7 +559,7 @@ struct ReviewBrowserView: View {
                 QuickLookPresenter.shared.preview(path: node.basePath)
             }
             Button("Reveal in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([URL(filePath: node.basePath)])
+                WorkspaceActions.revealInFinder(URL(filePath: node.basePath))
             }
             if !node.isLeaf {
                 Button("Show Contents") { controller.drill(into: node) }
@@ -605,7 +605,7 @@ struct ReviewBrowserView: View {
             HStack(spacing: 6) {
                 Text("\(selection.selectedCount.formatted()) Items Selected")
                     .font(.system(size: 12.5, weight: .medium))
-                Text("·")
+                Text("-")
                     .foregroundStyle(.tertiary)
                 Text(FileSizeFormatter.format(selection.selectedSize))
                     .font(.system(size: 12.5, weight: .bold))

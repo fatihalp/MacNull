@@ -297,11 +297,11 @@ public actor CleaningEngine {
     }
 
     private nonisolated func logError(path: URL, reason: String) {
-        appendLogLine("[ERROR] \(path.path(percentEncoded: false)) — \(reason)")
+        appendLogLine("[ERROR] \(path.path(percentEncoded: false)) - \(reason)")
     }
 
     private nonisolated func logSkip(path: URL, reason: String) {
-        appendLogLine("[SKIP] \(path.path(percentEncoded: false)) — \(reason)")
+        appendLogLine("[SKIP] \(path.path(percentEncoded: false)) - \(reason)")
     }
 
     private nonisolated func appendLogLine(_ body: String) {

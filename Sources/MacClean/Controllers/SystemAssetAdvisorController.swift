@@ -33,6 +33,6 @@ public final class SystemAssetAdvisorController {
 
     public func openSettings(for item: SystemAssetItem) {
         guard let url: URL = item.settingsURL else { return }
-        NSWorkspace.shared.open(url)
+        WorkspaceActions.open(url)
     }
 }

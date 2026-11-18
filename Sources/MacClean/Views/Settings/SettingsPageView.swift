@@ -65,7 +65,7 @@ struct SettingsPageView: View {
             HStack(spacing: 10) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Launch at login")
-                    Text("Open \(MCConstants.appName) automatically when you sign in to macOS. You can also manage this in System Settings → General → Login Items.")
+                    Text("Open \(MCConstants.appName) automatically when you sign in to macOS. You can also manage this in System Settings -> General -> Login Items.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -80,7 +80,7 @@ struct SettingsPageView: View {
             }
             .animation(.easeInOut(duration: 0.18), value: loginLauncher.isBusy)
             if loginLauncher.status == .requiresApproval {
-                Label("Needs approval in System Settings → General → Login Items",
+                Label("Needs approval in System Settings -> General -> Login Items",
                       systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.orange)
                     .font(.caption)
@@ -187,7 +187,7 @@ struct SettingsPageView: View {
                 }
             }
 
-            Button("Add Folder…") {
+            Button("Add Folder...") {
                 controller.addExcludedFolder()
             }
 
@@ -211,14 +211,14 @@ struct SettingsPageView: View {
                      title: "Release notes", caption: "Changelog and previous versions",
                      url: MCConstants.releasesURL)
             aboutRow(icon: "cup.and.saucer.fill", tint: .yellow,
-                     title: "Support Mac Sai", caption: "Buy the developer a coffee",
+                     title: "Support \(MCConstants.appName)", caption: "Buy the developer a coffee",
                      url: MCConstants.supportURL)
         }
     }
 
     private func aboutRow(icon: String, tint: Color, title: String, caption: String, url: URL) -> some View {
         Button {
-            NSWorkspace.shared.open(url)
+            WorkspaceActions.open(url)
         } label: {
             HStack(spacing: 12) {
                 ZStack {
@@ -281,7 +281,7 @@ struct SettingsPageView: View {
         case .enabled: return "Running"
         case .notRegistered: return "not registered"
         case .notFound: return "helper not found in bundle"
-        case .requiresApproval: return "needs approval in System Settings → Login Items"
+        case .requiresApproval: return "needs approval in System Settings -> Login Items"
         @unknown default: return "Unknown"
         }
     }

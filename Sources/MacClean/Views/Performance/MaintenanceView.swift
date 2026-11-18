@@ -115,7 +115,7 @@ struct MaintenanceView: View {
             .buttonStyle(.plain)
             .disabled(controller.isRunning(task))
             .help(task.severity == .advanced
-                  ? "Has multi-hour side effects — opens a confirmation"
+                  ? "Has multi-hour side effects - opens a confirmation"
                   : "Run this task")
         }
         .padding(.horizontal, 14)

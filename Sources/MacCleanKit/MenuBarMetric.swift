@@ -59,6 +59,6 @@ public enum MenuBarMetric: String, CaseIterable, Identifiable, Sendable {
 
     private static func formattedTemperature(_ value: Double?) -> String {
         guard let value, value.isFinite, value > 0, value <= 120 else { return "--" }
-        return "\(Int(value.rounded()))°C"
+        return "\(Int(value.rounded()))C"
     }
 }

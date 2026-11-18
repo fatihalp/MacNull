@@ -178,7 +178,7 @@ struct DuplicatesView: View {
                     .foregroundStyle(.primary.opacity(0.6))
             }
 
-            Text("Duplicate detection hashes every candidate file with SHA-256.\nLarge home folders can take 5–15 minutes.")
+            Text("Duplicate detection hashes every candidate file with SHA-256.\nLarge home folders can take 5-15 minutes.")
                 .font(.system(size: 12))
                 .foregroundStyle(.primary.opacity(0.55))
                 .multilineTextAlignment(.center)
