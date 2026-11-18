@@ -36,7 +36,7 @@ struct ExtensionsView: View {
                         ProgressView()
                             .controlSize(.large)
                             .tint(.primary)
-                        Text("Looking for extensions…")
+                        Text("Looking for extensions...")
                             .font(.system(size: 13))
                             .foregroundStyle(.primary.opacity(0.6))
                         Spacer()
@@ -134,7 +134,7 @@ struct ExtensionsView: View {
                     row(item)
                 }
             }
-            Text("Safari extensions can't be turned on, off, or deleted here — that would break the host app's signature. Manage them in Safari Settings.")
+            Text("Safari extensions can't be turned on, off, or deleted here - that would break the host app's signature. Manage them in Safari Settings.")
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
             .padding(.top, 4)
@@ -237,10 +237,10 @@ struct ExtensionsView: View {
             ? "User"
             : "This Mac"
         if let host = item.hostAppPath {
-            return "\(location) · \(host.deletingPathExtension().lastPathComponent)"
+            return "\(location) - \(host.deletingPathExtension().lastPathComponent)"
         }
         if !item.bundleIdentifier.isEmpty {
-            return "\(location) · \(item.bundleIdentifier)"
+            return "\(location) - \(item.bundleIdentifier)"
         }
         return location
     }

@@ -69,7 +69,7 @@ public actor MaintenanceExecutor {
         let err = result.error ?? ""
         if MaintenanceShell.isAuthorizationCancelled(err, errorNumber: result.errorNumber) {
             return TaskResult(task: task, success: false, output: "",
-                              error: "Cancelled — administrator access was not granted.")
+                              error: "Cancelled - administrator access was not granted.")
         }
 
         return TaskResult(task: task, success: false, output: "",
@@ -138,7 +138,7 @@ public actor MaintenanceExecutor {
         return TaskResult(
             task: .speedUpMail,
             success: true,
-            output: "Mail envelope index not found — Mail may use a different version directory.",
+            output: "Mail envelope index not found - Mail may use a different version directory.",
             error: nil
         )
     }

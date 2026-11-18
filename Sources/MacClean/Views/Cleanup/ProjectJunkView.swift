@@ -11,7 +11,7 @@ struct ProjectJunkView: View {
     private var subtitle: String {
         if let rootURL = controller.rootURL {
             let noAutoSelect = "Nothing is auto-selected."
-            return "\(rootURL.path(percentEncoded: false)) · \(noAutoSelect)"
+            return "\(rootURL.path(percentEncoded: false)) - \(noAutoSelect)"
         }
         let defaults = controller.availableDefaultRoots
         if !defaults.isEmpty {
@@ -62,7 +62,7 @@ struct ProjectJunkView: View {
                     showPicker = true
                 } label: {
                     Label(
-                        "Choose Custom Folder…",
+                        "Choose Custom Folder...",
                         systemImage: "folder.badge.plus"
                     )
                     .font(.system(size: 12.5, weight: .medium))
@@ -127,7 +127,7 @@ struct ProjectJunkView: View {
                     showPicker = true
                 } label: {
                     Label(
-                        "Choose Folder…",
+                        "Choose Folder...",
                         systemImage: "folder"
                     )
                 }
@@ -180,7 +180,7 @@ struct ProjectJunkView: View {
                     Text(projectName)
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
-                    Text("› \(folderName)")
+                    Text("> \(folderName)")
                         .font(.system(size: 12, design: .monospaced))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -223,7 +223,7 @@ struct ProjectJunkView: View {
         }
         .contextMenu {
             Button("Reveal in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([itemURL])
+                WorkspaceActions.revealInFinder(itemURL)
             }
         }
     }
@@ -255,7 +255,7 @@ struct ProjectJunkView: View {
             parts.append("\(status.dirty) dirty")
         }
         if status.ahead > 0 {
-            parts.append("↑\(status.ahead)")
+            parts.append("ahead \(status.ahead)")
         }
         if !status.hasUpstream {
             parts.append("unpushed")
@@ -263,6 +263,6 @@ struct ProjectJunkView: View {
         if parts.isEmpty {
             return status.branch
         }
-        return parts.joined(separator: " · ")
+        return parts.joined(separator: " - ")
     }
 }

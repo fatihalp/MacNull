@@ -68,21 +68,21 @@ struct SmartScanView: View {
                     .background((controller.scanMode == .deep ? Color(nsColor: .systemOrange) : Color(nsColor: .systemIndigo)).opacity(0.12))
                     .clipShape(Capsule())
 
-                    Text(isPreparing ? "Preparing Review…" : "Scanning your Mac…")
+                    Text(isPreparing ? "Preparing Review..." : "Scanning your Mac...")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(.primary)
 
                     if isPreparing {
                         HStack(spacing: 6) {
                             ProgressView().controlSize(.mini)
-                            Text("Analyzing findings for \(filesFound.formatted()) items…")
+                            Text("Analyzing findings for \(filesFound.formatted()) items...")
                                 .font(.system(size: 12.5))
                                 .foregroundStyle(.secondary)
                         }
                     } else {
                         HStack(spacing: 6) {
-                            let cleanPhase = phase.replacingOccurrences(of: "...", with: "").replacingOccurrences(of: "…", with: "")
-                            Text(cleanPhase.isEmpty ? "Checking system files…" : "\("Scanning") \(cleanPhase)…")
+                            let cleanPhase = phase.replacingOccurrences(of: "...", with: "")
+                            Text(cleanPhase.isEmpty ? "Checking system files..." : "\("Scanning") \(cleanPhase)...")
                                 .font(.system(size: 12.5))
                                 .foregroundStyle(.secondary)
                         }
@@ -188,7 +188,7 @@ struct SmartScanView: View {
                 } else {
                     HStack(spacing: 8) {
                         ProgressView().controlSize(.small)
-                        Text("Loading review…")
+                        Text("Loading review...")
                             .font(.system(size: 12.5, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -290,7 +290,7 @@ struct SmartScanView: View {
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(Color(nsColor: .systemGreen))
             } else if isActive {
-                Text("Scanning…")
+                Text("Scanning...")
                     .font(.system(size: 11.5, weight: .medium))
                     .foregroundStyle(Color(nsColor: .systemBlue))
             }
@@ -394,8 +394,8 @@ struct SmartScanView: View {
                     .foregroundStyle(controller.scanMode == .deep ? Color(nsColor: .systemOrange) : Color(nsColor: .systemIndigo))
                 Text(
                     controller.scanMode == .deep
-                    ? "Deep Clean Active — Project build outputs & developer caches auto-selected for maximum space recovery."
-                    : "Safe Clean Active — Only safe system caches selected. Code & project builds preserved."
+                    ? "Deep Clean Active - Project build outputs & developer caches auto-selected for maximum space recovery."
+                    : "Safe Clean Active - Only safe system caches selected. Code & project builds preserved."
                 )
                 .font(.system(size: 11.5, weight: .medium))
                 .foregroundStyle(.secondary)
@@ -483,7 +483,7 @@ struct SmartScanView: View {
 
                 Spacer()
 
-                Text("\(selectedCount.formatted()) \(selectedCount == 1 ? "item selected" : "items selected") · \(FileSizeFormatter.format(selectedSize))")
+                Text("\(selectedCount.formatted()) \(selectedCount == 1 ? "item selected" : "items selected") - \(FileSizeFormatter.format(selectedSize))")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
 
@@ -500,7 +500,7 @@ struct SmartScanView: View {
                 .disabled(controller.review == nil)
 
                 Button { promptClean() } label: {
-                    Text("Clean · \(FileSizeFormatter.format(selectedSize))")
+                    Text("Clean - \(FileSizeFormatter.format(selectedSize))")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color(nsColor: .systemBlue))

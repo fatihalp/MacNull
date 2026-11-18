@@ -57,7 +57,7 @@ struct UnusedAppsView: View {
                     VStack(spacing: 12) {
                         Spacer()
                         ProgressView().controlSize(.large)
-                        Text(controller.isUninstalling ? "Uninstalling…" : "Looking for unused apps…")
+                        Text(controller.isUninstalling ? "Uninstalling..." : "Looking for unused apps...")
                             .font(.system(size: 13))
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -119,7 +119,7 @@ struct UnusedAppsView: View {
                             Text(FileSizeFormatter.format(app.totalBytes))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(.secondary)
-                            Button("Uninstall…") {
+                            Button("Uninstall...") {
                                 appState.openUninstaller(forAppPath: app.path)
                             }
                             .buttonStyle(.bordered)
@@ -132,7 +132,7 @@ struct UnusedAppsView: View {
                 if !controller.selectedApps.isEmpty && !controller.isLoading && !controller.isUninstalling {
                     Divider()
                     HStack(spacing: 12) {
-                        Text("\(controller.selectedApps.count) app\(controller.selectedApps.count == 1 ? "" : "s") selected · \(FileSizeFormatter.format(controller.selectedTotalBytes))")
+                        Text("\(controller.selectedApps.count) app\(controller.selectedApps.count == 1 ? "" : "s") selected - \(FileSizeFormatter.format(controller.selectedTotalBytes))")
                             .font(.system(size: 12.5, weight: .medium))
                         Spacer()
                         Button("Deselect All") {
@@ -189,6 +189,6 @@ struct UnusedAppsView: View {
         let support = FileSizeFormatter.format(app.supportBytes)
         let lastLabel = "Last opened"
         let supportLabel = "Support files"
-        return "\(lastLabel) \(last) · \(supportLabel) \(support)"
+        return "\(lastLabel) \(last) - \(supportLabel) \(support)"
     }
 }

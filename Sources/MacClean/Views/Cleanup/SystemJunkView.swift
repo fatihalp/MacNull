@@ -175,7 +175,7 @@ struct SystemJunkView: View {
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(summary.topErrorGroups, id: \.message) { group in
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text("\(group.count.formatted())×")
+                        Text("\(group.count.formatted())x")
                             .font(.system(size: 12, weight: .semibold, design: .monospaced))
                             .foregroundStyle(.primary.opacity(0.6))
                             .frame(minWidth: 50, alignment: .trailing)
@@ -188,7 +188,7 @@ struct SystemJunkView: View {
                 }
                 let shownTotal = summary.topErrorGroups.reduce(0) { $0 + $1.count }
                 if summary.errorCount > shownTotal {
-                    Text("…and \((summary.errorCount - shownTotal).formatted()) more")
+                    Text("...and \((summary.errorCount - shownTotal).formatted()) more")
                         .font(.system(size: 11))
                         .foregroundStyle(.primary.opacity(0.5))
                         .padding(.top, 2)
@@ -212,7 +212,7 @@ struct SystemJunkView: View {
             return "Starting cleanup..."
         }
         let pct = Int((progress.fraction * 100).rounded())
-        return "Cleaning… \(pct)%"
+        return "Cleaning... \(pct)%"
     }
 
     private func doneView(summary: CleanSummary) -> some View {
@@ -252,7 +252,7 @@ struct SystemJunkView: View {
                 if summary.removedCount < summary.selectedCount {
 
                     Text("\(summary.removedCount) of \(summary.selectedCount) items removed" +
-                         (summary.errorCount > 0 ? " — \(summary.errorCount) error\(summary.errorCount == 1 ? "" : "s")" : ""))
+                         (summary.errorCount > 0 ? " - \(summary.errorCount) error\(summary.errorCount == 1 ? "" : "s")" : ""))
                         .font(.system(size: 12))
                         .foregroundStyle(.primary.opacity(0.65))
                 }

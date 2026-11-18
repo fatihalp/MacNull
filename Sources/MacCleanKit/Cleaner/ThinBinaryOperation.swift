@@ -75,7 +75,7 @@ public actor ThinBinaryOperation {
         let preLipoInode = (preLipoAttrs[.systemFileNumber] as? NSNumber)?.uint64Value ?? 0
         if preLipoInode != originalInode || preLipoSize != originalSize {
             throw OpError.raceDetected(
-                "inode \(originalInode)→\(preLipoInode) or size \(originalSize)→\(preLipoSize) changed between start and lipo step"
+                "inode \(originalInode)->\(preLipoInode) or size \(originalSize)->\(preLipoSize) changed between start and lipo step"
             )
         }
 
@@ -103,7 +103,7 @@ public actor ThinBinaryOperation {
 
         let thinnedAttrs = try fm.attributesOfItem(atPath: path)
         let thinnedSize = (thinnedAttrs[.size] as? NSNumber)?.uint64Value ?? 0
-        logger.info("Thinned \(path, privacy: .public): \(originalSize) → \(thinnedSize)")
+        logger.info("Thinned \(path, privacy: .public): \(originalSize) -> \(thinnedSize)")
         return Result(originalSize: originalSize, thinnedSize: thinnedSize)
     }
 

@@ -183,7 +183,7 @@ private struct DuplicateOriginalRow: View {
         .opacity(0.85)
         .contextMenu {
             Button("Reveal in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([item.url])
+                WorkspaceActions.revealInFinder(item.url)
             }
         }
     }
@@ -231,7 +231,7 @@ private struct DuplicateCopyRow: View {
         .onTapGesture { onToggle() }
         .contextMenu {
             Button("Reveal in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([item.url])
+                WorkspaceActions.revealInFinder(item.url)
             }
         }
     }

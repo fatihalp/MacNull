@@ -42,7 +42,7 @@ struct WiFiNetworksView: View {
                         ProgressView()
                             .controlSize(.large)
                             .tint(.primary)
-                        Text("Reading saved networks…")
+                        Text("Reading saved networks...")
                             .font(.system(size: 13))
                             .foregroundStyle(.primary.opacity(0.6))
                         Spacer()

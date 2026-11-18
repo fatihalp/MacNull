@@ -40,7 +40,7 @@ struct MacCleanApp: App {
         .defaultSize(width: 1000, height: 650)
         .commands {
             CommandGroup(replacing: .appSettings) {
-                Button("Settings…") {
+                Button("Settings...") {
                     appState.selectCategory(.settings)
                 }
                 .keyboardShortcut(",", modifiers: .command)

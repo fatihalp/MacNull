@@ -25,15 +25,15 @@ final class ProjectJunkController {
     private let scanner = ProjectJunkScanner()
 
     static var findingPhase: String {
-        "Finding projects…"
+        "Finding projects..."
     }
 
     static var measuringPhase: String {
-        "Measuring folders…"
+        "Measuring folders..."
     }
 
     static var checkingGitPhase: String {
-        "Checking Git status…"
+        "Checking Git status..."
     }
 
     var availableDefaultRoots: [URL] {

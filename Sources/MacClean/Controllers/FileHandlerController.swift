@@ -78,11 +78,11 @@ public final class FileHandlerController {
     }
 
     public func getAppInfo(for handler: HandlerEntry) -> (name: String, icon: NSImage)? {
-        if let bid = handler.appBundleIdentifier {
-            return service.getAppInfo(for: bid)
+        if let bundleID = handler.appBundleIdentifier, !bundleID.isEmpty {
+            return AppIconProvider.applicationNameAndIcon(forBundleID: bundleID)
         }
-        if handler.urlScheme != nil {
-            return service.getURLSchemeAppInfo(for: handler.urlScheme)
+        if let scheme = handler.urlScheme, !scheme.isEmpty {
+            return AppIconProvider.applicationNameAndIcon(forURLScheme: scheme)
         }
         return nil
     }

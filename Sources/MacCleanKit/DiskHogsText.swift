@@ -11,10 +11,10 @@ public enum DiskHogsText {
     public static var unavailableSimulator: String { "Unavailable simulator" }
     public static var olderRuntime: String { "Older runtime" }
     public static var pruneButton: String {
-        "Prune Selected Docker Items…"
+        "Prune Selected Docker Items..."
     }
     public static var deleteButton: String {
-        "Delete Selected Simulator Items…"
+        "Delete Selected Simulator Items..."
     }
     public static var dockerNotResponding: String {
         "Docker is installed but not responding. Start Docker Desktop, then click Refresh."

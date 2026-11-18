@@ -7,7 +7,7 @@ enum BrowserExtensionsStrings {
     }
 
     static var reading: String {
-        "Reading extensions…"
+        "Reading extensions..."
     }
 
     static var empty: String {

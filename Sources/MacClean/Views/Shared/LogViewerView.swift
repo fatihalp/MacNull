@@ -26,7 +26,7 @@ struct LogViewerView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Activity Log")
                     .font(.system(size: 18, weight: .semibold))
-                Text("~/Library/Logs/MacClean/operations.log — pruned after 30 days")
+                Text("~/Library/Logs/MacClean/operations.log - pruned after 30 days")
                     .font(.system(size: 11))
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
@@ -82,7 +82,7 @@ struct LogViewerView: View {
             }
             .buttonStyle(.bordered)
             .disabled(displayedText.isEmpty)
-            .help("Copy what you see to the clipboard — paste into a GitHub issue")
+            .help("Copy what you see to the clipboard - paste into a GitHub issue")
 
             Spacer()
 
@@ -105,15 +105,13 @@ struct LogViewerView: View {
     }
 
     private func copyAll() {
-        let pb = NSPasteboard.general
-        pb.clearContents()
-        pb.setString(displayedText, forType: .string)
+        WorkspaceActions.copyToClipboard(displayedText)
         copied = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copied = false }
     }
 
     private func revealInFinder() {
         let url = MCConstants.operationLogFile
-        NSWorkspace.shared.activateFileViewerSelecting([url])
+        WorkspaceActions.revealInFinder(url)
     }
 }

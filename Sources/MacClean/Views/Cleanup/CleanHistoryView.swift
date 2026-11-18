@@ -47,7 +47,7 @@ struct CleanHistoryView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(session.date.formatted(date: .abbreviated, time: .shortened))
                                     .font(.system(size: 13, weight: .medium))
-                                Text("\(Self.itemCount(session.items.count)) · \(FileSizeFormatter.format(session.totalBytes))")
+                                Text("\(Self.itemCount(session.items.count)) - \(FileSizeFormatter.format(session.totalBytes))")
                                     .font(.system(size: 11))
                                     .foregroundStyle(.secondary)
                                 if session.isPartial {

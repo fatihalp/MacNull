@@ -21,7 +21,7 @@ public actor ThinAppBundleOperation {
             case .noFatBinariesFound:
                 "no fat (universal) Mach-O binaries found in bundle"
             case .bundleInUse(let pids):
-                "bundle is in use by process(es) \(pids.joined(separator: ", ")) — quit the app and try again"
+                "bundle is in use by process(es) \(pids.joined(separator: ", ")) - quit the app and try again"
             case .bundleVerifyFailed(let s):
                 "thinning would have invalidated the app's code signature, so it was rolled back: \(s)"
             }

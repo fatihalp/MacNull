@@ -31,6 +31,20 @@ enum AppIconProvider {
         applicationPath(forBundleID: bundleID).map { FileManager.default.displayName(atPath: $0) }
     }
 
+    static func applicationNameAndIcon(forBundleID bundleID: String) -> (name: String, icon: NSImage)? {
+        applicationPath(forBundleID: bundleID).map(nameAndIcon(atPath:))
+    }
+
+    static func applicationNameAndIcon(forURLScheme scheme: String) -> (name: String, icon: NSImage)? {
+        guard let probeURL = URL(string: "\(scheme)://test"),
+              let appURL = NSWorkspace.shared.urlForApplication(toOpen: probeURL) else { return nil }
+        return nameAndIcon(atPath: appURL.path(percentEncoded: false))
+    }
+
+    private static func nameAndIcon(atPath path: String) -> (name: String, icon: NSImage) {
+        (FileManager.default.displayName(atPath: path), icon(forPath: path))
+    }
+
     private static func applicationPath(forBundleID bundleID: String) -> String? {
         NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)?.path(percentEncoded: false)
     }

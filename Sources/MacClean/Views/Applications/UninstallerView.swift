@@ -97,7 +97,7 @@ struct UninstallerView: View {
                     if !controller.checkedApps.isEmpty {
                         Divider()
                         HStack(spacing: 12) {
-                            Text("\(controller.checkedApps.count) app\(controller.checkedApps.count == 1 ? "" : "s") selected · \(FileSizeFormatter.format(controller.checkedTotalSize))")
+                            Text("\(controller.checkedApps.count) app\(controller.checkedApps.count == 1 ? "" : "s") selected - \(FileSizeFormatter.format(controller.checkedTotalSize))")
                                 .font(.system(size: 12.5, weight: .medium))
                                 .foregroundStyle(.primary)
                             Spacer()
@@ -285,13 +285,13 @@ struct UninstallerView: View {
                     ProgressView()
                         .controlSize(.small)
                     Text(controller.isResetting
-                         ? "Resetting…"
-                         : "Uninstalling…")
+                         ? "Resetting..."
+                         : "Uninstalling...")
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 } else {
                     if controller.safetyGuard.isProtectedApp(app.bundleIdentifier) {
-                        Text("Protected system app — can't be removed")
+                        Text("Protected system app - can't be removed")
                             .font(.system(size: 12))
                             .foregroundStyle(.secondary)
                     } else {

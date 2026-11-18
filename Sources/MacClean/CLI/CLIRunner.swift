@@ -271,11 +271,11 @@ public enum CLIRunner {
         for m in results {
             print("\u{001B}[1m\(padR(m.moduleName, 30))\u{001B}[0m | \u{001B}[1m\(padL("\(m.totalFileCount)", 10))\u{001B}[0m | \u{001B}[1;32m\(padL(m.formattedSize, 18))\u{001B}[0m")
             for cat in m.categories where cat.totalSize > 0 || config.isVerbose {
-                print("  ↳ \(padR(cat.category.displayName, 26)) | \(padL("\(cat.fileCount)", 10)) | \(padL(cat.formattedSize, 18))")
+                print("  - \(padR(cat.category.displayName, 26)) | \(padL("\(cat.fileCount)", 10)) | \(padL(cat.formattedSize, 18))")
                 if config.isVerbose {
                     let sortedItems = cat.items.sorted { $0.size > $1.size }.prefix(5)
                     for item in sortedItems {
-                        print("      • \(padR((item.url.path as NSString).lastPathComponent, 45)) \(padL(FileSizeFormatter.format(item.size), 12))")
+                        print("      - \(padR((item.url.path as NSString).lastPathComponent, 45)) \(padL(FileSizeFormatter.format(item.size), 12))")
                     }
                 }
             }
