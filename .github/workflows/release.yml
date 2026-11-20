@@ -33,8 +33,8 @@ jobs:
         run: |
           bash scripts/build-dmg.sh
           app=".build/dmg/MacNull.app"
-          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/MacClean"
-          lipo -verify_arch arm64 x86_64 "$app/Contents/Library/LoginItems/MacCleanMenu.app/Contents/MacOS/MacCleanMenu"
+          lipo "$app/Contents/MacOS/MacClean" -verify_arch arm64 x86_64
+          lipo "$app/Contents/Library/LoginItems/MacCleanMenu.app/Contents/MacOS/MacCleanMenu" -verify_arch arm64 x86_64
           codesign --verify --deep --strict "$app"
           hdiutil verify ".build/MacNull-${VERSION}.dmg"
           cd .build
