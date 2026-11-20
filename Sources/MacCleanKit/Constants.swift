@@ -378,9 +378,9 @@ public enum MCConstants {
 
     public static let repoURL = URL(string: "https://github.com/iliyami/MacSai")!
     public static let issuesURL = URL(string: "https://github.com/iliyami/MacSai/issues/new/choose")!
-    public static let releasesURL = URL(string: "https://github.com/iliyami/MacSai/releases")!
+    public static let releasesURL = URL(string: "https://github.com/fatihalp/MacNull/releases")!
 
     public static let supportURL = URL(string: "https://buymeacoffee.com/iliyami")!
 
-    public static let appVersion = "1.26.0"
+    public static let appVersion = "2.0.0"
 }

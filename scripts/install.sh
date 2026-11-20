@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-REPO="iliyami/MacSai"
-APP_NAME="Mac Sai.app"
+REPO="fatihalp/MacNull"
+APP_NAME="MacNull.app"
 INSTALL_DIR="${INSTALL_DIR:-/Applications}"
 
 cyan() { printf "\033[36m%s\033[0m\n" "$1"; }
@@ -12,7 +12,7 @@ red() { printf "\033[31m%s\033[0m\n" "$1"; }
 
 OS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
 if [ "$OS_VERSION" -lt 14 ]; then
-    red "Mac Sai requires macOS 14 (Sonoma) or later. You have $(sw_vers -productVersion)."
+    red "MacNull requires macOS 14 (Sonoma) or later. You have $(sw_vers -productVersion)."
     exit 1
 fi
 
@@ -26,7 +26,7 @@ if [ -z "$DMG_URL" ]; then
     exit 1
 fi
 
-cyan "Downloading Mac Sai $VERSION..."
+cyan "Downloading MacNull $VERSION..."
 TMP=$(mktemp -d)
 DMG_PATH="$TMP/macclean.dmg"
 MOUNT="$TMP/mount"
@@ -55,9 +55,9 @@ cleanup
 trap - EXIT
 
 green ""
-green "✓ Mac Sai $VERSION installed to $INSTALL_DIR/$APP_NAME"
+green "MacNull $VERSION installed to $INSTALL_DIR/$APP_NAME"
 green ""
 echo "Launch with: open \"$INSTALL_DIR/$APP_NAME\""
 echo ""
 echo "For Mail, Safari, and Privacy scans, grant Full Disk Access:"
-echo "  System Settings → Privacy & Security → Full Disk Access"
+echo "  System Settings > Privacy & Security > Full Disk Access"

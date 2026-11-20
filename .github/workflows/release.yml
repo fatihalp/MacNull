@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Verify release version
+        run: |
+          bash scripts/check-version-sync.sh
+          version=$(tr -d '[:space:]' < VERSION)
+          [[ "$GITHUB_REF_NAME" == "v$version" ]]
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build and smoke-test the CLI
+        run: |
+          swift build
+          swift run MacClean scan --module trash_bins
+
+      - name: Build and verify the universal DMG
+        run: |
+          bash scripts/build-dmg.sh
+          app=".build/dmg/MacNull.app"
+          lipo -verify_arch arm64 x86_64 "$app/Contents/MacOS/MacClean"
+          lipo -verify_arch arm64 x86_64 "$app/Contents/Library/LoginItems/MacCleanMenu.app/Contents/MacOS/MacCleanMenu"
+          codesign --verify --deep --strict "$app"
+          hdiutil verify ".build/MacNull-${VERSION}.dmg"
+          cd .build
+          shasum -a 256 "MacNull-${VERSION}.dmg" > "MacNull-${VERSION}.dmg.sha256"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "MacNull $VERSION" \
+            --notes "Universal macOS installer for Apple silicon and Intel Macs. Requires macOS 14 or later. The app is ad-hoc signed and has not been notarized by Apple." \
+            ".build/MacNull-${VERSION}.dmg" ".build/MacNull-${VERSION}.dmg.sha256"
