@@ -6,8 +6,6 @@ struct SmartScanView: View {
     private var controller: SmartScanController { appState.smartScanController }
     @Environment(AppState.self) private var appState
     @State private var showCleanConfirm: Bool = false
-    @AppStorage("hasWarnedAIConversationsCleanup") private var hasWarnedAIConversationsCleanup: Bool = false
-    @State private var showAIWarningAlert: Bool = false
 
     var body: some View {
         Group {
@@ -22,14 +20,14 @@ struct SmartScanView: View {
                 emptyView
             case .cleaning(let progress):
                 cleaningView(progress: progress)
-            case .done(let freedSize, let breakdown):
-                doneView(freedSize: freedSize, breakdown: breakdown)
+            case .done(let freedSize, let breakdown, let issueCount):
+                doneView(freedSize: freedSize, breakdown: breakdown, issueCount: issueCount)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .respondsToModuleShortcuts(
             onScan: { controller.startScan() },
-            onClean: { promptClean() },
+            onClean: { showCleanConfirm = true },
             canScan: {
                 switch controller.scanState {
                 case .idle, .empty, .done, .results: true
@@ -311,6 +309,7 @@ struct SmartScanView: View {
     @ViewBuilder
     private func resultsView(totalSize: UInt64) -> some View {
         let selectedCount = controller.review?.selectedCount ?? 0
+        let isDeepClean = controller.review?.scanMode == .deep
         Group {
             if controller.showingReview, let review = controller.review {
                 ReviewBrowserView(
@@ -319,30 +318,19 @@ struct SmartScanView: View {
                     initialSectionID: controller.reviewSectionID,
                     onDone: { controller.showingReview = false },
                     onReset: { controller.resetScan() },
-                    onClean: { promptClean() }
+                    onClean: { showCleanConfirm = true }
                 )
             } else {
                 resultsSummary(totalSize: totalSize)
             }
         }
-        .alert("Clean \(selectedCount) item\(selectedCount == 1 ? "" : "s")?", isPresented: $showCleanConfirm) {
+        .alert(isDeepClean ? "Continue with Deep Clean?" : "Clean \(selectedCount) item\(selectedCount == 1 ? "" : "s")?", isPresented: $showCleanConfirm) {
             Button("Cancel", role: .cancel) { }
-            Button("Clean", role: .destructive) {
-                controller.showingReview = false
-                controller.runCleanup()
+            Button(isDeepClean ? "Deep Clean" : "Clean", role: .destructive) {
+                controller.runCleanup(deepCleanConfirmed: isDeepClean)
             }
         } message: {
-            Text("Selected items move to the Trash. Items already in the Trash are deleted for good.")
-        }
-        .alert("Delete AI Conversations?", isPresented: $showAIWarningAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Delete Conversations", role: .destructive) {
-                hasWarnedAIConversationsCleanup = true
-                controller.showingReview = false
-                controller.runCleanup()
-            }
-        } message: {
-            Text("Deep Clean includes conversation histories, sessions, and project data from Gemini, Codex, and Claude. This data cannot be recovered once deleted.")
+            Text(controller.cleanupWarning)
         }
     }
 
@@ -499,7 +487,7 @@ struct SmartScanView: View {
                 .controlSize(.large)
                 .disabled(controller.review == nil)
 
-                Button { promptClean() } label: {
+                Button { showCleanConfirm = true } label: {
                     Text("Clean - \(FileSizeFormatter.format(selectedSize))")
                 }
                 .buttonStyle(.borderedProminent)
@@ -511,19 +499,6 @@ struct SmartScanView: View {
             .padding(.bottom, 24)
         }
         .padding(.horizontal, 20)
-    }
-
-    private func promptClean() {
-        if let review: ReviewSelection = controller.review,
-           review.hasSelectedAIConversations(),
-           !hasWarnedAIConversationsCleanup {
-            showAIWarningAlert = true
-        } else if controller.scanMode == .deep && hasWarnedAIConversationsCleanup {
-            controller.showingReview = false
-            controller.runCleanup()
-        } else {
-            showCleanConfirm = true
-        }
     }
 
     private func sectionCard(_ section: ReviewSection, selection: ReviewSelection) -> some View {
@@ -611,11 +586,11 @@ struct SmartScanView: View {
         }
     }
 
-    private func doneView(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow]) -> some View {
-        FitOrScroll { doneContent(freedSize: freedSize, breakdown: breakdown) }
+    private func doneView(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow], issueCount: Int) -> some View {
+        FitOrScroll { doneContent(freedSize: freedSize, breakdown: breakdown, issueCount: issueCount) }
     }
 
-    private func doneContent(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow]) -> some View {
+    private func doneContent(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow], issueCount: Int) -> some View {
         VStack(spacing: 20) {
             Spacer()
             Image(systemName: "checkmark.circle.fill")
@@ -624,7 +599,7 @@ struct SmartScanView: View {
             Text("Cleanup Complete")
                 .font(.system(size: 22, weight: .bold))
                 .foregroundStyle(.primary)
-            SizeDisplay(size: freedSize, label: "moved to Trash")
+            SizeDisplay(size: freedSize, label: "cleaned")
                 .foregroundStyle(.primary)
 
             if !breakdown.isEmpty {
@@ -656,11 +631,12 @@ struct SmartScanView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
 
-            Text("Your selected items are in the Trash. Empty it to free the space.")
-                .font(.system(size: 13))
-                .foregroundStyle(.primary.opacity(0.65))
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 420)
+            if issueCount > 0 {
+                Label("Cleanup reported \(issueCount) issue(s). Protected and unavailable files may have been skipped.", systemImage: "exclamationmark.triangle")
+                    .font(.system(size: 13))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 420)
+            }
             if controller.askForSupport { SupportCard() }
             Button("Done") { controller.resetScan() }
                 .buttonStyle(.bordered)

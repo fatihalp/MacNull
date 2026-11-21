@@ -29,8 +29,8 @@ final class SmartScanController {
     }
 
     func startScan(mode: SmartScanMode) {
-        self.scanMode = mode
         if case .cleaning = scanState { return }
+        self.scanMode = mode
         resetScan()
         let initialModuleName = "System Junk"
         currentModuleName = initialModuleName
@@ -90,13 +90,32 @@ final class SmartScanController {
         }
     }
 
-    func runCleanup() {
-        guard case .results = scanState, let review, review.selectedCount > 0 else { return }
+    var cleanupWarning: String {
+        var warnings: [String] = []
+        if review?.scanMode == .deep {
+            warnings.append(SmartScanMode.deepCleanupWarning)
+        }
+        if review?.hasSelectedAIConversations() == true {
+            warnings.append("The selection includes AI conversation history or session data.")
+        }
+        if let review, review.data.categories.contains(where: {
+            $0.category == .universalBinaries && review.selectedSize(ofCategory: $0.id) > 0
+        }) {
+            warnings.append("Selected universal binaries are modified in place.")
+        }
+        warnings.append("Files selected for removal move to the Trash. Files already in the Trash are permanently deleted.")
+        return warnings.joined(separator: "\n\n")
+    }
+
+    func runCleanup(deepCleanConfirmed: Bool = false) {
+        guard case .results = scanState, let review, review.selectedCount > 0,
+              review.scanMode != .deep || deepCleanConfirmed else { return }
         let modules = moduleResults
         let results = SmartScanCleanup.allResults(from: modules)
         let data = review.data
         let flags = review.snapshot()
         let generation = generation
+        showingReview = false
         scanState = .cleaning(progress: 0)
         cleanTask = Task {
             let selection = await Task.detached(priority: .userInitiated) {
@@ -119,7 +138,7 @@ final class SmartScanController {
                 from: modules, selectedItems: result.removedURLs
             )
             askForSupport = SupportAskLedger.shared.shouldAsk(for: result.summary(selectedCount: selection.count))
-            scanState = .done(freedSize: result.freedBytes, breakdown: breakdown)
+            scanState = .done(freedSize: result.freedBytes, breakdown: breakdown, issueCount: result.errors.count)
             cleanTask = nil
         }
     }

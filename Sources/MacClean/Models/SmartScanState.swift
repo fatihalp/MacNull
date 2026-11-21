@@ -47,7 +47,7 @@ enum SmartScanState {
     case results(cleanup: UInt64, protection: Int, performance: Int, totalSize: UInt64, moduleResults: [ModuleScanResult])
     case empty
     case cleaning(progress: Double)
-    case done(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow])
+    case done(freedSize: UInt64, breakdown: [SmartScanCleanup.RecentlyCleanedRow], issueCount: Int)
 }
 
 extension SmartScanState {

@@ -300,12 +300,13 @@ public enum CLIRunner {
 
     private static func runClean(config: CLIConfig) async {
         let scanResults = await runScan(config: config)
-        var allItems: [FileItem] = []
-        for m in scanResults {
-            for c in m.categories {
-                allItems.append(contentsOf: c.items)
-            }
+        let categories = scanResults.flatMap(\.categories)
+        if categories.contains(where: { $0.category == .universalBinaries && !$0.items.isEmpty }) {
+            print("\nUniversal binary findings are excluded from file cleanup.")
         }
+        let allItems = categories
+            .filter { $0.category != .universalBinaries }
+            .flatMap(\.items)
 
         guard !allItems.isEmpty else {
             print("\nNo cleanable items found.")
@@ -317,8 +318,26 @@ public enum CLIRunner {
 
         if config.isDryRun {
             print("\n\u{001B}[1;33m[DRY RUN] Simulation complete. No files were removed.\u{001B}[0m")
-            print("Would have cleaned \(allItems.count) files freeing up \(totalFormatted).")
+            let guardPolicy = SafetyGuard()
+            let excludedFolders = FolderExclusionPreferences.paths
+            let eligible = allItems.filter {
+                (try? guardPolicy.validatePath($0.url, excludedFolders: excludedFolders)) != nil
+            }
+            let eligibleBytes = eligible.reduce(UInt64(0)) { $0 + $1.size }
+            print("Would have cleaned \(eligible.count) items totaling \(FileSizeFormatter.format(eligibleBytes)).")
+            if eligible.count < allItems.count {
+                print("Items blocked by safety checks: \(allItems.count - eligible.count)")
+            }
             return
+        }
+
+        if config.mode == .deep {
+            print("\nWarning: \(SmartScanMode.deepCleanupWarning)")
+        }
+        if config.isPermanent {
+            print("Selected files will be permanently deleted.")
+        } else if config.mode == .deep {
+            print("Files already in the Trash will be permanently deleted.")
         }
 
         if !config.autoConfirm {
@@ -341,7 +360,7 @@ public enum CLIRunner {
         }
 
         print("\u{001B}[2K", terminator: "\r")
-        print("\n\u{001B}[1;32m=== Cleanup Completed Successfully ===\u{001B}[0m")
+        print("\n\u{001B}[1;32m=== Cleanup Complete ===\u{001B}[0m")
         print("Items Removed: \(result.removedCount)")
         print("Space Freed:   \(FileSizeFormatter.format(result.freedBytes))")
         if result.skippedCount > 0 {

@@ -4,6 +4,8 @@ public enum SmartScanMode: String, CaseIterable, Identifiable, Sendable {
     case safe = "safe"
     case deep = "deep"
 
+    public static let deepCleanupWarning = "Deep Clean can remove project build files and app data. Apps may need to rebuild files or download data again. Review your selection before continuing."
+
     public var id: String { rawValue }
 
     public var title: String {
