@@ -103,3 +103,12 @@ When making changes:
    ```bash
    LC_ALL=C grep -rn '[^ -~	]' Sources/
    ```
+
+## Apple Silicon Builds and Releases
+
+- Build and distribute MacNull only for Apple silicon (`arm64`) on macOS 14 or later. This applies to both `MacClean` and the bundled `MacCleanMenu` helper. Use `scripts/build-dmg.sh` for packaging. It passes `--arch arm64` to SwiftPM.
+- For a release, update `VERSION` and `MCConstants.appVersion` in `Sources/MacCleanKit/Constants.swift` together. Run `bash scripts/check-version-sync.sh` before pushing the matching `vX.Y.Z` tag.
+- The tag triggers `.github/workflows/release.yml` on a GitHub-hosted macOS runner. It builds the project, smoke-tests the CLI, and checks that `lipo -archs` returns exactly `arm64` for both packaged executables. It verifies the app signature and disk image before publishing the DMG and its SHA-256 checksum.
+- For Visiosoft-signed releases, use the team `TJUL8932F9` Developer ID Application identity and a validated `NOTARY_PROFILE`. Run `bash scripts/build-dmg.sh --notarize` with `APPLE_DEVELOPER_ID` set, then stage the notarized assets in a GitHub draft release before pushing the tag. The tag workflow skips tags with an existing release draft or published release. Match the release notes to the actual signing status.
+- Confirm the successful Actions run, the published release, and the downloaded DMG's checksum. Use a new version for changes to a published package so existing downloads retain their published checksum.
+- Direct users to the [latest release](https://github.com/fatihalp/MacNull/releases/latest) and the DMG under **Assets**. Keep the README instructions suitable for installation through Finder.

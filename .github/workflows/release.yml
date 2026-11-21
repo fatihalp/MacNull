@@ -24,12 +24,24 @@ jobs:
           [[ "$GITHUB_REF_NAME" == "v$version" ]]
           echo "VERSION=$version" >> "$GITHUB_ENV"
 
+      - name: Check for a staged release
+        id: staged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" --jq '.[].tag_name')
+          if grep -Fxq -- "$GITHUB_REF_NAME" <<< "$existing"; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build and smoke-test the CLI
+        if: steps.staged.outputs.exists != 'true'
         run: |
           swift build
           swift run MacClean scan --module trash_bins
 
       - name: Build and verify the Apple silicon DMG
+        if: steps.staged.outputs.exists != 'true'
         run: |
           bash scripts/build-dmg.sh
           app=".build/dmg/MacNull.app"
@@ -46,6 +58,7 @@ jobs:
           shasum -a 256 "MacNull-${VERSION}.dmg" > "MacNull-${VERSION}.dmg.sha256"
 
       - name: Publish GitHub release
+        if: steps.staged.outputs.exists != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
