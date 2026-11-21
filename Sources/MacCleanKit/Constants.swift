@@ -21,8 +21,20 @@ public enum MCConstants {
         "/usr",
         "/bin",
         "/sbin",
+        "/etc",
+        "/dev",
+        "/cores",
+        "/var/db",
+        "/var/root",
+        "/var/folders/zz",
+        "/var/vm",
+        "/var/run",
+        "/var/audit",
         "/Library/Apple",
-        "/private/var/db",
+        "/Applications/Safari.app",
+        "/.DocumentRevisions-V100",
+        "/.Spotlight-V100",
+        "/.fseventsd",
     ]
 
     public static let protectedApps: Set<String> = [

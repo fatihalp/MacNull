@@ -55,7 +55,7 @@ public struct TrashBinsModule: ScanModule {
             options: [.skipHiddenVolumes]
         ) {
             for volume in volumes {
-                let trashURL = volume.appending(path: ".Trashes")
+                let trashURL = SafetyGuard.volumeTrash(on: volume)
                 if FileManager.default.fileExists(atPath: trashURL.path(percentEncoded: false)) {
                     targets.append(ScanTarget(path: trashURL, recursive: true))
                 }

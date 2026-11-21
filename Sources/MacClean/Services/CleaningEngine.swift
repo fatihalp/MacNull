@@ -145,23 +145,6 @@ public actor CleaningEngine {
         skippedCount: inout Int,
         trashedItems: inout [TrashedItem]
     ) {
-        let urls = chunk.map(\.url)
-        do {
-            try safetyGuard.validateDeletion(paths: urls)
-        } catch SafetyGuard.SafetyError.tooManyFiles {
-
-            logger.error("Chunk exceeds the \(MCConstants.maxFilesPerOperation)-file safety cap")
-            errors.append(CleanError(
-                path: "validation",
-                error: SafetyGuard.SafetyError.tooManyFiles(chunk.count).localizedDescription
-            ))
-            skippedCount += chunk.count
-            return
-        } catch {
-
-            logger.notice("Chunk has an unsafe path; validating per-item instead of skipping all")
-        }
-
         for item in chunk {
             if Task.isCancelled { break }
 
@@ -187,7 +170,7 @@ public actor CleaningEngine {
                 removedURLs.insert(item.url)
                 logOperation(path: item.url, size: realSize, dryRun: true)
 
-            case .trash where Self.isInsideTrash(item.url):
+            case .trash where SafetyGuard.isInTrash(item.url):
                 do {
                     try FileManager.default.removeItem(at: item.url)
                     removedCount += 1
@@ -271,11 +254,6 @@ public actor CleaningEngine {
             }
         }
         return total
-    }
-
-    private static func isInsideTrash(_ url: URL) -> Bool {
-        let path = url.path(percentEncoded: false)
-        return path.contains("/.Trash/") || path.contains("/.Trashes/")
     }
 
     private static func isBenignMissingFile(_ error: NSError) -> Bool {

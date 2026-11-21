@@ -34,6 +34,7 @@ public actor ThinAppBundleOperation {
     public init() {}
 
     public func thin(bundle: URL, to targetArch: BinaryArch) async throws -> Result {
+        try SafetyGuard().validatePath(bundle)
 
         let busyPIDs = try Self.pidsHoldingFilesIn(bundle: bundle)
         if !busyPIDs.isEmpty {
