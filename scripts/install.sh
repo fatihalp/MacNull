@@ -10,6 +10,11 @@ cyan() { printf "\033[36m%s\033[0m\n" "$1"; }
 green() { printf "\033[32m%s\033[0m\n" "$1"; }
 red() { printf "\033[31m%s\033[0m\n" "$1"; }
 
+if [[ "$(sysctl -n hw.optional.arm64 2>/dev/null)" != "1" ]]; then
+    red "MacNull requires a Mac with Apple silicon."
+    exit 1
+fi
+
 OS_VERSION=$(sw_vers -productVersion | cut -d. -f1)
 if [ "$OS_VERSION" -lt 14 ]; then
     red "MacNull requires macOS 14 (Sonoma) or later. You have $(sw_vers -productVersion)."

@@ -34,11 +34,10 @@ echo "Signing identity: $SIGNING_IDENTITY"
 echo "Notarize: $NOTARIZE"
 echo ""
 
-BUILD_ARCHS="${BUILD_ARCHS:---arch arm64 --arch x86_64}"
-echo "[1/7] Building release binaries (${BUILD_ARCHS})..."
-swift build -c release ${BUILD_ARCHS} --product MacClean
-swift build -c release ${BUILD_ARCHS} --product MacCleanMenu
-BUILD_DIR=$(swift build -c release ${BUILD_ARCHS} --product MacClean --show-bin-path)
+echo "[1/7] Building Apple silicon release binaries (arm64)..."
+swift build -c release --arch arm64 --product MacClean
+swift build -c release --arch arm64 --product MacCleanMenu
+BUILD_DIR=$(swift build -c release --arch arm64 --product MacClean --show-bin-path)
 echo "  → Binaries: ${BUILD_DIR}"
 
 echo "[2/7] Creating app bundle..."

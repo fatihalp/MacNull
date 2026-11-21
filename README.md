@@ -72,7 +72,7 @@ swift run MacClean clean --mode safe --dry-run
 
 ## Build from source
 
-Requires macOS 14 or later and Swift 6.
+Requires a Mac with Apple silicon, macOS 14 or later, and Swift 6 to build from source.
 
 ```bash
 swift build

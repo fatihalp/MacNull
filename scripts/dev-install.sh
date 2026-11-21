@@ -9,8 +9,8 @@ DEST="/Applications/${APP_NAME}.app"
 
 BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
 DIRTY=$(git status --porcelain 2>/dev/null | head -1 | grep -q . && echo " + uncommitted changes" || true)
-echo "=== Dev install: building current checkout [${BRANCH}${DIRTY}] v$(tr -d '[:space:]' < VERSION) ($(uname -m), ad-hoc signed) ==="
-BUILD_ARCHS="--arch $(uname -m)" ./scripts/build-dmg.sh --app-only
+echo "=== Dev install: building current checkout [${BRANCH}${DIRTY}] v$(tr -d '[:space:]' < VERSION) (arm64, ad-hoc signed) ==="
+./scripts/build-dmg.sh --app-only
 
 DEVID=$(security find-identity -v -p codesigning | awk -F'"' '/Developer ID Application/{print $2; exit}')
 if [ -n "${DEVID}" ]; then

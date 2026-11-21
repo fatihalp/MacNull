@@ -29,13 +29,16 @@ jobs:
           swift build
           swift run MacClean scan --module trash_bins
 
-      - name: Build and verify the universal DMG
+      - name: Build and verify the Apple silicon DMG
         run: |
           bash scripts/build-dmg.sh
           app=".build/dmg/MacNull.app"
           for binary in "$app/Contents/MacOS/MacClean" "$app/Contents/Library/LoginItems/MacCleanMenu.app/Contents/MacOS/MacCleanMenu"; do
             archs=$(lipo -archs "$binary")
-            [[ "$archs" == "arm64 x86_64" || "$archs" == "x86_64 arm64" ]]
+            if [[ "$archs" != "arm64" ]]; then
+              echo "::error::Expected arm64 only for $binary; found $archs"
+              exit 1
+            fi
           done
           codesign --verify --deep --strict "$app"
           hdiutil verify ".build/MacNull-${VERSION}.dmg"
@@ -47,5 +50,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" --verify-tag --title "MacNull $VERSION" \
-            --notes "Universal macOS installer for Apple silicon and Intel Macs. Requires macOS 14 or later. The app is ad-hoc signed and has not been notarized by Apple." \
+            --notes "Requires a Mac with Apple silicon (arm64) and macOS 14 or later. The app is ad-hoc signed and has not been notarized by Apple." \
             ".build/MacNull-${VERSION}.dmg" ".build/MacNull-${VERSION}.dmg.sha256"
